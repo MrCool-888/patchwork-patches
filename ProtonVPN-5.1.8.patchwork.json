@@ -6,6 +6,8 @@
   "appVersion": "5.1.8",
   "author": "Patchwork",
   "source": "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications",
+  "packVersion": "1.1.0",
+  "minimumPatcherVersion": "0.4.0",
   "versionFile": "ProtonVPN.Client.exe",
   "versionSha256": "4fc9d4cd64e8ac74ad5a5f9666419f08f561d770d9f210f1aee16bb8af8bb52c",
   "patches": [
@@ -48,7 +50,8 @@
           "returnType": "boolean",
           "value": false
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "hide-promotions",
@@ -97,7 +100,8 @@
           "returnType": "boolean",
           "value": false
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "server-delay",
@@ -121,7 +125,8 @@
           "method": "System.TimeSpan ProtonVPN.Client.Logic.Connection.ChangeServerModerator::GetRemainingDelayUntilNextAttempt()",
           "returnType": "timeSpanZero"
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "lan-connections",
@@ -155,7 +160,8 @@
           "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsLocalAreaNetworkAccessEnabled(System.Boolean)",
           "count": 1
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "custom-dns",
@@ -181,7 +187,8 @@
           "count": 1,
           "value": true
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "netshield",
@@ -224,7 +231,8 @@
           "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsNetShieldEnabled(System.Boolean)",
           "count": 1
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "split-tunneling",
@@ -259,7 +267,8 @@
           "count": 1,
           "value": true
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "connection-preferences",
@@ -285,7 +294,8 @@
           "count": 1,
           "value": true
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "profiles",
@@ -310,15 +320,85 @@
           "type": "ProtonVPN.Client.Models.Connections.Profiles.ProfileConnectionItem",
           "value": true
         }
-      ]
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "free-locations",
-      "name": "Free server location selection",
-      "description": "Not implemented: Windows needs a server-aware selector for eligible free locations. This pack does not unlock paid servers.",
+      "name": "Free server country selection",
+      "description": "Lists eligible free countries for free accounts, enables their country Connect button, and preserves the selected country while filtering connection candidates to free non-business servers. Free accounts use strict selection without falling back to another country. Individual city/server rows stay restricted. Paid-account country and server lists keep their original behavior. Requires sign-in; live VPN connectivity is not yet verified.",
       "category": "Connections",
-      "status": "planned",
-      "operations": []
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedConditionalProjection",
+          "file": "ProtonVPN.Client.Logic.Servers.dll",
+          "sha256": "e133e5654ace39139d15c04c0f7bed6acbffd2afd4852ba3c13960ea9e7d147a",
+          "method": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Country\u003e ProtonVPN.Client.Logic.Servers.Cache.ServersCache::get_Countries()",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Servers.Cache.ServersCache::_settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "sourceMethod": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry\u003e ProtonVPN.Client.Logic.Servers.Cache.ServersCache::get_FreeCountries()",
+          "mappings": [
+            {
+              "getter": "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry::get_Code()",
+              "setter": "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.Country::set_Code(System.String)"
+            },
+            {
+              "getter": "System.Boolean ProtonVPN.Client.Logic.Servers.Contracts.Models.StandardLocationBase::get_IsLocationUnderMaintenance()",
+              "setter": "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.FeatureLocationBase::set_IsStandardUnderMaintenance(System.Boolean)"
+            }
+          ]
+        },
+        {
+          "kind": "managedConditionalCall",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "d3bd9d21a04c2c16c24430ee1c3fa1a8a351e122a9981a188dea447350ec76bc",
+          "method": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Connection.ServerListGenerators.ServerListGeneratorBase::GetAvailableServers(ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent,System.Boolean)",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Connection.ServerListGenerators.ServerListGeneratorBase::Settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "calledMethod": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetServers()",
+          "replacementMethod": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()",
+          "count": 1
+        },
+        {
+          "kind": "managedOverrideBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.Logic.Connection.Contracts.dll",
+          "sha256": "05c6253a7555518be1eb87bc628398330af3bd0d998ca52348150ed62ee43058",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.CountryLocationIntentBase::get_IsForPaidUsersOnly()",
+          "type": "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.SingleCountryLocationIntent",
+          "value": false
+        },
+        {
+          "kind": "managedConditionalBooleanCall",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "d3bd9d21a04c2c16c24430ee1c3fa1a8a351e122a9981a188dea447350ec76bc",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.RequestCreators.ConnectionRequestCreatorBase::IsToBypassSmartServerListGenerator(ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent)",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Connection.RequestCreators.RequestCreatorBase::Settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "calledMethod": "System.Boolean ProtonVPN.Client.Settings.Contracts.IUserSettings::get_IsSmartReconnectEnabled()",
+          "value": false,
+          "count": 1
+        }
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "amoled-theme",
