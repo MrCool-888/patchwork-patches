@@ -41,7 +41,9 @@ class BuildProtonPack
     }
     static void Add(string id, string name, string description, string category, params object[] operations)
     {
-        patches.Add(new Dictionary<string, object> { { "id", id }, { "name", name }, { "description", description }, { "category", category }, { "status", operations.Length == 0 ? "planned" : "ready" }, { "operations", operations } });
+        var patch = new Dictionary<string, object> { { "id", id }, { "name", name }, { "description", description }, { "category", category }, { "status", operations.Length == 0 ? "planned" : "ready" }, { "operations", operations } };
+        if (operations.Length != 0) patch["version"] = "1.0.0";
+        patches.Add(patch);
     }
     static int Main(string[] args)
     {
@@ -89,18 +91,44 @@ class BuildProtonPack
         Add("profiles", "Connection profile controls", "Shows profile creation/editing and clears the profile row's local restriction. Connections still pass through Proton's account and location validation.", "Connections",
             Return(client, "ProtonVPN.Client.UI.Main.Sidebar.Connections.Profiles.ProfilesPageViewModel", "get_IsUpsellBannerVisible", "boolean", false),
             Override("ProtonVPN.Client.Models.Connections.Profiles.ProfileConnectionItem", true));
-        Add("free-locations", "Free server location selection", "Not implemented: Windows needs a server-aware selector for eligible free locations. This pack does not unlock paid servers.", "Connections");
+        const string cache = "ProtonVPN.Client.Logic.Servers.Cache.ServersCache";
+        const string generator = "ProtonVPN.Client.Logic.Connection.ServerListGenerators.ServerListGeneratorBase";
+        const string planGetter = "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()";
+        const string paidGetter = "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()";
+        var freeCountries = Op("ProtonVPN.Client.Logic.Servers.dll", cache, "get_Countries", "managedConditionalProjection");
+        freeCountries["condition"] = new[] { "ProtonVPN.Client.Settings.Contracts.ISettings " + cache + "::_settings", planGetter, paidGetter };
+        freeCountries["sourceMethod"] = "System.Collections.Generic.IReadOnlyList`1<ProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry> " + cache + "::get_FreeCountries()";
+        freeCountries["mappings"] = new object[] {
+            new Dictionary<string, object> { { "getter", "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry::get_Code()" }, { "setter", "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.Country::set_Code(System.String)" } },
+            new Dictionary<string, object> { { "getter", "System.Boolean ProtonVPN.Client.Logic.Servers.Contracts.Models.StandardLocationBase::get_IsLocationUnderMaintenance()" }, { "setter", "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.FeatureLocationBase::set_IsStandardUnderMaintenance(System.Boolean)" } }
+        };
+        var freeServers = Op(logic, generator, "GetAvailableServers", "managedConditionalCall");
+        freeServers["condition"] = new[] { "ProtonVPN.Client.Settings.Contracts.ISettings " + generator + "::Settings", planGetter, paidGetter };
+        freeServers["calledMethod"] = "System.Collections.Generic.IEnumerable`1<ProtonVPN.Client.Logic.Servers.Contracts.Models.Server> ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetServers()";
+        freeServers["replacementMethod"] = "System.Collections.Generic.IEnumerable`1<ProtonVPN.Client.Logic.Servers.Contracts.Models.Server> ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()";
+        freeServers["count"] = 1;
+        var countryRow = Op(client, "ProtonVPN.Client.Models.Connections.ConnectionItemBase", "InvalidateIsRestricted", "managedOverrideBooleanSetter");
+        countryRow["type"] = "ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem";
+        countryRow["setterMethod"] = "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)"; countryRow["value"] = false;
+        var countryIntent = Op("ProtonVPN.Client.Logic.Connection.Contracts.dll", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.CountryLocationIntentBase", "get_IsForPaidUsersOnly", "managedOverrideBoolean");
+        countryIntent["type"] = "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.SingleCountryLocationIntent"; countryIntent["value"] = false;
+        const string requestBase = "ProtonVPN.Client.Logic.Connection.RequestCreators.ConnectionRequestCreatorBase";
+        var strictCountry = Op(logic, requestBase, "IsToBypassSmartServerListGenerator", "managedConditionalBooleanCall");
+        strictCountry["condition"] = new[] { "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Connection.RequestCreators.RequestCreatorBase::Settings", planGetter, paidGetter };
+        strictCountry["calledMethod"] = "System.Boolean ProtonVPN.Client.Settings.Contracts.IUserSettings::get_IsSmartReconnectEnabled()"; strictCountry["value"] = false; strictCountry["count"] = 1;
+        Add("free-locations", "Free server country selection", "Lists eligible free countries for free accounts, enables their country Connect button, and preserves the selected country while filtering connection candidates to free non-business servers. Free accounts use strict selection without falling back to another country. Individual city/server rows stay restricted. Paid-account country and server lists keep their original behavior. Requires sign-in; live VPN connectivity is not yet verified.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry);
         Add("amoled-theme", "AMOLED dark theme", "Not implemented: the Windows client uses compiled WinUI resources rather than Android theme resources.", "Appearance");
         Add("accent-color", "Custom accent color", "Not implemented for Windows compiled WinUI resources.", "Appearance");
         Add("switch-style", "Styled switches", "Not implemented for native Windows WinUI switches.", "Appearance");
         var pack = new Dictionary<string, object> {
             { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
             { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
+            { "packVersion", "1.1.0" }, { "minimumPatcherVersion", "0.4.0" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built standalone pack: 9 available, 4 planned."); return 0;
+        Console.WriteLine("Built standalone pack v1.1.0: 10 available, 3 planned."); return 0;
     }
 }
