@@ -1,0 +1,8 @@
+build/
+work/
+*.exe
+*.dll
+*.pdb
+.env*
+settings.json
+backups/

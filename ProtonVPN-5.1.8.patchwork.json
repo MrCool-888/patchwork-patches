@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "id": "proton-vpn-win-5-1-8-r1",
+  "appId": "proton-vpn",
+  "appName": "Proton VPN",
+  "appVersion": "5.1.8",
+  "author": "Patchwork",
+  "source": "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications",
+  "versionFile": "ProtonVPN.Client.exe",
+  "versionSha256": "4fc9d4cd64e8ac74ad5a5f9666419f08f561d770d9f210f1aee16bb8af8bb52c",
+  "patches": [
+    {
+      "id": "disable-telemetry",
+      "name": "Disable usage telemetry",
+      "description": "Stops both authenticated and pre-login statistical event senders. Diagnostic reports submitted by the user are separate.",
+      "category": "Privacy",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "55b53b4a1cc777cecfd17f5fb1012df1e292e0f3d5aff0ebe94da63cc2e17644",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.AuthenticatedStatisticalEventSender::get_CanSendTelemetryEvents()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "55b53b4a1cc777cecfd17f5fb1012df1e292e0f3d5aff0ebe94da63cc2e17644",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.AuthenticatedStatisticalEventSender::get_IsShareStatisticsEnabled()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "55b53b4a1cc777cecfd17f5fb1012df1e292e0f3d5aff0ebe94da63cc2e17644",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.UnauthenticatedStatisticalEventSender::get_CanSendTelemetryEvents()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "55b53b4a1cc777cecfd17f5fb1012df1e292e0f3d5aff0ebe94da63cc2e17644",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.UnauthenticatedStatisticalEventSender::get_IsShareStatisticsEnabled()",
+          "returnType": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "hide-promotions",
+      "name": "Hide upgrade promotions",
+      "description": "Hides the connection-card, sidebar, profile-page and tray upsell banners. Service and information notices remain available.",
+      "category": "Interface",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Components.Banners.BannerComponent::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.ViewModels.CountriesComponentViewModelBase::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Profiles.ProfilesPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Dialogs.Tray.Pages.TrayMainPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Home.Upsell.ConnectionCardUpsellBannerViewModel::get_IsBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "server-delay",
+      "name": "Remove local server change delay",
+      "description": "Makes the desktop cooldown check accept a server change and report zero remaining time. Server limits can still apply.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "d3bd9d21a04c2c16c24430ee1c3fa1a8a351e122a9981a188dea447350ec76bc",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.ChangeServerModerator::CanChangeServer()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "d3bd9d21a04c2c16c24430ee1c3fa1a8a351e122a9981a188dea447350ec76bc",
+          "method": "System.TimeSpan ProtonVPN.Client.Logic.Connection.ChangeServerModerator::GetRemainingDelayUntilNextAttempt()",
+          "returnType": "timeSpanZero"
+        }
+      ]
+    },
+    {
+      "id": "lan-connections",
+      "name": "LAN connections controls",
+      "description": "Exposes the shared advanced-settings screen and uses the saved LAN access toggle. The same screen also displays custom DNS and NAT controls; their effective settings have separate checks.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsLocalAreaNetworkAccessEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedSuppressCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Void ProtonVPN.Client.Settings.SettingsCorrector::Correct()",
+          "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsLocalAreaNetworkAccessEnabled(System.Boolean)",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "custom-dns",
+      "name": "Custom DNS controls",
+      "description": "Exposes the shared advanced-settings screen and uses the saved custom DNS toggle and resolver list. Test DNS behavior on your network before relying on it.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsCustomDnsServersEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "netshield",
+      "name": "NetShield client controls",
+      "description": "Opens the NetShield widget and settings and uses the saved toggle. This changes client checks; Proton\u0027s servers still decide whether DNS filtering is available for the account.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Features.Bases.FeatureWidgetViewModelBase::get_IsRestricted()",
+          "type": "ProtonVPN.Client.UI.Main.Features.NetShield.NetShieldWidgetViewModel",
+          "value": false
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToNetShieldPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsNetShieldEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedSuppressCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Void ProtonVPN.Client.Settings.SettingsCorrector::Correct()",
+          "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsNetShieldEnabled(System.Boolean)",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "split-tunneling",
+      "name": "Split tunneling client controls",
+      "description": "Opens the split-tunneling widget and settings and uses the saved routing toggle. VPN routing and kill-switch interaction still need a live network test.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Features.Bases.FeatureWidgetViewModelBase::get_IsRestricted()",
+          "type": "ProtonVPN.Client.UI.Main.Features.SplitTunneling.SplitTunnelingWidgetViewModel",
+          "value": false
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToSplitTunnelingPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsSplitTunnelingEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "connection-preferences",
+      "name": "Connection preference controls",
+      "description": "Shows the default-connection and excluded-location controls and reads the saved default connection. Account-eligible servers and normal connection validation still apply.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "ProtonVPN.Client.Settings.Contracts.Models.DefaultConnection ProtonVPN.Client.Settings.UserSettings::get_DefaultConnection()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "profiles",
+      "name": "Connection profile controls",
+      "description": "Shows profile creation/editing and clears the profile row\u0027s local restriction. Connections still pass through Proton\u0027s account and location validation.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Profiles.ProfilesPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBooleanArgument",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Profiles.ProfileConnectionItem",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "free-locations",
+      "name": "Free server location selection",
+      "description": "Not implemented: Windows needs a server-aware selector for eligible free locations. This pack does not unlock paid servers.",
+      "category": "Connections",
+      "status": "planned",
+      "operations": []
+    },
+    {
+      "id": "amoled-theme",
+      "name": "AMOLED dark theme",
+      "description": "Not implemented: the Windows client uses compiled WinUI resources rather than Android theme resources.",
+      "category": "Appearance",
+      "status": "planned",
+      "operations": []
+    },
+    {
+      "id": "accent-color",
+      "name": "Custom accent color",
+      "description": "Not implemented for Windows compiled WinUI resources.",
+      "category": "Appearance",
+      "status": "planned",
+      "operations": []
+    },
+    {
+      "id": "switch-style",
+      "name": "Styled switches",
+      "description": "Not implemented for native Windows WinUI switches.",
+      "category": "Appearance",
+      "status": "planned",
+      "operations": []
+    }
+  ]
+}
