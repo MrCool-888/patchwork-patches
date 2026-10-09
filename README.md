@@ -6,11 +6,11 @@ Current pack: **1.2.0**, release **proton-vpn-5.1.8-r3**. Requires **Patchwork 0
 
 ## Install the patch pack
 
-1. Update Patchwork to 0.4.2 or newer.
-2. If an earlier pack is applied, restore that session in **History & restore** first. Importing a new definition does not update already-patched files.
-3. Download **ProtonVPN-5.1.8.patchwork.json** from this repository's release assets. The source ZIP is for developers.
+1. Update Patchwork to 0.5.0 or newer for automatic sources and direct patch upgrades. The pack format itself requires 0.4.2+.
+2. In **Patch sources**, paste `https://github.com/MrCool-888/patchwork-patches` and choose **Add source** with pre-releases enabled. It checks immediately and automatically about once an hour while open. With an earlier pack applied and verified Patchwork history, preview and choose **Update patches** directly; no manual restore is needed. Older 0.4.x patchers still require restore first.
+3. For a manual import instead, download **ProtonVPN-5.1.8.patchwork.json** from this repository's release assets. The source ZIP is for developers.
 4. Choose **Add patch file** in Patchwork and import the JSON. The stable bundle ID replaces the older catalog entry without creating a duplicate.
-5. Select the original Windows 5.1.8.0 program folder, choose patches and review **Preview changes**. Close Proton before applying. Writes to Program Files use the Windows administrator prompt.
+5. Select the compatible Windows 5.1.8.0 program folder, choose patches and review **Preview changes**. Close Proton before applying. Writes to Program Files use the Windows administrator prompt.
 
 The original hashes determine compatibility. Different app versions need a matching new pack. Restore verified originals through History to remove the patches.
 
@@ -59,3 +59,4 @@ The pack targets Windows source tag v5.1.8, commit d2a4f8bc92a0fd296943a7cdd15f4
 Compile `source/BuildProtonPack.cs` separately against Patchwork and Mono.Cecil, then pass the original app folder and output JSON. Compile the three probe sources separately against .NET 8 references and run against a complete patched workspace copy. Probes use mock settings/navigation, reserved documentation IPs and no live network calls. These tools are excluded from the patcher.
 
 No Proton binaries, account settings, credentials, VPN session data or user backups are distributed. Patchwork is independent of Proton and Morphe.
+
