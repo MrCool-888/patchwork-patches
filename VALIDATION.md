@@ -1,12 +1,13 @@
 # Proton VPN 5.1.8 patch validation
 
-Pack **1.2.0**, release r3, requires **Patchwork 0.4.2+**. Promotions and free selection are patch version **1.1.0**; other available patches are **1.0.0**. Tested October 9, 2026.
+Pack **1.3.0**, release **r4**, requires **Patchwork 0.6.0+**. Free selection is patch 1.2.0, promotions 1.1.0, and other available patches 1.0.0. Tested October 9, 2026.
 
-## File transformations
+## File transformations and updates
 
-All eleven available patches previewed independently. Selecting all eleven produced six changed client assemblies; repeat previews had identical hashes. The combined plan applied to a complete workspace copy and restored exact original bytes. Separate sessions tested free selection alone and promotions/accelerator without the other feature patches, then restored their original bytes.
+All 14 available patches previewed independently. The combined plan changes six exact original assemblies. Repeated combined previews produced identical hashes. Custom accent/switch choices changed the generated output, were recorded in history and restored byte-for-byte.
 
-The version launcher and original six assembly fingerprints remain the same as r2. The user's live Proton installation was not modified. Tests validate workspace files against the journal's original hashes; they do not require the user's installed files to be unpatched.
+Applied pack 1.2.0 to a complete workspace copy, simulated the older journal format without patch IDs, then updated directly to 1.3.0 without manual restore. Preview left files unchanged; the parent became Superseded and six output hashes matched. After the probes, restoration recovered all original fingerprints. The launcher and original fingerprints are unchanged. The live installed app and its settings were not modified.
+
 | File | SHA-256 |
 | --- | --- |
 | ProtonVPN.StatisticalEvents.dll | 55b53b4a1cc777cecfd17f5fb1012df1e292e0f3d5aff0ebe94da63cc2e17644 |
@@ -16,23 +17,24 @@ The version launcher and original six assembly fingerprints remain the same as r
 | ProtonVPN.Client.Logic.Servers.dll | e133e5654ace39139d15c04c0f7bed6acbffd2afd4852ba3c13960ea9e7d147a |
 | ProtonVPN.Client.Logic.Connection.Contracts.dll | 05c6253a7555518be1eb87bc628398330af3bd0d998ca52348150ed62ee43058 |
 
+## Actual copied method checks
 
-## Runtime evidence
+The .NET 8 copies passed **40 selector checks**, **13 settings/Accelerator checks**, and **19 prior method checks** (72 total). The six new selector checks verify free country expansion returns country-matching free server rows, bypasses paid city/state loading, keeps the row context, clears the local upgrade gate, sends the exact clicked server ID, yields no result for a country without free servers, and retains the original paid city/state path. Earlier checks cover search, free/business/paid/offline filtering, maintenance, no server fallback, account plan preservation, strict selection and row Connect actions.
 
-The actual copied .NET 8 assemblies passed **66 checks** in total:
+Fixtures use in-memory settings/cache/navigation proxies and reserved documentation IPs. They never sign in, connect a VPN, run a service or write real settings.
 
-- **19 earlier method checks:** telemetry, cooldown, UI availability, unchanged free account entitlement, and saved false/true values for LAN, DNS, NetShield and split tunneling.
-- **34 selector checks:** previous free-country/cache/maintenance/strict-candidate behavior plus individual free-server Connect access; exact server intent preserved by the real connection manager; exact server ID wins over another online free server in the same country; missing/offline selections have no fallback; Smart reconnect bypass; the real row Connect action submits the exact server; paid server rows remain restricted for free accounts; paid access is preserved; city and business gateway restrictions remain; real search finds exact names and country/free prefixes. These 34 also passed with only free selection applied.
-- **13 settings checks:** accelerator stays enabled with saved off/on values; free account entitlement unchanged; accelerator page reports enabled; three settings promotion branches use the normal-control presentation; accelerator, NetShield, split-tunneling and port-forwarding navigation avoid the upsell activator; connection settings labels accelerator On; the real service settings creator receives SplitTcp=true. These 13 also passed with only promotions and accelerator applied.
+## Real WinUI resources
 
-Fixtures use in-memory settings, fake navigation/cache interfaces, reserved documentation IP 192.0.2.1 and complete workspace copies. They do not contact an API, sign in, connect a VPN, start a service or write real user settings. Backend fixtures test conditional setter execution, original inherited argument propagation, invalid condition rejection and exact restoration.
+Extracted three generated XAML dictionaries from the patched LoadTypographyResourceDictionary method using source/DumpThemes.cs. An isolated .NET 8/native Windows App Runtime host using source/ThemeLoadProbe.cs successfully loaded **74 Color/SolidColorBrush resources**, then verified effective Light/Dark accent and switch-track lookups plus the Dark black background. A pre-existing accent dictionary was overridden as expected. The host used copied runtime files and a test-only launcher bound to ThemeLoadProbe.dll. No production app window or account session was opened.
+
+Patchwork's 37 app scenarios also exercise generated-hook execution, composed resources, color validation, saved preferences, journal choices, direct color updates, byte-exact restore, worker choice freezing and altered-job refusal. This verifies resource loading and lookup; full Proton page rendering, system High Contrast appearance and interactive native color-picker behavior still need user UI verification.
+
+## Guest compatibility attempt
+
+The live Windows probe received HTTP 200/Code 1000 for an unauthenticated session, then **HTTP 422/Code 5003: Platform expected to be in [Android, iOS]** for credentialless authentication. DELETE /auth revoked the temporary session with HTTP 200. Tokens remained in memory and are not distributed. The independent source/GuestCompatibilityProbe.cjs logs status codes only, with the known platform error. See AUTH-RESEARCH.md. Guest sessions stay unavailable.
 
 ## Limits
 
-These checks establish selected actual method behavior and file-transform correctness. They do not establish a real logged-in WinUI session, VPN tunnel, accelerator speed, DNS leak protection, NetShield server filtering, LAN reachability, split-routing/kill-switch behavior, default/excluded locations or profiles. Server account entitlements remain unchanged.
+No real signed-in Proton UI session, VPN tunnel, Accelerator throughput, DNS leaks, NetShield server filtering, LAN reachability, split routing, profiles or server entitlements were tested. The free-server change fixes the inspected client browsing/connect path; backend availability and protocol validation remain Proton's. Theme resources are bounded overrides, and other compiled graphics/gradient effects may retain original colors.
 
-Individual free-server selection is exposed through Proton Search, using a full server name or its prefix such as NL-FREE. A country tree/server-browser redesign is not included. City and paid/business rows remain restricted for free accounts. Maintenance and protocol checks remain in the actual intent filter.
-
-Hide promotions changes settings presentation/navigation; effective feature settings are separate patches. Accelerator is deliberately forced on, including the displayed toggle; restore the patch to regain off-toggle control. Normal informational, account and maintenance notices remain.
-
-Guest sessions are not implemented in this pack. Official Android sources implement credentialless authentication and return real session tokens; a Windows port still needs guest authentication, persistence, refresh and connection credential handling. Windows 5.1.8's normal connection flow obtains an account-issued certificate through an authenticated API. Existing guest-hole recovery is used for login/API access rather than the Android guest-session flow. Sign-in is retained and the planned catalog entry has no operations. See AUTH-RESEARCH.md. AMOLED backgrounds, accent colors and styled switches also remain unimplemented.
+Generator and probes are separate source tools, never installer payloads. No Proton binaries, account data, user backups, identifiers or credentials are distributed.

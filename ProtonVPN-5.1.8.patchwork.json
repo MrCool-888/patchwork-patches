@@ -6,8 +6,8 @@
   "appVersion": "5.1.8",
   "author": "Patchwork",
   "source": "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications",
-  "packVersion": "1.2.0",
-  "minimumPatcherVersion": "0.4.2",
+  "packVersion": "1.3.0",
+  "minimumPatcherVersion": "0.6.0",
   "versionFile": "ProtonVPN.Client.exe",
   "versionSha256": "4fc9d4cd64e8ac74ad5a5f9666419f08f561d770d9f210f1aee16bb8af8bb52c",
   "patches": [
@@ -394,7 +394,7 @@
     {
       "id": "free-locations",
       "name": "Free country and individual server selection",
-      "description": "Lists eligible free countries and enables individual free-server Connect actions in Proton\u0027s Search. Search a free server name or country prefix (for example NL-FREE), then choose its Connect action. Preserves the exact server ID and uses strict free non-business candidates without fallback. Paid-server rows stay restricted for free accounts; city rows keep their original restrictions. Requires sign-in; live VPN connectivity is not yet verified.",
+      "description": "Expand a free country to see its individual free servers and use their Connect actions. Also enables free server results in Search. Preserves the selected server ID and restricts connection candidates to free non-business servers without fallback. Paid accounts retain city/state browsing. Offline servers retain maintenance controls. Requires sign-in; live VPN connectivity is not yet verified.",
       "category": "Connections",
       "status": "ready",
       "operations": [
@@ -484,14 +484,38 @@
           "method": "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.ServerLocationIntentBase::get_IsForPaidUsersOnly()",
           "type": "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.SingleServerLocationIntent",
           "value": false
+        },
+        {
+          "kind": "managedEnumerableFactory",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Models.Connections.ConnectionItemBase\u003e ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem::GetSubItems()",
+          "condition": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.HostLocationItemBase`1::_lastKnownIsPaidUser"
+          ],
+          "source": [
+            "ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader ProtonVPN.Client.Models.Connections.ConnectionItemBase::ServersLoader",
+            "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()"
+          ],
+          "filter": [
+            "System.String ProtonVPN.Client.Models.Connections.CountryLocationItemBase::get_ExitCountryCode()"
+          ],
+          "factory": [
+            "ProtonVPN.Client.Factories.ILocationItemFactory ProtonVPN.Client.Models.Connections.HostLocationItemBase`1::LocationItemFactory"
+          ],
+          "argument": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.ConnectionItemBase::get_IsSearchItem()"
+          ],
+          "elementGetter": "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.Server::get_ExitCountry()",
+          "factoryMethod": "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem ProtonVPN.Client.Factories.ILocationItemFactory::GetServer(ProtonVPN.Client.Logic.Servers.Contracts.Models.Server,System.Boolean)"
         }
       ],
-      "version": "1.1.0"
+      "version": "1.2.0"
     },
     {
       "id": "no-sign-in",
-      "name": "Guest VPN session (not implemented)",
-      "description": "Not implemented: Android has an official credentialless guest authentication flow. Windows 5.1.8 needs a port that obtains, stores and refreshes a real guest session and connection credentials. Existing guest-hole recovery is not that flow. Sign-in is retained; this entry has no patch operations.",
+      "name": "Guest VPN session (Windows API rejected)",
+      "description": "Attempted with a real temporary Windows unauthenticated session on 2026-10-09. Proton\u0027s credentialless endpoint returned HTTP 422, Code 5003: Platform expected to be in [Android, iOS]. The temporary session was revoked. No usable Windows guest session was obtained; sign-in remains required. See AUTH-RESEARCH.md in the separate patch repository.",
       "category": "Connections",
       "status": "planned",
       "operations": []
@@ -499,26 +523,536 @@
     {
       "id": "amoled-theme",
       "name": "AMOLED dark theme",
-      "description": "Not implemented: the Windows client uses compiled WinUI resources rather than Android theme resources.",
+      "description": "Uses black and near-black app surfaces and forces Proton\u0027s dark theme. Disabling this patch restores normal theme selection. Resource overrides load before the app windows; High Contrast resources are not overridden.",
       "category": "Appearance",
-      "status": "planned",
-      "operations": []
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedThemeResources",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.App::LoadTypographyResourceDictionary()",
+          "resources": [
+            {
+              "theme": "Dark",
+              "key": "BackgroundNormColor",
+              "type": "color",
+              "value": "#000000"
+            },
+            {
+              "theme": "Dark",
+              "key": "BackgroundNormColorBrush",
+              "type": "brush",
+              "value": "#000000"
+            },
+            {
+              "theme": "Dark",
+              "key": "BackgroundWeakColor",
+              "type": "color",
+              "value": "#080808"
+            },
+            {
+              "theme": "Dark",
+              "key": "BackgroundWeakColorBrush",
+              "type": "brush",
+              "value": "#080808"
+            },
+            {
+              "theme": "Dark",
+              "key": "BackgroundStrongColor",
+              "type": "color",
+              "value": "#141414"
+            },
+            {
+              "theme": "Dark",
+              "key": "BackgroundStrongColorBrush",
+              "type": "brush",
+              "value": "#141414"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakColor",
+              "type": "color",
+              "value": "#101010"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakColorBrush",
+              "type": "brush",
+              "value": "#101010"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakHoverColor",
+              "type": "color",
+              "value": "#202020"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakHoverColorBrush",
+              "type": "brush",
+              "value": "#202020"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakActiveColor",
+              "type": "color",
+              "value": "#282828"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionWeakActiveColorBrush",
+              "type": "brush",
+              "value": "#282828"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderNormColor",
+              "type": "color",
+              "value": "#282828"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderNormColorBrush",
+              "type": "brush",
+              "value": "#282828"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderWeakColor",
+              "type": "color",
+              "value": "#202020"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderWeakColorBrush",
+              "type": "brush",
+              "value": "#202020"
+            },
+            {
+              "theme": "Dark",
+              "key": "MapNormColor",
+              "type": "color",
+              "value": "#050505"
+            },
+            {
+              "theme": "Dark",
+              "key": "MapNormColorBrush",
+              "type": "brush",
+              "value": "#050505"
+            },
+            {
+              "theme": "Dark",
+              "key": "MapHighlightColor",
+              "type": "color",
+              "value": "#181818"
+            },
+            {
+              "theme": "Dark",
+              "key": "MapHighlightColorBrush",
+              "type": "brush",
+              "value": "#181818"
+            }
+          ]
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "Microsoft.UI.Xaml.ElementTheme ProtonVPN.Client.Services.Selection.ApplicationThemeSelector::GetTheme()",
+          "returnType": "enum",
+          "value": 2
+        }
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "accent-color",
       "name": "Custom accent color",
-      "description": "Not implemented for Windows compiled WinUI resources.",
+      "description": "Choose the color used by primary buttons, links, focus borders and accent brushes, plus its foreground text color. Applies to Light and Dark themes. Choose contrasting colors for readable controls.",
       "category": "Appearance",
-      "status": "planned",
-      "operations": []
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedThemeResources",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.App::LoadTypographyResourceDictionary()",
+          "resources": [
+            {
+              "theme": "Light",
+              "key": "PrimaryColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "PrimaryColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "BorderFocusColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "BorderFocusColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "TextOnPrimaryColor",
+              "type": "color",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Light",
+              "key": "TextOnPrimaryColorBrush",
+              "type": "brush",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Dark",
+              "key": "PrimaryColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "PrimaryColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderFocusColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderFocusColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "TextOnPrimaryColor",
+              "type": "color",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Dark",
+              "key": "TextOnPrimaryColorBrush",
+              "type": "brush",
+              "value": "$foreground"
+            }
+          ]
+        }
+      ],
+      "version": "1.0.0",
+      "options": [
+        {
+          "id": "accent",
+          "label": "Accent",
+          "type": "color",
+          "default": "#8A66FF"
+        },
+        {
+          "id": "foreground",
+          "label": "Button text",
+          "type": "color",
+          "default": "#FFFFFF"
+        }
+      ]
     },
     {
       "id": "switch-style",
-      "name": "Styled switches",
-      "description": "Not implemented for native Windows WinUI switches.",
+      "name": "Custom switch colors",
+      "description": "Choose enabled toggle-switch track and knob colors while keeping the native switch layout, disabled states and keyboard controls. Applies to Light and Dark themes.",
       "category": "Appearance",
-      "status": "planned",
-      "operations": []
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedThemeResources",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.App::LoadTypographyResourceDictionary()",
+          "resources": [
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOn",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOnPointerOver",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOnPressed",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOn",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOnPointerOver",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOnPressed",
+              "type": "brush",
+              "value": "$knob"
+            }
+          ]
+        }
+      ],
+      "version": "1.0.0",
+      "options": [
+        {
+          "id": "track",
+          "label": "Switch track",
+          "type": "color",
+          "default": "#36C9A0"
+        },
+        {
+          "id": "knob",
+          "label": "Switch knob",
+          "type": "color",
+          "default": "#FFFFFF"
+        }
+      ]
     }
   ]
 }
