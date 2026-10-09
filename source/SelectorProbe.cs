@@ -78,6 +78,7 @@ class SelectorProbe
         };
         long businessFeature = Convert.ToInt64(Enum.Parse(serverType.GetProperty("Features").PropertyType, "B2B"));
         object nl = server("nl-free", "NL", 0, 0, true), jp = server("jp-free", "JP", 0, 0, true), down = server("nl-offline", "NL", 0, 0, false), plus = server("nl-plus", "NL", 2, 0, true), business = server("nl-business", "NL", 0, businessFeature, true);
+        Property(nl, "Name", "NL-FREE#100"); Property(jp, "Name", "JP-FREE#101");
         var allServers = Items(serverType, nl, jp, down, plus, business);
         var cacheInterface = T("ProtonVPN.Client.Logic.Servers.dll", "ProtonVPN.Client.Logic.Servers.Cache.IServersCache");
         var fakeCache = SelectorProxy.Make(cacheInterface, (method, data) => method.Name == "get_Servers" ? allServers : method.Name == "get_Countries" ? Get(cache, "Countries") : Default(method.ReturnType));
@@ -112,9 +113,10 @@ class SelectorProbe
         var host = itemType.BaseType.BaseType; var subItemsField = host.GetField("<SubItems>k__BackingField", Instance);
         var children = Activator.CreateInstance(subItemsField.FieldType); subItemsField.SetValue(item, children);
         var childType = T("ProtonVPN.Client.dll", "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem"); var child = Blank(childType);
+        Set(child, "<Server>k__BackingField", nl);
         children.GetType().GetMethod("Add").Invoke(children, new object[] { child });
         Call(item, "InvalidateIsRestricted", false); Check(!(bool)Get(item, "IsRestricted"), "Free country row enables its Connect action");
-        Check((bool)Get(child, "IsRestricted"), "Free-country override keeps individual server child rows restricted");
+        Check(!(bool)Get(child, "IsRestricted"), "Free server child row enables its individual Connect action");
         var lastPaid = host.GetField("_lastKnownIsPaidUser", Instance); Check(!(bool)lastPaid.GetValue(item), "Country override preserves free status for restricted city/server child rows");
         Call(item, "InvalidateIsRestricted", true); Check((bool)lastPaid.GetValue(item) && !(bool)Get(item, "IsRestricted"), "Paid country row preserves inherited paid propagation");
         Check(!(bool)Get(child, "IsRestricted"), "Paid child-row access is preserved");
@@ -127,6 +129,39 @@ class SelectorProbe
         Set(item, "ConnectionManager", fakeManager); Set(item, "<LocationIntent>k__BackingField", location);
         Call(item, "InvalidateIsRestricted", false); ((Task)Call(item, "ToggleConnectionAsync")).GetAwaiter().GetResult();
         Check(clickedIntent != null && Object.ReferenceEquals(Get(clickedIntent, "Location"), location), "Country Connect action submits the chosen country to the connection manager");
+
+        var serverIntentType = T("ProtonVPN.Client.Logic.Connection.Contracts.dll", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.SingleServerLocationIntent");
+        var infoType = serverIntentType.GetProperty("Server").PropertyType;
+        var info = infoType.GetMethod("From", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { "nl-free", "NL-FREE#100" });
+        var specific = Activator.CreateInstance(serverIntentType, new object[] { location, info });
+        Check(!(bool)Get(specific, "IsForPaidUsersOnly"), "Single server intent survives free-account normalization");
+        var specificIntent = Activator.CreateInstance(intentType, new object[] { specific, null }); paid = false;
+        var normalizedServer = Call(manager, "CreateNewIntentIfUserPlanIsFree", specificIntent);
+        Check(Object.ReferenceEquals(Get(normalizedServer, "Location"), specific), "Actual manager preserves the selected server object");
+        candidates = Call(generator, "GetAvailableServers", specificIntent, false);
+        var otherNl = server("nl-other-free", "NL", 0, 0, true);
+        var sameCountryCandidates = Items(serverType, nl, otherNl, jp, down);
+        selected = List(Call(normalizedServer, "FilterAndSortServers", sameCountryCandidates, null, protocols, false));
+        Check(selected.Count == 1 && (string)Get(selected[0], "Id") == "nl-free", "Exact selected server ID wins over other free servers in the same country");
+        Check(List(Call(normalizedServer, "FilterAndSortServers", Items(serverType, otherNl, jp, down), null, protocols, false)).Count == 0, "Missing selected server does not fall back to another server");
+        Property(nl, "Status", (sbyte)0);
+        Check(List(Call(normalizedServer, "FilterAndSortServers", sameCountryCandidates, null, protocols, false)).Count == 0, "Offline selected server does not silently fall back"); Property(nl, "Status", (sbyte)1);
+        Check((bool)Call(creator, "IsToBypassSmartServerListGenerator", specificIntent), "Individual free server selection bypasses Smart reconnect fallback");
+        Set(child, "<LocationIntent>k__BackingField", specific); Set(child, "ConnectionManager", fakeManager);
+        Call(child, "InvalidateIsRestricted", false); ((Task)Call(child, "ToggleConnectionAsync")).GetAwaiter().GetResult();
+        Check(Object.ReferenceEquals(Get(clickedIntent, "Location"), specific), "Individual server Connect action submits the exact selected server");
+        Set(child, "<Server>k__BackingField", plus); Call(child, "InvalidateIsRestricted", false);
+        Check((bool)Get(child, "IsRestricted"), "Paid server rows remain restricted for free accounts");
+        Call(child, "InvalidateIsRestricted", true); Check(!(bool)Get(child, "IsRestricted"), "Paid accounts retain individual paid server access");
+        Set(child, "<Server>k__BackingField", nl); Call(child, "InvalidateIsRestricted", false);
+        var gatewayType = T("ProtonVPN.Client.dll", "ProtonVPN.Client.Models.Connections.Gateways.GatewayServerLocationItem");
+        var gateway = Blank(gatewayType); Call(gateway, "InvalidateIsRestricted", false); Check((bool)Get(gateway, "IsRestricted"), "Business gateway rows retain their original restrictions");
+        var cityType = T("ProtonVPN.Client.dll", "ProtonVPN.Client.Models.Connections.Countries.CityLocationItem"); var city = Blank(cityType);
+        var cityHost = cityType.BaseType.BaseType; cityHost.GetField("<SubItems>k__BackingField", Instance).SetValue(city, Activator.CreateInstance(subItemsField.FieldType));
+        Call(city, "InvalidateIsRestricted", false); Check((bool)Get(city, "IsRestricted"), "City rows retain their original restrictions");
+        var searchType = T("ProtonVPN.Client.Logic.Searches.dll", "ProtonVPN.Client.Logic.Searches.GlobalSearch"); var search = Blank(searchType); Set(search, "_serversLoader", loader);
+        Check(List(Call(search, "SearchServers", "NL-FREE#100", null)).Any(x => Object.ReferenceEquals(x, nl)), "Actual server search finds the selectable exact free server name");
+        Check(List(Call(search, "SearchServers", "NL-FREE", null)).Count == 1, "Searching a free-server country prefix exposes its cached rows");
         Console.WriteLine(checks + " selector checks passed. No account, network, service, settings file or installed app was changed."); return 0;
     }
     static object GetRawCountries(object cache) { return cache.GetType().GetField("_countries", Instance).GetValue(cache); }
