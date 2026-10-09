@@ -6,8 +6,8 @@
   "appVersion": "5.1.8",
   "author": "Patchwork",
   "source": "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications",
-  "packVersion": "1.1.0",
-  "minimumPatcherVersion": "0.4.0",
+  "packVersion": "1.2.0",
+  "minimumPatcherVersion": "0.4.2",
   "versionFile": "ProtonVPN.Client.exe",
   "versionSha256": "4fc9d4cd64e8ac74ad5a5f9666419f08f561d770d9f210f1aee16bb8af8bb52c",
   "patches": [
@@ -56,7 +56,7 @@
     {
       "id": "hide-promotions",
       "name": "Hide upgrade promotions",
-      "description": "Hides the connection-card, sidebar, profile-page and tray upsell banners. Service and information notices remain available.",
+      "description": "Hides the connection-card, sidebar, profile-page and tray upsell banners, plus settings upgrade cards and subscription badges. Settings links open their normal pages; effective feature/account checks remain separate. Service and information notices remain available.",
       "category": "Interface",
       "status": "ready",
       "operations": [
@@ -99,6 +99,74 @@
           "method": "System.Boolean ProtonVPN.Client.UI.Main.Home.Upsell.ConnectionCardUpsellBannerViewModel::get_IsBannerVisible()",
           "returnType": "boolean",
           "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        }
+      ],
+      "version": "1.1.0"
+    },
+    {
+      "id": "vpn-accelerator",
+      "name": "Keep VPN Accelerator enabled",
+      "description": "Keeps VPN Accelerator on, opens its settings without an upgrade prompt, and shows its enabled state. This overrides the saved off toggle; restore this patch to return toggle control. Live speed improvements are not verified.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "e5193706fda534c6c87a2418fb8c9de083b45a8647222a4c00b3d134fd2ded5d",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsVpnAcceleratorEnabled()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.VpnAcceleratorSettingsPageViewModel::get_IsVpnAcceleratorEnabled()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToVpnAcceleratorPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.String ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_VpnAcceleratorSettingsState()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
         }
       ],
       "version": "1.0.0"
@@ -325,8 +393,8 @@
     },
     {
       "id": "free-locations",
-      "name": "Free server country selection",
-      "description": "Lists eligible free countries for free accounts, enables their country Connect button, and preserves the selected country while filtering connection candidates to free non-business servers. Free accounts use strict selection without falling back to another country. Individual city/server rows stay restricted. Paid-account country and server lists keep their original behavior. Requires sign-in; live VPN connectivity is not yet verified.",
+      "name": "Free country and individual server selection",
+      "description": "Lists eligible free countries and enables individual free-server Connect actions in Proton\u0027s Search. Search a free server name or country prefix (for example NL-FREE), then choose its Connect action. Preserves the exact server ID and uses strict free non-business candidates without fallback. Paid-server rows stay restricted for free accounts; city rows keep their original restrictions. Requires sign-in; live VPN connectivity is not yet verified.",
       "category": "Connections",
       "status": "ready",
       "operations": [
@@ -396,9 +464,37 @@
           "calledMethod": "System.Boolean ProtonVPN.Client.Settings.Contracts.IUserSettings::get_IsSmartReconnectEnabled()",
           "value": false,
           "count": 1
+        },
+        {
+          "kind": "managedOverrideConditionalBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "condition": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.ServerLocationItemBase::get_IsFree()"
+          ],
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.Logic.Connection.Contracts.dll",
+          "sha256": "05c6253a7555518be1eb87bc628398330af3bd0d998ca52348150ed62ee43058",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.ServerLocationIntentBase::get_IsForPaidUsersOnly()",
+          "type": "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.SingleServerLocationIntent",
+          "value": false
         }
       ],
-      "version": "1.0.0"
+      "version": "1.1.0"
+    },
+    {
+      "id": "no-sign-in",
+      "name": "Guest VPN session (not implemented)",
+      "description": "Not implemented: Android has an official credentialless guest authentication flow. Windows 5.1.8 needs a port that obtains, stores and refreshes a real guest session and connection credentials. Existing guest-hole recovery is not that flow. Sign-in is retained; this entry has no patch operations.",
+      "category": "Connections",
+      "status": "planned",
+      "operations": []
     },
     {
       "id": "amoled-theme",
