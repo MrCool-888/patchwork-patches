@@ -55,7 +55,7 @@ function verifyArchives() {
     assert.deepEqual([...entries.keys()].sort(), [...originalEntries.keys()].sort());
     for (const [entry, metadata] of originalEntries) {
       if (metadata.link || metadata.unpacked) assert.deepEqual(entries.get(entry), metadata);
-      else if (entry !== 'src/createWindow.js') {
+      else if (!['src/createWindow.js', 'src/autoUpdater/index.js', 'src/blitz-entry.js', 'src/ota.js'].includes(entry)) {
         assert.equal(hash(installed.member(entry)), hash(changed.member(entry)), 'Untouched entry changed: ' + entry);
         const { offset: beforeOffset, ...before } = metadata;
         const { offset: afterOffset, ...after } = entries.get(entry);
@@ -74,7 +74,7 @@ function verifyArchives() {
   console.log('PASS actual archive: all 3051 entries preserved, metadata/integrity valid, three selections and JavaScript syntax verified');
 }
 function verifyCompact() {
-  const text = readArchive(path.join(__dirname, '../blitz-integration/artifacts/compact.asar')).member('src/createWindow.js').toString();
+  const text = readArchive(path.join(process.argv[2], 'compact.asar')).member('src/createWindow.js').toString();
   const constants = text.match(/const DEFAULT_MIN_WIDTH = \d+;/)[0] + text.match(/const DEFAULT_HEIGHT = \d+;/)[0];
   const startup = text.match(/  MIN_WIDTH = DEFAULT_MIN_WIDTH;\n  MIN_HEIGHT = DEFAULT_HEIGHT;/)[0];
   const minimum = text.match(/  windows\.client\.setMinimumSize\([\s\S]*?\n  \);/)[0];

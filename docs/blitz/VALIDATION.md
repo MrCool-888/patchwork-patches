@@ -1,4 +1,20 @@
-# Validation: Blitz Clean Desktop 1.0.0 / Patchwork 0.8.0 prerelease
+# Validation: Blitz Clean Desktop 1.1.0 / Patchwork 0.8.2 prerelease
+
+## Startup repair and update policy — October 10, 2026
+
+The original 1.0.0 pack omitted Blitz's native archive checksum and is superseded. The reported installed-client startup exited with **E6**. Static inspection of `blitz_core.node` established that its native check compares XXH32 (seed zero) of the complete `resources/app.asar` with the final four little-endian bytes of `icudtl.dat`. The original archive checksum is `97f3905b`, matching that footer; the old patched archive checksum was `aa3155e5`, leaving a mismatch. The fix updates the checksum rather than disabling the native comparison. No native module or executable is patched.
+
+Original companion: 10,468,212 bytes, SHA-256 `b816e1c340fbcb32c3a5dec883270aa44b929a2dc9bf4de6270fe8aee27757ad`; footer offset 10,468,208. Every operation pins the original archive/member or companion fingerprint. Automatic update guards also edit `src/autoUpdater/index.js`, `src/blitz-entry.js` and `src/ota.js`. `src/createWindow.js` retains the prior desktop hook and compact sizing changes.
+
+All **46 Patchwork self-tests pass, zero failures**. New coverage checks reference vectors, the real-size companion, strict paths/offset/algorithm/fingerprints, shared-operation composition, older ASAR-only history upgrades, two-file interrupted writes and rollback, selection changes and exact restoration. Actual original archive/companion copies pass independent preview/apply/update/recovery/worker/stale-preview/restore checks.
+
+Independent Python xxHash verification confirms the rebuilt archive/footer values: both selections `cc7b10e7`, clean only `8c117863`, compact only `00e3fe28`. The companion changes only its final four bytes. Node checks retain all 3,051 members and verify untouched contents/metadata, member integrity and JavaScript syntax. Updated lifecycle, compact-size and headless browser-layout fixtures pass.
+
+Update-policy fixtures execute the actual changed client/OTA functions. Default startup and polling produce no automatic update requests. Manual checks remain callable. `BLITZ_AUTO_UPDATE=1` explicitly restores automatic checks. Identical policy/checksum operations in both selectable patches compose once.
+
+The corrected patch was **not applied to the installed Blitz client**, at the user's request. Live corrected startup remains unverified. An isolated native bootstrap attempt did not reproduce complete Blitz initialization and cannot establish live startup success. Earlier native Electron hook tests below did not exercise the native Blitz archive check; that limitation caused the first pack to miss E6. Real account, login/settings/game/update and monitor/DPI checks remain pending.
+
+## Historical 1.0.0 / 0.8.0 hook and archive evidence
 
 Windows x64, October 10, 2026. Source baseline: [MrCool-888/patchwork](https://github.com/MrCool-888/patchwork), commit `e777596adc92f888a25aca938fd03984245060ee`. Patchwork 0.8.0 and the combined patch pack are experimental prereleases. Validation did not apply changes to the installed Blitz client.
 
@@ -38,7 +54,7 @@ This can increase full-load network traffic. DevTools can detach the cache-contr
 
 ## Remaining live validation
 
-These tests establish transaction safety, native archive acceptance and controlled runtime behavior. They do not establish a complete live Blitz session. Still pending: startup using the real remote frontend, actual logged-out/free/premium sign-ins, login and settings workflows, real game pages, the update service, monitor/DPI transitions and game-overlay interaction. Account labels in fixtures are not real account tests. Game overlays and additional premium features are not included.
+These tests establish transaction safety, Electron archive parsing and controlled hook behavior. They did not establish acceptance by Blitz's separate native checksum check or a complete live session. Still pending for the corrected pack: startup using the real remote frontend, actual logged-out/free/premium sign-ins, login and settings workflows, real game pages, the update service, monitor/DPI transitions and game-overlay interaction. Account labels in fixtures are not real account tests. Game overlays and additional premium features are not included.
 
 Frontend updates can arrive independently of the installed archive. Unknown frontend versions intentionally retain their original web behavior. Client updates can replace the archive, and a different original fingerprint needs a matching pack. Preserve backups/journals and close Blitz before any transaction.
 
@@ -49,3 +65,4 @@ Frontend updates can arrive independently of the installed archive. Unknown fron
 - [Electron ASAR integrity enforcement](https://www.electronjs.org/docs/latest/tutorial/asar-integrity)
 - [Electron webRequest API](https://www.electronjs.org/docs/latest/api/web-request)
 - [Electron debugger API](https://www.electronjs.org/docs/latest/api/debugger)
+- [XXH32 specification](https://github.com/Cyan4973/xxHash/blob/dev/doc/xxhash_spec.md)

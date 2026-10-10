@@ -4,8 +4,8 @@
   "appId": "blitz",
   "appName": "Blitz",
   "appVersion": "3.0.7.134 (frontend 3.0.8-ota.0)",
-  "packVersion": "1.0.0",
-  "minimumPatcherVersion": "0.8.0",
+  "packVersion": "1.1.0",
+  "minimumPatcherVersion": "0.8.2",
   "versionFile": "resources/app.asar",
   "versionSha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
   "author": "Local build",
@@ -15,9 +15,9 @@
       "id": "clean-desktop",
       "name": "Clean desktop",
       "category": "Desktop",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "ready",
-      "description": "Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits.",
+      "description": "Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits. Automatic Blitz client/frontend updates are off by default; manual checks remain available. Maintains the native archive checksum in the final four bytes of icudtl.dat.",
       "operations": [
         {
           "kind": "asarTextReplace",
@@ -38,6 +38,65 @@
           "find": "  browserView.webContents.loadURL(url);",
           "replacement": "  patchworkInstallDesktopCleanup(browserView, url);\n  browserView.webContents.loadURL(url);",
           "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/autoUpdater/index.js",
+          "entrySha256": "e67aece0f4bd27a0a2484656b5fb04802e082380c0876ab31aa7921baef7c0d6",
+          "find": "function pollForUpdates() {",
+          "replacement": "function pollForUpdates() {\n  if (process.env.BLITZ_AUTO_UPDATE !== \"1\") return;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/autoUpdater/index.js",
+          "entrySha256": "e67aece0f4bd27a0a2484656b5fb04802e082380c0876ab31aa7921baef7c0d6",
+          "find": "function bootApp(showSplash) {",
+          "replacement": "function bootApp(showSplash) {\n  if (process.env.BLITZ_AUTO_UPDATE !== \"1\") return Promise.resolve();",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/blitz-entry.js",
+          "entrySha256": "53c7f597eb8706737be7fa2ec7a1c8101b4d2b2804a231a98062f40d9d91e29f",
+          "find": "const initialOtaUpdateCheck = ota.checkForUpdates();",
+          "replacement": "const initialOtaUpdateCheck = ota.checkForUpdates(true);",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/ota.js",
+          "entrySha256": "8e98dcbd6f6b3622ec7122428bfa70e282887300be752bd31d6411fbe3aff3d3",
+          "find": "  async checkForUpdates() {",
+          "replacement": "  async checkForUpdates(automatic = false) {\n    if (automatic && process.env.BLITZ_AUTO_UPDATE !== \"1\") return null;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/ota.js",
+          "entrySha256": "8e98dcbd6f6b3622ec7122428bfa70e282887300be752bd31d6411fbe3aff3d3",
+          "find": "        await this.checkForUpdates();",
+          "replacement": "        await this.checkForUpdates(true);",
+          "count": 1
+        },
+        {
+          "kind": "asarChecksum",
+          "file": "icudtl.dat",
+          "sha256": "b816e1c340fbcb32c3a5dec883270aa44b929a2dc9bf4de6270fe8aee27757ad",
+          "archive": "resources/app.asar",
+          "archiveSha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "algorithm": "xxhash32",
+          "offset": 10468208
         }
       ]
     },
@@ -45,9 +104,9 @@
       "id": "compact-window",
       "name": "Compact window",
       "category": "Local features",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "ready",
-      "description": "Allows a 940 x 500 minimum desktop window for every account, bounded by the screen size. Does not change account roles or stored minimum-size preferences. Contains executable JavaScript client edits.",
+      "description": "Allows a 940 x 500 minimum desktop window for every account, bounded by the screen size. Does not change account roles or stored minimum-size preferences. Contains executable JavaScript client edits. Automatic Blitz client/frontend updates are off by default; manual checks remain available. Maintains the native archive checksum in the final four bytes of icudtl.dat.",
       "operations": [
         {
           "kind": "asarTextReplace",
@@ -88,6 +147,65 @@
           "find": "  fetchUser().then((user) => {\n    if (user && hasPremiumRole(user.roles)) {\n      MIN_WIDTH = 940;\n      MIN_HEIGHT = 500;\n      write(\"MIN_WIDTH\", MIN_WIDTH);\n      write(\"MIN_HEIGHT\", MIN_HEIGHT);\n      windows.client.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);\n    } else {\n      MIN_WIDTH = DEFAULT_MIN_WIDTH;\n      MIN_HEIGHT = DEFAULT_HEIGHT;\n      write(\"MIN_WIDTH\", MIN_WIDTH);\n      write(\"MIN_HEIGHT\", MIN_HEIGHT);\n      const [currentWidth, currentHeight] = windows.client.getSize();\n      if (currentWidth < MIN_WIDTH || currentHeight < MIN_HEIGHT) {\n        windows.client.setSize(\n          Math.max(currentWidth, MIN_WIDTH),\n          Math.max(currentHeight, MIN_HEIGHT)\n        );\n        ensureWindowIsOnADisplay();\n      }\n      windows.client.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);\n    }\n  });",
           "replacement": "  windows.client.setMinimumSize(\n    Math.max(1, Math.min(MIN_WIDTH, displaySize.width - SCREEN_MARGIN)),\n    Math.max(1, Math.min(MIN_HEIGHT, displaySize.height - SCREEN_MARGIN))\n  );",
           "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/autoUpdater/index.js",
+          "entrySha256": "e67aece0f4bd27a0a2484656b5fb04802e082380c0876ab31aa7921baef7c0d6",
+          "find": "function pollForUpdates() {",
+          "replacement": "function pollForUpdates() {\n  if (process.env.BLITZ_AUTO_UPDATE !== \"1\") return;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/autoUpdater/index.js",
+          "entrySha256": "e67aece0f4bd27a0a2484656b5fb04802e082380c0876ab31aa7921baef7c0d6",
+          "find": "function bootApp(showSplash) {",
+          "replacement": "function bootApp(showSplash) {\n  if (process.env.BLITZ_AUTO_UPDATE !== \"1\") return Promise.resolve();",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/blitz-entry.js",
+          "entrySha256": "53c7f597eb8706737be7fa2ec7a1c8101b4d2b2804a231a98062f40d9d91e29f",
+          "find": "const initialOtaUpdateCheck = ota.checkForUpdates();",
+          "replacement": "const initialOtaUpdateCheck = ota.checkForUpdates(true);",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/ota.js",
+          "entrySha256": "8e98dcbd6f6b3622ec7122428bfa70e282887300be752bd31d6411fbe3aff3d3",
+          "find": "  async checkForUpdates() {",
+          "replacement": "  async checkForUpdates(automatic = false) {\n    if (automatic && process.env.BLITZ_AUTO_UPDATE !== \"1\") return null;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/ota.js",
+          "entrySha256": "8e98dcbd6f6b3622ec7122428bfa70e282887300be752bd31d6411fbe3aff3d3",
+          "find": "        await this.checkForUpdates();",
+          "replacement": "        await this.checkForUpdates(true);",
+          "count": 1
+        },
+        {
+          "kind": "asarChecksum",
+          "file": "icudtl.dat",
+          "sha256": "b816e1c340fbcb32c3a5dec883270aa44b929a2dc9bf4de6270fe8aee27757ad",
+          "archive": "resources/app.asar",
+          "archiveSha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "algorithm": "xxhash32",
+          "offset": 10468208
         }
       ]
     }
