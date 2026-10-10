@@ -6,8 +6,8 @@
   "appVersion": "5.1.8",
   "author": "Patchwork",
   "source": "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications",
-  "packVersion": "1.3.0",
-  "minimumPatcherVersion": "0.6.0",
+  "packVersion": "1.4.0",
+  "minimumPatcherVersion": "0.6.1",
   "versionFile": "ProtonVPN.Client.exe",
   "versionSha256": "4fc9d4cd64e8ac74ad5a5f9666419f08f561d770d9f210f1aee16bb8af8bb52c",
   "patches": [
@@ -56,7 +56,7 @@
     {
       "id": "hide-promotions",
       "name": "Hide upgrade promotions",
-      "description": "Hides the connection-card, sidebar, profile-page and tray upsell banners, plus settings upgrade cards and subscription badges. Settings links open their normal pages; effective feature/account checks remain separate. Service and information notices remain available.",
+      "description": "Hides shared upgrade banners/feature cards, subscription badges, four explicit Upgrade buttons (including change-server and network notices), promotional announcement offers/popups, and restricted server-row upgrade actions. Available rows keep Connect and maintenance checks. NPS surveys and normal service notices remain available; actual account plan and backend eligibility are unchanged.",
       "category": "Interface",
       "status": "ready",
       "operations": [
@@ -123,9 +123,103 @@
           "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel::get_IsPaidUser()",
           "returnType": "boolean",
           "value": true
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "02ffdd254326230c3ce16e97d5c7b639c83355bd33c503f079540b5a77a64c19",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Custom.UpsellBanner::.ctor()"
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "02ffdd254326230c3ce16e97d5c7b639c83355bd33c503f079540b5a77a64c19",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.UpsellBannerControl::.ctor()"
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "02ffdd254326230c3ce16e97d5c7b639c83355bd33c503f079540b5a77a64c19",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Custom.UpsellFeatureContentControl::.ctor()"
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "02ffdd254326230c3ce16e97d5c7b639c83355bd33c503f079540b5a77a64c19",
+          "method": "System.Boolean ProtonVPN.Client.Common.UI.Controls.Custom.GridSettingsCard::get_IsSubscriptionBadgeVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Boolean ProtonVPN.Client.UI.Overlays.WhatsNew.WhatsNewOverlayViewModel::get_IsSubscriptionBadgeVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedEnumFilter",
+          "file": "ProtonVPN.Client.Logic.Announcements.dll",
+          "sha256": "6a16e53b2223d8c0c22fb0afbf4545c23c1d2ff9422636f36a3e1c28b3243985",
+          "method": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement\u003e ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider::GetAllActive()",
+          "elementGetter": "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.AnnouncementType ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement::get_Type()",
+          "value": 4
+        },
+        {
+          "kind": "managedEnumGuardNull",
+          "file": "ProtonVPN.Client.Logic.Announcements.dll",
+          "sha256": "6a16e53b2223d8c0c22fb0afbf4545c23c1d2ff9422636f36a3e1c28b3243985",
+          "method": "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider::GetActiveAndUnseenByType(ProtonVPN.Client.Logic.Announcements.Contracts.Entities.AnnouncementType)",
+          "values": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "02ffdd254326230c3ce16e97d5c7b639c83355bd33c503f079540b5a77a64c19",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Bases.ConnectionRowButtonBase::set_IsRestricted(System.Boolean)",
+          "field": "",
+          "fromParameter": true
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.UI.Main.Home.Upsell.ChangeServerComponentView/ChangeServerComponentView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Main.Home.Upsell.ChangeServerComponentView/ChangeServerComponentView_obj1_Bindings::obj7",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.P2PDetectionShellView/P2PDetectionShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.P2PDetectionShellView/P2PDetectionShellView_obj1_Bindings::obj2",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.StreamingDetectionShellView/StreamingDetectionShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.StreamingDetectionShellView/StreamingDetectionShellView_obj1_Bindings::obj2",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.UpsellCarouselShellView/UpsellCarouselShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.UpsellCarouselShellView/UpsellCarouselShellView_obj1_Bindings::obj3",
+          "fromParameter": false
         }
       ],
-      "version": "1.1.0"
+      "version": "1.2.0"
     },
     {
       "id": "vpn-accelerator",
@@ -394,7 +488,7 @@
     {
       "id": "free-locations",
       "name": "Free country and individual server selection",
-      "description": "Expand a free country to see its individual free servers and use their Connect actions. Also enables free server results in Search. Preserves the selected server ID and restricts connection candidates to free non-business servers without fallback. Paid accounts retain city/state browsing. Offline servers retain maintenance controls. Requires sign-in; live VPN connectivity is not yet verified.",
+      "description": "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires sign-in.",
       "category": "Connections",
       "status": "ready",
       "operations": [
@@ -508,14 +602,70 @@
           ],
           "elementGetter": "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.Server::get_ExitCountry()",
           "factoryMethod": "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem ProtonVPN.Client.Factories.ILocationItemFactory::GetServer(ProtonVPN.Client.Logic.Servers.Contracts.Models.Server,System.Boolean)"
+        },
+        {
+          "kind": "managedOverrideConditionalBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "value": false,
+          "conditionExpected": false,
+          "condition": [
+            "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_RecentConnection()",
+            "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection::get_ConnectionIntent()",
+            "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.ILocationIntent ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent::get_Location()",
+            "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IIntent::get_IsForPaidUsersOnly()"
+          ],
+          "exclusions": [
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsSecureCore()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsP2P()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsTor()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsB2B()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsProfileIntent()"
+            ]
+          ]
         }
       ],
-      "version": "1.2.0"
+      "version": "1.3.0"
+    },
+    {
+      "id": "hide-paid-modes",
+      "name": "Hide paid country modes",
+      "description": "Hides Secure Core, P2P and Tor country tabs on free accounts, keeping All countries and free server selection. Paid accounts retain their mode tabs. This changes navigation only; it does not grant access to paid servers. Restart Proton after an account-plan change.",
+      "category": "Interface",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedEnumFilter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "a07dd312e8997c99e335d871b206f180d78fa0d950d929a234194148635fd8d4",
+          "method": "System.Collections.Generic.List`1\u003cProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent\u003e ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel::get_CountriesComponents()",
+          "elementGetter": "ProtonVPN.Client.Core.Enums.CountriesConnectionType ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent::get_ConnectionType()",
+          "value": 0,
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.UI.Main.Sidebar.Bases.ConnectionListViewModelBase`1::get_Settings()",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ]
+        }
+      ],
+      "version": "1.0.0"
     },
     {
       "id": "no-sign-in",
-      "name": "Guest VPN session (Windows API rejected)",
-      "description": "Attempted with a real temporary Windows unauthenticated session on 2026-10-09. Proton\u0027s credentialless endpoint returned HTTP 422, Code 5003: Platform expected to be in [Android, iOS]. The temporary session was revoked. No usable Windows guest session was obtained; sign-in remains required. See AUTH-RESEARCH.md in the separate patch repository.",
+      "name": "Guest VPN session (port under development)",
+      "description": "Android client identity successfully obtained a temporary guest session, VPN credentials and a Windows-identity connection certificate on 2026-10-09. All temporary sessions were revoked. This is compatibility research, not an integrated Windows guest connection. Protected storage, refresh, logout, client workflow and tunnel validation remain; sign-in is still required in this pack. See AUTH-RESEARCH.md.",
       "category": "Connections",
       "status": "planned",
       "operations": []

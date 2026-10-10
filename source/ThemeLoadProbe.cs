@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
@@ -28,6 +31,7 @@ class ProbeApp : Application
 {
     public static string Path;
     public static Exception Failure;
+    public ProbeApp() { RequestedTheme = ApplicationTheme.Dark; }
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         int checks = 0;
@@ -57,7 +61,48 @@ class ProbeApp : Application
                 var background = ((Microsoft.UI.Xaml.Shapes.Rectangle)black.Children[0]).Fill as SolidColorBrush;
                 if (background == null || background.Color.R != 0 || background.Color.G != 0 || background.Color.B != 0) throw new Exception("AMOLED background lookup failed.");
                 Console.WriteLine("PASS WinUI Dark theme resolves the black AMOLED surface.");
+                VerifyPromotions();
             } catch (Exception error) { Failure = error; Console.Error.WriteLine(error); }
             finally { Exit(); }
     }
+    static void Set(object value, string name, object field)
+    {
+        for (var type = value.GetType(); type != null; type = type.BaseType)
+        { var member = type.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly); if (member != null) { member.SetValue(value, field); return; } }
+        throw new Exception("Missing UI fixture field: " + name);
+    }
+    static void VerifyPromotions()
+    {
+        var common = Assembly.LoadFrom(System.IO.Path.Combine(AppContext.BaseDirectory, "ProtonVPN.Client.Common.UI.dll"));
+        foreach (string name in new[] { "UpsellBanner", "UpsellFeatureContentControl" })
+        {
+            var control = (FrameworkElement)Activator.CreateInstance(common.GetType("ProtonVPN.Client.Common.UI.Controls.Custom." + name, true));
+            if (control.Visibility != Visibility.Collapsed || control.Width != 0 || control.Height != 0 || control.IsHitTestVisible) throw new Exception("Shared promotional control remains visible.");
+            Console.WriteLine("PASS Real WinUI hides shared " + name + " with no hit target or layout size.");
+        }
+        var rowType = common.GetType("ProtonVPN.Client.Common.UI.Controls.Custom.ServerConnectionRowButton", true);
+        var row = (FrameworkElement)Activator.CreateInstance(rowType); rowType.GetProperty("IsRestricted").SetValue(row, true);
+        if (row.Visibility != Visibility.Collapsed || row.IsHitTestVisible) throw new Exception("Restricted row remains visible.");
+        rowType.GetProperty("IsRestricted").SetValue(row, false);
+        if (row.Visibility != Visibility.Visible || !row.IsHitTestVisible) throw new Exception("Available row was not restored.");
+        Console.WriteLine("PASS Real WinUI hides restricted row actions and restores available rows.");
+        var client = Assembly.LoadFrom(System.IO.Path.Combine(AppContext.BaseDirectory, "ProtonVPN.Client.dll"));
+        var localizationType = Assembly.LoadFrom(System.IO.Path.Combine(AppContext.BaseDirectory, "ProtonVPN.Client.Localization.Contracts.dll")).GetType("ProtonVPN.Client.Localization.Contracts.ILocalizationProvider", true);
+        var localizer = DispatchProxy.Create(localizationType, typeof(UiProbeLocalizer));
+        foreach (string viewName in new[] { "ProtonVPN.Client.UI.Main.Home.Upsell.ChangeServerComponentView", "ProtonVPN.Client.UI.Dialogs.Upsell.UpsellCarouselShellView", "ProtonVPN.Client.UI.Dialogs.Upsell.P2PDetectionShellView", "ProtonVPN.Client.UI.Dialogs.Upsell.StreamingDetectionShellView" })
+        {
+            var viewType = client.GetType(viewName, true); var view = RuntimeHelpers.GetUninitializedObject(viewType);
+            var vm = RuntimeHelpers.GetUninitializedObject(viewType.GetProperty("ViewModel").PropertyType); Set(vm, "<Localizer>k__BackingField", localizer); Set(view, "<ViewModel>k__BackingField", vm);
+            var bindingType = viewType.GetNestedType(viewType.Name + "_obj1_Bindings", BindingFlags.Public | BindingFlags.NonPublic); var binding = RuntimeHelpers.GetUninitializedObject(bindingType); Set(binding, "dataRoot", view);
+            var buttons = bindingType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Where(x => x.FieldType == typeof(Microsoft.UI.Xaml.Controls.Button)).ToList();
+            foreach (var field in buttons) field.SetValue(binding, new Microsoft.UI.Xaml.Controls.Button());
+            var hook = bindingType.GetMethod("Invoke_ViewModel_Localizer_M_Get_1992939572", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public); hook.Invoke(binding, new object[] { Int32.MaxValue });
+            if (!buttons.Any(x => { var button = (FrameworkElement)x.GetValue(binding); return button.Visibility == Visibility.Collapsed && button.Width == 0 && button.Height == 0 && !button.IsHitTestVisible; })) throw new Exception("Explicit Upgrade button remains visible: " + viewName);
+            Console.WriteLine("PASS Real WinUI hides explicit Upgrade button in " + viewType.Name + ".");
+        }
+    }
+}
+public class UiProbeLocalizer : DispatchProxy
+{
+    protected override object Invoke(MethodInfo method, object[] args) { return method.ReturnType == typeof(string) ? "Upgrade" : method.ReturnType.IsValueType ? Activator.CreateInstance(method.ReturnType) : null; }
 }

@@ -39,6 +39,34 @@ class BuildProtonPack
         var op = Op("ProtonVPN.Client.dll", parent, argument ? "InvalidateIsRestricted" : "get_IsRestricted", argument ? "managedOverrideBooleanArgument" : "managedOverrideBoolean");
         op["type"] = type; op["value"] = argument; return op;
     }
+    static Dictionary<string, object> Ui(string file, MethodDefinition method, string field = "", bool parameter = false)
+    {
+        return new Dictionary<string, object> { { "kind", "managedUiVisibility" }, { "file", file }, { "sha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, file))) }, { "method", method.FullName }, { "field", field }, { "fromParameter", parameter } };
+    }
+    static IEnumerable<object> PromotionControls()
+    {
+        const string common = "ProtonVPN.Client.Common.UI.dll";
+        var seed = Op(common, "ProtonVPN.Client.Common.UI.Controls.Custom.UpsellBanner", ".ctor", "managedUiVisibility");
+        yield return seed;
+        yield return Op(common, "ProtonVPN.Client.Common.UI.Controls.UpsellBannerControl", ".ctor", "managedUiVisibility");
+        yield return Op(common, "ProtonVPN.Client.Common.UI.Controls.Custom.UpsellFeatureContentControl", ".ctor", "managedUiVisibility");
+        yield return Return(common, "ProtonVPN.Client.Common.UI.Controls.Custom.GridSettingsCard", "get_IsSubscriptionBadgeVisible", "boolean", false);
+        yield return Return("ProtonVPN.Client.dll", "ProtonVPN.Client.UI.Overlays.WhatsNew.WhatsNewOverlayViewModel", "get_IsSubscriptionBadgeVisible", "boolean", false);
+        const string announcementsFile = "ProtonVPN.Client.Logic.Announcements.dll", announcementsType = "ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider";
+        var offerList = Op(announcementsFile, announcementsType, "GetAllActive", "managedEnumFilter");
+        offerList["elementGetter"] = "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.AnnouncementType ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement::get_Type()"; offerList["value"] = 4; yield return offerList;
+        var offerPopup = Op(announcementsFile, announcementsType, "GetActiveAndUnseenByType", "managedEnumGuardNull"); offerPopup["values"] = new[] { 0, 1, 2, 3 }; yield return offerPopup;
+        var row = ManagedPatches.Types(modules[common].Types).Single(x => x.FullName == "ProtonVPN.Client.Common.UI.Controls.Bases.ConnectionRowButtonBase").Methods.Single(x => x.Name == "set_IsRestricted");
+        yield return Ui(common, row, "", true);
+        int buttons = 0;
+        foreach (var method in ManagedPatches.Types(modules["ProtonVPN.Client.dll"].Types).SelectMany(x => x.Methods).Where(x => x.HasBody && x.Body.Instructions.Any(i => i.OpCode == OpCodes.Ldstr && (string)i.Operand == "Common_Actions_Upgrade")))
+        {
+            // Exact compiled button field used by the localized Upgrade content binding.
+            var fields = method.Body.Instructions.Where(x => x.OpCode == OpCodes.Ldfld).Select(x => (FieldReference)x.Operand).Where(x => x.DeclaringType.FullName == method.DeclaringType.FullName && x.FieldType.FullName == "Microsoft.UI.Xaml.Controls.Button").GroupBy(x => x.FullName).Select(x => x.First()).ToList();
+            foreach (var field in fields) { buttons++; yield return Ui("ProtonVPN.Client.dll", method, field.FullName); }
+        }
+        if (buttons != 4) throw new Exception("Upgrade button inventory changed: " + buttons);
+    }
     static void Add(string id, string name, string description, string category, params object[] operations)
     {
         var patch = new Dictionary<string, object> { { "id", id }, { "name", name }, { "description", description }, { "category", category }, { "status", operations.Length == 0 ? "planned" : "ready" }, { "operations", operations } };
@@ -80,7 +108,10 @@ class BuildProtonPack
             Return(client, connSettings, "get_IsPaidUser", "boolean", true),
             Return(client, advanced, "get_IsPaidUser", "boolean", true),
             Return(client, "ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel", "get_IsPaidUser", "boolean", true));
-        ((Dictionary<string, object>)patches.Last())["version"] = "1.1.0";
+        var promotion = (Dictionary<string, object>)patches.Last();
+        promotion["operations"] = ((object[])promotion["operations"]).Concat(PromotionControls()).ToArray();
+        promotion["version"] = "1.2.0";
+        promotion["description"] = "Hides shared upgrade banners/feature cards, subscription badges, four explicit Upgrade buttons (including change-server and network notices), promotional announcement offers/popups, and restricted server-row upgrade actions. Available rows keep Connect and maintenance checks. NPS surveys and normal service notices remain available; actual account plan and backend eligibility are unchanged.";
         Add("vpn-accelerator", "Keep VPN Accelerator enabled", "Keeps VPN Accelerator on, opens its settings without an upgrade prompt, and shows its enabled state. This overrides the saved off toggle; restore this patch to return toggle control. Live speed improvements are not verified.", "Networking",
             Return(settings, userSettings, "get_IsVpnAcceleratorEnabled", "boolean", true),
             Return(client, "ProtonVPN.Client.UI.Main.Settings.Pages.Connection.VpnAcceleratorSettingsPageViewModel", "get_IsVpnAcceleratorEnabled", "boolean", true),
@@ -150,9 +181,18 @@ class BuildProtonPack
         countryServers["argument"] = new[] { "System.Boolean ProtonVPN.Client.Models.Connections.ConnectionItemBase::get_IsSearchItem()" };
         countryServers["elementGetter"] = "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.Server::get_ExitCountry()";
         countryServers["factoryMethod"] = "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem ProtonVPN.Client.Factories.ILocationItemFactory::GetServer(ProtonVPN.Client.Logic.Servers.Contracts.Models.Server,System.Boolean)";
-        Add("free-locations", "Free country and individual server selection", "Expand a free country to see its individual free servers and use their Connect actions. Also enables free server results in Search. Preserves the selected server ID and restricts connection candidates to free non-business servers without fallback. Paid accounts retain city/state browsing. Offline servers retain maintenance controls. Requires sign-in; live VPN connectivity is not yet verified.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers);
-        ((Dictionary<string, object>)patches.Last())["version"] = "1.2.0";
-        Add("no-sign-in", "Guest VPN session (Windows API rejected)", "Attempted with a real temporary Windows unauthenticated session on 2026-10-09. Proton's credentialless endpoint returned HTTP 422, Code 5003: Platform expected to be in [Android, iOS]. The temporary session was revoked. No usable Windows guest session was obtained; sign-in remains required. See AUTH-RESEARCH.md in the separate patch repository.", "Connections");
+        const string recentType = "ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem";
+        var recentRow = Op(client, "ProtonVPN.Client.Models.Connections.ConnectionItemBase", "InvalidateIsRestricted", "managedOverrideConditionalBooleanSetter");
+        recentRow["type"] = recentType; recentRow["setterMethod"] = "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)"; recentRow["value"] = false; recentRow["conditionExpected"] = false;
+        recentRow["condition"] = new[] { "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection " + recentType + "::get_RecentConnection()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection::get_ConnectionIntent()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.ILocationIntent ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent::get_Location()", "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IIntent::get_IsForPaidUsersOnly()" };
+        recentRow["exclusions"] = new[] { "IsSecureCore", "IsP2P", "IsTor", "IsB2B", "IsProfileIntent" }.Select(x => new[] { "System.Boolean " + recentType + "::get_" + x + "()" }).ToArray();
+        Add("free-locations", "Free country and individual server selection", "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires sign-in.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers, recentRow);
+        ((Dictionary<string, object>)patches.Last())["version"] = "1.3.0";
+        var modes = Op(client, "ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel", "get_CountriesComponents", "managedEnumFilter");
+        modes["elementGetter"] = "ProtonVPN.Client.Core.Enums.CountriesConnectionType ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent::get_ConnectionType()"; modes["value"] = 0;
+        modes["condition"] = new[] { "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.UI.Main.Sidebar.Bases.ConnectionListViewModelBase`1::get_Settings()", planGetter, paidGetter };
+        Add("hide-paid-modes", "Hide paid country modes", "Hides Secure Core, P2P and Tor country tabs on free accounts, keeping All countries and free server selection. Paid accounts retain their mode tabs. This changes navigation only; it does not grant access to paid servers. Restart Proton after an account-plan change.", "Interface", modes);
+        Add("no-sign-in", "Guest VPN session (port under development)", "Android client identity successfully obtained a temporary guest session, VPN credentials and a Windows-identity connection certificate on 2026-10-09. All temporary sessions were revoked. This is compatibility research, not an integrated Windows guest connection. Protected storage, refresh, logout, client workflow and tunnel validation remain; sign-in is still required in this pack. See AUTH-RESEARCH.md.", "Connections");
         var black = new List<object>();
         string[] backgrounds = { "BackgroundNormColor", "#000000", "BackgroundWeakColor", "#080808", "BackgroundStrongColor", "#141414", "InteractionWeakColor", "#101010", "InteractionWeakHoverColor", "#202020", "InteractionWeakActiveColor", "#282828", "BorderNormColor", "#282828", "BorderWeakColor", "#202020", "MapNormColor", "#050505", "MapHighlightColor", "#181818" };
         for (int i = 0; i < backgrounds.Length; i += 2) ColorPair(black, "Dark", backgrounds[i], backgrounds[i + 1]);
@@ -176,12 +216,12 @@ class BuildProtonPack
         var pack = new Dictionary<string, object> {
             { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
             { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
-            { "packVersion", "1.3.0" }, { "minimumPatcherVersion", "0.6.0" },
+            { "packVersion", "1.4.0" }, { "minimumPatcherVersion", "0.6.1" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built standalone pack v1.3.0: 14 available, guest sessions unavailable."); return 0;
+        Console.WriteLine("Built standalone pack v1.4.0: 15 available, guest port still planned."); return 0;
     }
 }

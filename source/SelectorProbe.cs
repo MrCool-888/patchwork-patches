@@ -36,7 +36,12 @@ class SelectorProbe
     }
     static object Get(object value, string name) { return value.GetType().GetProperty(name, Instance).GetValue(value); }
     static void Property(object value, string name, object data) { value.GetType().GetProperty(name, Instance).SetValue(value, data); }
-    static object Call(object value, string name, params object[] args) { return value.GetType().GetMethod(name, Instance).Invoke(value, args); }
+    static object Call(object value, string name, params object[] args)
+    {
+        for (var type = value.GetType(); type != null; type = type.BaseType)
+        { var method = type.GetMethod(name, Instance | BindingFlags.DeclaredOnly); if (method != null) return method.Invoke(value, args); }
+        throw new Exception("Missing probe method: " + name);
+    }
     static Array Items(Type type, params object[] items) { var array = Array.CreateInstance(type, items.Length); for (int i = 0; i < items.Length; i++) array.SetValue(items[i], i); return array; }
     static List<object> List(object values) { return ((IEnumerable)values).Cast<object>().ToList(); }
     static void Check(bool condition, string name) { if (!condition) throw new Exception(name); checks++; Console.WriteLine("PASS " + name); }
@@ -191,6 +196,36 @@ class SelectorProbe
         Property(countryList[0], "Code", "DE"); Check(List(Call(item, "GetSubItems")).Count == 0, "Country expansion never substitutes another country's servers"); Property(countryList[0], "Code", "NL");
         Call(item, "InvalidateIsRestricted", true); expanded = List(Call(item, "GetSubItems"));
         Check(usedPaidList && expanded.Count == 1 && Object.ReferenceEquals(expanded[0], city), "Paid country expansion preserves the original city/state factory path");
+        var recentType = T("ProtonVPN.Client.dll", "ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem");
+        var recentInterface = T("ProtonVPN.Client.Logic.Recents.Contracts.dll", "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection");
+        object recentIntent = specificIntent;
+        var recentData = SelectorProxy.Make(recentInterface, (method, data) => method.Name == "get_ConnectionIntent" ? recentIntent : Default(method.ReturnType));
+        var recent = Blank(recentType); Set(recent, "<RecentConnection>k__BackingField", recentData); Set(recent, "ConnectionManager", fakeManager);
+        Call(recent, "InvalidateIsRestricted", false); Check(!(bool)Get(recent, "IsRestricted"), "Standard individual free-server Recent shows Connect without an upgrade gate");
+        ((Task)Call(recent, "ToggleConnectionAsync")).GetAwaiter().GetResult(); Check(Object.ReferenceEquals(clickedIntent, specificIntent), "Recent Connect submits the original exact-server intent");
+        Property(recent, "IsUnderMaintenance", true); Check(!(bool)Call(recent, "CanToggleConnection"), "Recent maintenance still disables connection"); Property(recent, "IsUnderMaintenance", false);
+        var p2pType = T("ProtonVPN.Client.Logic.Connection.Contracts.dll", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Features.P2PFeatureIntent");
+        recentIntent = Activator.CreateInstance(intentType, new object[] { location, Activator.CreateInstance(p2pType) }); Call(recent, "InvalidateIsRestricted", false);
+        Check((bool)Get(recent, "IsRestricted"), "Paid P2P recent retains its restriction instead of gaining free eligibility");
+        Call(recent, "InvalidateIsRestricted", true); Check(!(bool)Get(recent, "IsRestricted"), "Paid-account Recent access is preserved");
+        recentIntent = intent; Call(recent, "InvalidateIsRestricted", false); Check(!(bool)Get(recent, "IsRestricted"), "Standard country Recent also shows Connect");
+        var componentsInterface = T("ProtonVPN.Client.dll", "ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent");
+        var modeType = componentsInterface.GetProperty("ConnectionType").PropertyType;
+        var components = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(componentsInterface));
+        for (int mode = 0; mode < 4; mode++) { int capturedMode = mode; components.Add(SelectorProxy.Make(componentsInterface, (method, data) => method.Name == "get_ConnectionType" ? Enum.ToObject(modeType, capturedMode) : Default(method.ReturnType))); }
+        var countriesPage = Blank(T("ProtonVPN.Client.dll", "ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel"));
+        Set(countriesPage, "<CountriesComponents>k__BackingField", components); Set(countriesPage, "<Settings>k__BackingField", settings); paid = false;
+        var visibleModes = List(Get(countriesPage, "CountriesComponents")); Check(visibleModes.Count == 1 && Convert.ToInt32(Call(visibleModes[0], "get_ConnectionType")) == 0, "Free-account country tabs hide Secure Core, P2P and Tor and retain All");
+        Check(components.Count == 4 && Object.ReferenceEquals(visibleModes[0], components[0]), "Mode filtering keeps original component objects and leaves the source list intact");
+        paid = true; Check(Object.ReferenceEquals(Get(countriesPage, "CountriesComponents"), components), "Paid accounts retain all original country mode tabs");
+        var announcementType = T("ProtonVPN.Client.Logic.Announcements.Contracts.dll", "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement");
+        var announcementMode = announcementType.GetProperty("Type").PropertyType;
+        var announcementList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(announcementType));
+        for (int mode = 0; mode < 5; mode++) { var notice = Activator.CreateInstance(announcementType); Property(notice, "Id", "probe-" + mode); Property(notice, "Type", Enum.ToObject(announcementMode, mode)); Property(notice, "StartDateTimeUtc", DateTime.UtcNow.AddDays(-1)); Property(notice, "EndDateTimeUtc", DateTime.UtcNow.AddDays(1)); announcementList.Add(notice); }
+        var announcements = Blank(T("ProtonVPN.Client.Logic.Announcements.dll", "ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider")); Set(announcements, "_readWriteLock", new ReaderWriterLockSlim()); Set(announcements, "_announcements", announcementList);
+        Check(List(Call(announcements, "GetAllActive")).Count == 1 && Object.ReferenceEquals(List(Call(announcements, "GetAllActive"))[0], announcementList[4]), "Promotional offer feed excludes offer types while retaining the NPS survey");
+        for (int mode = 0; mode < 4; mode++) Check(Call(announcements, "GetActiveAndUnseenByType", Enum.ToObject(announcementMode, mode)) == null, "Promotional announcement lookup disabled for type " + mode);
+        Check(Object.ReferenceEquals(Call(announcements, "GetActiveAndUnseenByType", Enum.ToObject(announcementMode, 4)), announcementList[4]), "Non-promotional survey lookup preserves the original provider path");
         Console.WriteLine(checks + " selector checks passed. No account, network, service, settings file or installed app was changed."); return 0;
     }
     static object GetRawCountries(object cache) { return cache.GetType().GetField("_countries", Instance).GetValue(cache); }

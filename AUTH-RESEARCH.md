@@ -1,40 +1,43 @@
 # Guest session research
 
-Reviewed October 9, 2026. This is research for a future Windows implementation; pack 1.3.0 retains sign-in and does not implement guest sessions.
+Reviewed October 9, 2026. Pack 1.4.0 still requires sign-in. The new Android-identity probe succeeded through guest session, VPN credentials and connection certificate issuance; the Windows client has not yet been integrated with that workflow.
 
-## Android and Morphe
+## Official Android workflow
 
-Proton VPN officially supports [Continue as guest on Android](https://protonvpn.com/support/best-android-vpn-app). This feature belongs to the original Android app. No separate sign-in-removal implementation was found in the current Morphe Proton patch directory or its credentialless/login/guest code search results.
+The Android guest feature belongs to the original Proton app. Morphe's existing free-account and settings patches do not create tokens. Proton's [AuthenticationApi](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/data/src/main/kotlin/me/proton/core/auth/data/api/AuthenticationApi.kt) declares POST auth/v4/credentialless. [AuthRepositoryImpl](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/data/src/main/kotlin/me/proton/core/auth/data/repository/AuthRepositoryImpl.kt) maps its response to session information without a username. [CreateLoginLessSession](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/domain/src/main/kotlin/me/proton/core/auth/domain/usecase/CreateLoginLessSession.kt) delegates storage and account state to the account workflow. PostLoginLessAccountSetup creates a credentialless user representation and refreshes scopes before marking the account ready.
 
-Morphe's [FreeAccountState.kt](https://github.com/hxreborn/morphe-patches/blob/main/patches/src/main/kotlin/app/morphe/patches/protonvpn/misc/restrictions/FreeAccountState.kt) identifies the existing user-info/VPN-user fields and observes updates. It does not create session tokens. The [settings patch](https://github.com/hxreborn/morphe-patches/blob/main/patches/src/main/kotlin/app/morphe/patches/protonvpn/misc/settings/PatchesSettingsPatch.kt) inserts patch settings and initializes its extension; it does not supply guest credentials.
+Guest use still needs an authenticated backend session and connection credentials. Hiding the login page alone does not provide them.
 
-Official Proton source shows the actual mechanism:
+## Live compatibility results
 
-- [AuthenticationApi](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/data/src/main/kotlin/me/proton/core/auth/data/api/AuthenticationApi.kt) declares POST auth/v4/credentialless.
-- [AuthRepositoryImpl](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/data/src/main/kotlin/me/proton/core/auth/data/repository/AuthRepositoryImpl.kt) constructs the request with challenge-frame data and maps the reply to session information without a username.
-- [CreateLoginLessSession](https://github.com/ProtonMail/protoncore_android/blob/1b87f94ebfdfaf5e67145e8668efc52dbb931e0b/auth/domain/src/main/kotlin/me/proton/core/auth/domain/usecase/CreateLoginLessSession.kt) creates an account/session using the returned user ID, session ID, access token, refresh token and scopes, then delegates session handling to the account workflow. Post-login account setup follows.
-- The Android app's [AccountViewModel](https://github.com/ProtonVPN/android-app/blob/fd1cb1dd108888e57b36ce8d7cc1dcdc25517c61/app/src/main/java/com/protonvpn/android/auth/ui/AccountViewModel.kt) handles the credentialless account workflow and becomes ready when account setup is ready.
+The independent source/GuestCompatibilityProbe.cjs uses normal HTTPS validation, holds session tokens only in memory, prints status/code/credential-presence booleans, and revokes its temporary sessions. It never prints raw replies, identifiers, credentials, private keys or certificates.
 
-Guest use still has an authenticated backend session. Hiding a sign-in page is not equivalent to implementing that session.
+Earlier Windows-identity attempt:
 
-## Windows 5.1.8
+- POST /auth/v4/sessions using windows-vpn@5.1.8: HTTP 200, Code 1000.
+- POST /auth/v4/credentialless with Payload {}: HTTP 422, Code 5003, requiring Android or iOS.
+- Temporary session revoked with DELETE /auth: HTTP 200.
 
-The Windows source inspected is tag v5.1.8, commit d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9.
+Requested Android-identity attempt, using android-vpn@5.20.57.0 (the [official Android release](https://github.com/ProtonVPN/android-app/releases/tag/5.20.57.0)):
 
-[ApiClient](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Api/ProtonVPN.Api/ApiClient.cs) issues normal connection certificates through an authorized request. [UserAuthenticator](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Client/Logic/Auth/ProtonVPN.Client.Logic.Auth/UserAuthenticator.cs) still runs normal username/password login inside guest-hole recovery. Guest-hole bootstrap is temporary API recovery, separate from Android's credentialless account workflow.
+- Unauthenticated bootstrap: HTTP 200, Code 1000.
+- Credentialless request with Payload {}: HTTP 200, Code 1000; guest session issued.
+- GET /vpn/v2 with that guest session and windows-vpn@5.1.8: HTTP 200, Code 1000; VPN info and connection credential fields present.
+- POST /vpn/v1/certificate with Windows identity, a newly generated in-memory Ed25519 public key, EC/session mode and no optional features: HTTP 200, Code 1000; certificate present.
+- Both guest and bootstrap sessions revoked with DELETE /auth: HTTP 200 each. Private key material was discarded; no credentials were persisted.
 
-## Live Windows compatibility attempt
+The change was the client identity header. No Android device telemetry or challenge answers were fabricated. The optional probe stops on human verification without solving or bypassing it. These results establish that the tested mobile session can authorize Windows API requests; they do not establish a working tunnel, certificate renewal, reconnect or restart behavior. The earlier conclusion that Windows-platform rejection alone prevented a port is superseded by this successful test.
 
-On October 9, 2026, the independent source/GuestCompatibilityProbe.cjs used HTTPS with normal certificate validation and the honest Windows client identity windows-vpn@5.1.8. POST /auth/v4/sessions returned HTTP 200, Code 1000, providing a temporary unauthenticated session. POST /auth/v4/credentialless with that session and {Payload:{}} returned **HTTP 422, Code 5003**, with **Platform expected to be in [Android, iOS]**. The temporary session was revoked with DELETE /auth (HTTP 200). Only status/code/field names were retained; no access tokens, refresh tokens or account identifiers are distributed.
+## Windows integration still needed
 
-This is a platform rejection from the tested endpoint, before a usable Windows guest session was obtained. The probe supplies an empty challenge payload to test that boundary; it is not a complete guest client. No mobile identity was impersonated. Windows guest support therefore remains unavailable in the catalog, and existing sign-in and credential/certificate validation stay active. A future backend change requires another explicit compatibility check and the client work below.
+The [Windows 5.1.8 UserAuthenticator](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Client/Logic/Auth/ProtonVPN.Client.Logic.Auth/UserAuthenticator.cs) uses its SRP login path before CompleteLoginAsync. Guest-hole recovery still performs normal login. [ApiClient](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Api/ProtonVPN.Api/ApiClient.cs) obtains VPN info and connection certificates through the current authorized session.
 
-## Work needed for a functioning Windows port
+A complete port needs:
 
-1. Implement a guest authentication client with Proton's request/challenge handling and platform compatibility. The tested endpoint currently rejects the Windows platform; backend support must change or a supported Windows flow must be identified.
-2. Integrate the returned session and VPN-user state with Windows authentication, protected credential storage, refresh, revocation and recovery. Keep existing signed-in accounts intact.
-3. Obtain and renew the connection certificate/key material through the guest session using the Windows connection service. Preserve certificate verification and server/protocol eligibility checks.
-4. Add an explicit Continue as guest action and handle unavailable service, cancellation, restart, expiry and transition to normal sign-in.
-5. Test an actual free-server tunnel, reconnect, process restart, token expiry and logout. Copied-method tests alone cannot validate this feature.
+1. An explicit Continue as guest action that handles unavailable service, cancellation and human verification.
+2. Integration of the guest session and credentialless account state into the Windows auth workflow, with protected token storage, refresh, revocation and recovery. Existing accounts must remain intact.
+3. Use of the existing connection-key/certificate manager and service, preserving certificate checks and free-server/protocol eligibility.
+4. Restart, expiry, refresh, reconnect, logout and transition-to-normal-sign-in behavior.
+5. A real free-server tunnel and traffic/DNS verification on a test machine.
 
-Patchwork's current declarative operations change existing return values, calls and selectors. They cannot add this network/session lifecycle. The Windows implementation therefore needs additional client code and a reviewable delivery mechanism before an executable guest-session patch can be supplied. No Android or Morphe implementation code is copied into this pack.
+The current declarative patch operations cannot supply the complete asynchronous network/session lifecycle. A reviewable client-code delivery mechanism is required before shipping that integration. The compatibility probe is separate research source, never run by patch application and never bundled into the installer. The catalog entry remains planned, accurately indicating that the API experiment succeeded but the guest client is not implemented.
