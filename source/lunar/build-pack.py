@@ -127,5 +127,5 @@ pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId=
     dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Experimental: enables the local all-cosmetics rendering path, handles outfit and badge mutations locally and suppresses the outgoing cosmetic push. Requires default account outfit/catalog assets. Unequip existing online cosmetics BEFORE applying; previously saved online outfits can remain visible to others. Login/assets still use the network; emotes/sprays are outside scope. Favorite clicks are acknowledged without persistence. Exact patched-JAR guard stops launch if game/version changes. No live Minecraft or multiplayer privacy verification.',operations=cosmetic_ops)
 ])
 args.output_dir.mkdir(parents=True,exist_ok=True)
-out=args.output_dir/('LunarClient-'+args.version+'.patchwork.json'); out.write_text(json.dumps(pack,indent=2)+'\n',encoding='utf-8')
+out=args.output_dir/('LunarClient-'+args.version+'.patchwork.json'); out.write_text(json.dumps(pack,indent=2)+'\n',encoding='utf-8',newline='\n')
 print(json.dumps({'file':str(out),'size':out.stat().st_size,'gameEntryEditCounts':[len(x.get('edits',[])) for x in jar_ops],'launcherEdits':len(clean_ops)-1,'gameSHA1':game_sha1}))
