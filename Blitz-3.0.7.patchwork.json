@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "blitz-clean-desktop-3-0-7",
+  "appId": "blitz",
+  "appName": "Blitz",
+  "appVersion": "3.0.7.134 (frontend 3.0.8-ota.0)",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.8.0",
+  "versionFile": "resources/app.asar",
+  "versionSha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+  "author": "Local build",
+  "source": "Local Blitz Clean Desktop pack",
+  "patches": [
+    {
+      "id": "clean-desktop",
+      "name": "Clean desktop",
+      "category": "Desktop",
+      "version": "1.0.0",
+      "status": "ready",
+      "description": "Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits.",
+      "operations": [
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "function createBrowserView({ width, height, url }) {",
+          "replacement": "// Injected into Blitz's main process; no code runs while Patchwork imports or previews.\nfunction patchworkInstallDesktopCleanup(browserView, initialURL) {\n  const wc = browserView.webContents;\n  const contentsId = wc.id;\n  const knownHosts = new Set([\n    \"blitz.gg\", \"blitzapp.gg\", \"agentselect.net\", \"championselect.net\",\n    \"lolstats.com\", \"probuilds.net\", \"tftcomps.gg\",\n  ]);\n  function supported(value) {\n    try {\n      const parsed = new URL(value);\n      return parsed.protocol === \"https:\" && knownHosts.has(parsed.hostname) &&\n        /^\\/v3\\.0\\.8-ota\\.0(?:\\/|$)/.test(parsed.pathname) &&\n        !parsed.searchParams.has(\"overlay-route\");\n    } catch { return false; }\n  }\n  const key = Symbol.for(\"patchwork.blitz.desktop-cleanup.v1\");\n  const session = wc.session;\n  if (!session[key]) {\n    const views = new Map();\n    session[key] = { views };\n    session.webRequest.onBeforeRequest({ urls: [\n      \"https://dn0qt3r0xannq.cloudfront.net/blitz-ONuZ1Ty9qx/*\",\n      \"https://live.primis.tech/live/liveView.php*\",\n    ] }, (details, callback) => {\n      const view = views.get(details.webContentsId);\n      let cancel = false;\n      if (view && view.active) {\n        try {\n          const request = new URL(details.url);\n          cancel = (request.hostname === \"dn0qt3r0xannq.cloudfront.net\" &&\n            request.pathname.startsWith(\"/blitz-ONuZ1Ty9qx/\") &&\n            request.pathname.endsWith(\"/prebid-load.js\")) ||\n            (request.hostname === \"live.primis.tech\" && request.pathname === \"/live/liveView.php\");\n        } catch { /* An unrecognized URL retains its original behavior. */ }\n      }\n      callback({ cancel });\n    });\n  }\n  const state = { active: supported(initialURL), cssKey: null, generation: 0 };\n  session[key].views.set(contentsId, state);\n  // Chromium can satisfy scripts from memory without invoking webRequest.\n  // Disable cache only for supported desktop views, before their first load.\n  let ownsDebugger = false;\n  async function cacheMode(active) {\n    try {\n      if (active && !wc.debugger.isAttached()) {\n        wc.debugger.attach(\"1.3\"); ownsDebugger = true;\n      }\n      if (wc.debugger.isAttached()) {\n        await wc.debugger.sendCommand(\"Network.setCacheDisabled\", { cacheDisabled: active });\n        if (!active && ownsDebugger) { ownsDebugger = false; wc.debugger.detach(); }\n      }\n    } catch (error) {\n      if (!wc.isDestroyed()) log.warn(\"[Patchwork]\", \"Desktop cache bypass unavailable: \" + error.message);\n    }\n  }\n  wc.debugger.on(\"detach\", (_event, reason) => {\n    const unexpected = ownsDebugger;\n    ownsDebugger = false;\n    if (unexpected && state.active && !wc.isDestroyed()) log.warn(\"[Patchwork]\", \"Desktop cache bypass detached: \" + reason);\n  });\n  wc.on(\"devtools-closed\", () => cacheMode(supported(wc.getURL())));\n  const loadURL = wc.loadURL.bind(wc);\n  const reload = wc.reload.bind(wc);\n  wc.loadURL = async (value, options) => {\n    const bypass = cacheMode(supported(value));\n    // A new view has no renderer yet; its queued protocol command needs a load.\n    if (wc.getURL()) await bypass;\n    if (!wc.isDestroyed()) return loadURL(value, options);\n  };\n  wc.reload = () => {\n    if (state.active) cacheMode(true).then(() => { if (!wc.isDestroyed()) wc.reloadIgnoringCache(); }); else reload();\n  };\n  wc.on(\"will-navigate\", (event, value) => {\n    if (!supported(value)) return;\n    event.preventDefault();\n    wc.loadURL(value).catch(error => {\n      if (!wc.isDestroyed()) log.warn(\"[Patchwork]\", \"Desktop navigation failed: \" + error.message);\n    });\n  });\n  const css = `\n    .blitz-app { --right-rail-width: 0px !important; --rail-gap: 0px !important; }\n    [class~=\"🤑-wrapper\"], [class~=\"🤑-column\"], [class~=\"🤑-leaderboard\"],\n    [class~=\"🤑-rectangle\"], [class~=\"🤑-placeholder\"],\n    [data-primis-placement-id], #display-desktop-anchor, [id^=\"display-rr-\"],\n    li:has(> a.get-premium-btn), .get-premium-btn, .ads-toggle,\n    .latest-feature-container.svelte-1lr1kw5, .blitz3-promo.svelte-lj7rjc {\n      display: none !important; pointer-events: none !important;\n    }\n  `;\n  function report(value) {\n    if (!state.active) {\n      let location = \"unrecognized URL\";\n      try { const parsed = new URL(value); location = parsed.origin + parsed.pathname; } catch {}\n      log.warn(\"[Patchwork]\", \"Desktop cleanup skipped for unsupported frontend: \" + location);\n    }\n  }\n  async function refresh(value) {\n    const generation = ++state.generation;\n    state.active = supported(value);\n    const oldKey = state.cssKey; state.cssKey = null;\n    if (oldKey && !wc.isDestroyed()) {\n      try { await wc.removeInsertedCSS(oldKey); } catch {}\n    }\n    if (!state.active || wc.isDestroyed()) { report(value); return; }\n    try {\n      const inserted = await wc.insertCSS(css, { cssOrigin: \"user\" });\n      if (wc.isDestroyed()) return;\n      if (generation !== state.generation || !state.active) {\n        await wc.removeInsertedCSS(inserted); return;\n      }\n      state.cssKey = inserted;\n    } catch (error) {\n      if (!wc.isDestroyed()) log.warn(\"[Patchwork]\", \"Desktop cleanup CSS failed: \" + error.message);\n    }\n  }\n  wc.on(\"did-start-navigation\", (_event, value, inPlace, mainFrame) => {\n    if (!mainFrame) return;\n    state.active = supported(value);\n    state.generation++;\n    cacheMode(state.active);\n    if (!inPlace) state.cssKey = null;\n  });\n  wc.on(\"did-finish-load\", () => refresh(wc.getURL()));\n  wc.on(\"did-navigate-in-page\", (_event, value, mainFrame) => {\n    if (mainFrame) refresh(value);\n  });\n  wc.once(\"destroyed\", () => {\n    state.active = false; state.generation++; session[key].views.delete(contentsId);\n  });\n  report(initialURL);\n}\n\nfunction createBrowserView({ width, height, url }) {",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "  browserView.webContents.loadURL(url);",
+          "replacement": "  patchworkInstallDesktopCleanup(browserView, url);\n  browserView.webContents.loadURL(url);",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "compact-window",
+      "name": "Compact window",
+      "category": "Local features",
+      "version": "1.0.0",
+      "status": "ready",
+      "description": "Allows a 940 x 500 minimum desktop window for every account, bounded by the screen size. Does not change account roles or stored minimum-size preferences. Contains executable JavaScript client edits.",
+      "operations": [
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "const DEFAULT_MIN_WIDTH = 1075;",
+          "replacement": "const DEFAULT_MIN_WIDTH = 940;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "const DEFAULT_HEIGHT = 850;",
+          "replacement": "const DEFAULT_HEIGHT = 500;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "  MIN_WIDTH = Math.min(\n    (await get(\"MIN_WIDTH\")) || DEFAULT_MIN_WIDTH,\n    DEFAULT_MIN_WIDTH\n  );\n  MIN_HEIGHT = (await get(\"MIN_HEIGHT\")) || MIN_HEIGHT;",
+          "replacement": "  MIN_WIDTH = DEFAULT_MIN_WIDTH;\n  MIN_HEIGHT = DEFAULT_HEIGHT;",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "resources/app.asar",
+          "sha256": "44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193",
+          "entry": "src/createWindow.js",
+          "entrySha256": "1e29a02656eac1859940f8c5f192e6b4ae8cf0bf50a524ffcece3779f4a587d1",
+          "find": "  fetchUser().then((user) => {\n    if (user && hasPremiumRole(user.roles)) {\n      MIN_WIDTH = 940;\n      MIN_HEIGHT = 500;\n      write(\"MIN_WIDTH\", MIN_WIDTH);\n      write(\"MIN_HEIGHT\", MIN_HEIGHT);\n      windows.client.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);\n    } else {\n      MIN_WIDTH = DEFAULT_MIN_WIDTH;\n      MIN_HEIGHT = DEFAULT_HEIGHT;\n      write(\"MIN_WIDTH\", MIN_WIDTH);\n      write(\"MIN_HEIGHT\", MIN_HEIGHT);\n      const [currentWidth, currentHeight] = windows.client.getSize();\n      if (currentWidth < MIN_WIDTH || currentHeight < MIN_HEIGHT) {\n        windows.client.setSize(\n          Math.max(currentWidth, MIN_WIDTH),\n          Math.max(currentHeight, MIN_HEIGHT)\n        );\n        ensureWindowIsOnADisplay();\n      }\n      windows.client.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);\n    }\n  });",
+          "replacement": "  windows.client.setMinimumSize(\n    Math.max(1, Math.min(MIN_WIDTH, displaySize.width - SCREEN_MARGIN)),\n    Math.max(1, Math.min(MIN_HEIGHT, displaySize.height - SCREEN_MARGIN))\n  );",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const { readArchive, hash } = require('./asar-reader.cjs');
+const installed = process.argv[2] || path.join(process.env.LOCALAPPDATA, 'Programs/Blitz/resources/app.asar');
+const destination = process.argv[3] || path.join(process.cwd(), 'Blitz-3.0.7.patchwork.json');
+const archive = readArchive(installed);
+assert.equal(hash(archive.bytes), '44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193', 'Use the verified original Blitz archive.');
+const entry = 'src/createWindow.js';
+const original = archive.member(entry).toString('utf8');
+function edit(find, replacement) {
+  assert.equal(original.split(find).length - 1, 1, 'Expected one original match: ' + find);
+  return { kind: 'asarTextReplace', file: 'resources/app.asar', sha256: hash(archive.bytes),
+    entry, entrySha256: hash(archive.member(entry)), find, replacement, count: 1 };
+}
+const hook = fs.readFileSync(path.join(__dirname, 'desktop-cleanup.js'), 'utf8').trim();
+const start = 'function createBrowserView({ width, height, url }) {';
+const load = '  browserView.webContents.loadURL(url);';
+const savedMinimum = `  MIN_WIDTH = Math.min(
+    (await get("MIN_WIDTH")) || DEFAULT_MIN_WIDTH,
+    DEFAULT_MIN_WIDTH
+  );
+  MIN_HEIGHT = (await get("MIN_HEIGHT")) || MIN_HEIGHT;`;
+const accountStart = original.indexOf('  fetchUser().then((user) => {');
+const accountEnd = original.indexOf('\n\n  windows.client._initialURL', accountStart);
+assert.ok(accountStart >= 0 && accountEnd > accountStart);
+const pack = {
+  schemaVersion: 1, id: 'blitz-clean-desktop-3-0-7', appId: 'blitz', appName: 'Blitz',
+  appVersion: '3.0.7.134 (frontend 3.0.8-ota.0)', packVersion: '1.0.0', minimumPatcherVersion: '0.8.0',
+  versionFile: 'resources/app.asar', versionSha256: hash(archive.bytes), author: 'Local build', source: 'Local Blitz Clean Desktop pack',
+  patches: [
+    { id: 'clean-desktop', name: 'Clean desktop', category: 'Desktop', version: '1.0.0', status: 'ready',
+      description: 'Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits.',
+      operations: [edit(start, hook + '\n\n' + start), edit(load, '  patchworkInstallDesktopCleanup(browserView, url);\n' + load)] },
+    { id: 'compact-window', name: 'Compact window', category: 'Local features', version: '1.0.0', status: 'ready',
+      description: 'Allows a 940 x 500 minimum desktop window for every account, bounded by the screen size. Does not change account roles or stored minimum-size preferences. Contains executable JavaScript client edits.',
+      operations: [
+        edit('const DEFAULT_MIN_WIDTH = 1075;', 'const DEFAULT_MIN_WIDTH = 940;'),
+        edit('const DEFAULT_HEIGHT = 850;', 'const DEFAULT_HEIGHT = 500;'),
+        edit(savedMinimum, '  MIN_WIDTH = DEFAULT_MIN_WIDTH;\n  MIN_HEIGHT = DEFAULT_HEIGHT;'),
+        edit(original.slice(accountStart, accountEnd), `  windows.client.setMinimumSize(
+    Math.max(1, Math.min(MIN_WIDTH, displaySize.width - SCREEN_MARGIN)),
+    Math.max(1, Math.min(MIN_HEIGHT, displaySize.height - SCREEN_MARGIN))
+  );`),
+      ] },
+  ],
+};
+fs.mkdirSync(path.dirname(destination), { recursive: true });
+fs.writeFileSync(destination, JSON.stringify(pack, null, 2) + '\n');
+console.log('Built ' + destination + ' (' + fs.statSync(destination).size + ' bytes)');

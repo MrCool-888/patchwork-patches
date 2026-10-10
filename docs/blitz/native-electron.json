@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "electron": "31.2.1",
+  "chrome": "126.0.6478.127",
+  "registrations": 1,
+  "cancelled": 10,
+  "preservedHeaders": 38,
+  "checks": [
+    "native desktop request cancellation",
+    "existing response handler",
+    "startup with warm memory/disk cache",
+    "reload with warm fixture cache",
+    "SPA and full navigation",
+    "unknown frontend original behavior",
+    "BrowserView recreation",
+    "unrelated view",
+    "collapsed CSS and reclaimed column",
+    "dynamic slots",
+    "940 x 500 native window minimum"
+  ]
+}

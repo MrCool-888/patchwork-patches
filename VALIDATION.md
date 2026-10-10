@@ -1,5 +1,11 @@
 # Proton VPN 5.1.8 patch validation
 
+## Combined Blitz + Proton prerelease
+
+The combined release reuses the existing Proton VPN 1.5.1 JSON byte for byte. Its SHA-256 is `8c4d7ace14103abf3011725db409478003309bf2545b8dfa1369dbcc644036a9`. No Proton operations, versions, original fingerprints or validation claims change. Blitz 1.0.0 is a separate bundle with its own exact original archive/member fingerprints and requires Patchwork 0.8.0.
+
+The two JSON files are separate assets in one prerelease, retaining their stable filenames. Adding this repository as a Patchwork source with prereleases enabled offers both app bundles. See [docs/blitz/VALIDATION.md](docs/blitz/VALIDATION.md) for Blitz's 44 patcher checks, isolated transactions and native Electron warm-cache evidence, plus remaining live testing.
+
 ## Experimental 1.5.1 / r7 prerelease — October 10, 2026
 
 The native WinUI navigation regression first reproduced r6's exact `Guest sign-in cancelled.` failure with fake HTTP: LoggingIn switches to a loading control and unloads the sign-in page, whose old handler cancels the shared authenticator token. The baseline differs only by injecting the fake protocol; no real sessions are created by the regression test.
