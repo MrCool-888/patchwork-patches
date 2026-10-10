@@ -8,7 +8,7 @@ class ValidatePack
     static void Assert(bool ok, string message) { if (!ok) throw new Exception(message); }
     static void Main(string[] args)
     {
-        if (args.Length != 3) throw new ArgumentException("Usage: ValidatePack PACK_JSON ORIGINALS_DIR NEW_SCRATCH_DIR");
+        if (args.Length < 3 || args.Length > 4) throw new ArgumentException("Usage: ValidatePack PACK_JSON ORIGINALS_DIR NEW_SCRATCH_DIR [PREVIOUS_PACK_JSON]");
         var bundle = PatchBundle.Parse(File.ReadAllText(args[0]));
         string originals = Path.GetFullPath(args[1]), scratch = Path.GetFullPath(args[2]);
         if (Directory.Exists(scratch) || File.Exists(scratch)) throw new IOException("Choose a fresh scratch directory.");
@@ -20,7 +20,8 @@ class ValidatePack
             File.Copy(Path.Combine(originals, Path.GetFileName(path)), dest);
         }
         var engine = new PatchEngine(Path.Combine(scratch, "history"));
-        var plan = engine.Preview(bundle, target, new[] { "clean-launcher", "local-cosmetics" });
+        var selected = bundle.Patches.Select(x => x.Id).ToArray();
+        var plan = engine.Preview(bundle, target, selected);
         Assert(plan.Files.Count == 3, "Expected three file changes.");
         var game = plan.Files.Single(x => x.RelativePath.EndsWith("lunar.jar")); string before, after;
         byte[] repeated = JarPatches.Transform(game.BeforeBytes, bundle.Patches[1].Operations.Where(x => x.Kind.StartsWith("jar")).ToList(), out before, out after);
@@ -31,9 +32,36 @@ class ValidatePack
         try { engine.Apply(plan); throw new Exception("Expected injected failure."); } catch (IOException) { }
         foreach (var file in plan.Files) Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(target, file.RelativePath))) == file.BeforeHash, "Rollback mismatch.");
         Console.WriteLine("PASS partial-write rollback."); engine.BeforeWriteForTest = null;
-        engine.Apply(engine.Preview(bundle, target, new[] { "clean-launcher", "local-cosmetics" }));
+        if (args.Length == 4)
+        {
+            var previous = PatchBundle.Parse(File.ReadAllText(args[3]));
+            engine.Apply(engine.Preview(previous, target, new[] { "clean-launcher", "local-cosmetics" }));
+        }
+        engine.Apply(engine.Preview(bundle, target, selected));
         foreach (var file in plan.Files) Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(target, file.RelativePath))) == file.AfterHash, "Apply mismatch.");
-        var update = engine.Preview(bundle, target, new[] { "clean-launcher" });
+        if (selected.Contains("disable-auto-updates"))
+        {
+            var removal = engine.Preview(bundle, target, new[] { "clean-launcher", "local-cosmetics" });
+            var archive = removal.Files.Single(x => x.RelativePath.EndsWith("app.asar"));
+            Assert(archive.AfterHash != archive.BeforeHash, "Removing update patch did not change launcher.");
+            if (args.Length == 4)
+            {
+                var prior = PatchBundle.Parse(File.ReadAllText(args[3]));
+                var cleanRoot = Path.Combine(scratch, "original-target");
+                foreach (var file in plan.Files)
+                {
+                    string dest = PatchEngine.Resolve(cleanRoot, file.RelativePath); Directory.CreateDirectory(Path.GetDirectoryName(dest));
+                    File.WriteAllBytes(dest, file.BeforeBytes);
+                }
+                var oldPlan = new PatchEngine(Path.Combine(scratch, "prior-history")).Preview(prior, cleanRoot, new[] { "clean-launcher", "local-cosmetics" });
+                Assert(archive.AfterHash == oldPlan.Files.Single(x => x.RelativePath.EndsWith("app.asar")).AfterHash, "Deselection did not recover the previous launcher patch.");
+            }
+            engine.Apply(removal);
+            engine.Apply(engine.Preview(bundle, target, selected));
+            Console.WriteLine("PASS direct pack upgrade and updater deselection/reselection.");
+        }
+        var remaining = selected.Where(x => x != "local-cosmetics").ToArray();
+        var update = engine.Preview(bundle, target, remaining);
         Assert(update.Files.Single(x => x.RelativePath.EndsWith("lunar.jar")).AfterHash == game.BeforeHash, "Removing cosmetics did not restore JAR.");
         var journal = engine.Apply(update); Console.WriteLine("PASS full apply and selection removal.");
         engine.Restore(journal);

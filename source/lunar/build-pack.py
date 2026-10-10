@@ -116,15 +116,30 @@ else:
       ('uA=({notification:e})=>{let t=cA[e.type]','uA=({notification:e})=>{if(e.type===$k.Notification_NotificationType.NOTIFICATION_TYPE_PROMOTION)return null;let t=cA[e.type]')
     ]
 clean_ops=[fuse]; cosmetic_ops=list(jar_ops)
+updater = 'M9' if args.version == '3.7.17-ow' else 'j9'
+update_pairs = [
+    ('async checkForUpdates(e){if(e&&(this.userInitiated=e),',
+     'async checkForUpdates(e){if(!e){this.logger.info(`Automatic launcher updates disabled by Patchwork.`);return}if(e&&(this.userInitiated=e),'),
+    (updater+'.autoUpdater.autoDownload=!1,'+updater+'.autoUpdater.autoRunAppAfterInstall=!0',
+     updater+'.autoUpdater.autoDownload=!1,'+updater+'.autoUpdater.autoInstallOnAppQuit=!1,'+updater+'.autoUpdater.autoRunAppAfterInstall=!0'),
+    ('q9.checkForUpdates(e.forceInstall)',
+     'this.client.assetServerModule.logger.info(`Server-requested launcher update blocked by Patchwork.`)')
+]
+update_ops=[]
+for old,new in update_pairs:
+    name='dist-electron/electron/main.js'
+    assert entries[name].decode('utf-8').count(old)==1,old
+    update_ops.append(dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=old,replacement=new,count=1))
 for old,new in pairs:
     names=[name for name,data in entries.items() if data.decode('utf-8').count(old)==1]
     assert len(names)==1,(old,names)
     name=names[0]
     op=dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=old,replacement=new,count=1)
     (cosmetic_ops if old.startswith(('Jme=','SS=async')) else clean_ops).append(op)
-pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.1',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
+pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.2',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
     dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.1',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.',operations=clean_ops),
-    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.1',status='ready',dependencies=['clean-launcher'],description='Experimental: handles outfit and badge mutations locally and suppresses the inspected outgoing cosmetic push. Requires default account outfit/catalog assets. Minecraft 1.21.11 launch, locker rendering and local equip/unequip verified with launcher 3.7.24-ow; 3.7.17 tested on copies. Open Locker using the main menu shirt icon, wait for the catalog, select Local Outfit and Equip. Unequip existing online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope. Favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops)
+    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.1',status='ready',dependencies=['clean-launcher'],description='Experimental: handles outfit and badge mutations locally and suppresses the inspected outgoing cosmetic push. Requires default account outfit/catalog assets. Minecraft 1.21.11 launch, locker rendering and local equip/unequip verified with launcher 3.7.24-ow; 3.7.17 tested on copies. Open Locker using the main menu shirt icon, wait for the catalog, select Local Outfit and Equip. Unequip existing online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope. Favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops),
+    dict(id='disable-auto-updates',name='Disable automatic updates',category='Launcher',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Stops automatic launcher update checks at startup, on timers and after channel changes. Blocks server-requested launcher updates, including force-install requests, and disables installation on app exit. Manual Check for updates remains available; restore patches before updating Lunar. Requires Remove ads and promotions for its launcher archive compatibility change. Game/runtime downloads during Minecraft launch are separate and remain unchanged.',operations=update_ops)
 ])
 args.output_dir.mkdir(parents=True,exist_ok=True)
 out=args.output_dir/('LunarClient-'+args.version+'.patchwork.json'); out.write_text(json.dumps(pack,indent=2)+'\n',encoding='utf-8',newline='\n')

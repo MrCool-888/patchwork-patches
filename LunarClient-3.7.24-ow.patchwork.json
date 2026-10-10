@@ -4,7 +4,7 @@
   "appId": "lunar-client",
   "appName": "Lunar Client",
   "appVersion": "3.7.24-ow / multiver 29a43e6",
-  "packVersion": "0.1.1",
+  "packVersion": "0.1.2",
   "minimumPatcherVersion": "0.9.1",
   "versionFile": "AppData/Local/Programs/Lunar Client/resources/app.asar",
   "versionSha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
@@ -264,6 +264,49 @@
           "entrySha256": "9781715efe843f763240bf27874f9604da9cb4a5b2959f5d6c1768a5e20540db",
           "find": "SS=async e=>{let t=await bS(e.location);if(!t)",
           "replacement": "SS=async e=>{let t=await bS(e.location);if((0,S.basename)(e.location)===`lunar.jar`){if(e.expectedHash===`3a30454c0e076f6feee2246c5969d006414f4307`&&t===`bd3d081b9c8556a1b0c98c156bc0c1b783ec5bad`)return{reason:yS.Matched};throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}if(!t)",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "disable-auto-updates",
+      "name": "Disable automatic updates",
+      "category": "Launcher",
+      "version": "0.1.0",
+      "status": "ready",
+      "dependencies": [
+        "clean-launcher"
+      ],
+      "description": "Stops automatic launcher update checks at startup, on timers and after channel changes. Blocks server-requested launcher updates, including force-install requests, and disables installation on app exit. Manual Check for updates remains available; restore patches before updating Lunar. Requires Remove ads and promotions for its launcher archive compatibility change. Game/runtime downloads during Minecraft launch are separate and remain unchanged.",
+      "operations": [
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
+          "entry": "dist-electron/electron/main.js",
+          "entrySha256": "9781715efe843f763240bf27874f9604da9cb4a5b2959f5d6c1768a5e20540db",
+          "find": "async checkForUpdates(e){if(e&&(this.userInitiated=e),",
+          "replacement": "async checkForUpdates(e){if(!e){this.logger.info(`Automatic launcher updates disabled by Patchwork.`);return}if(e&&(this.userInitiated=e),",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
+          "entry": "dist-electron/electron/main.js",
+          "entrySha256": "9781715efe843f763240bf27874f9604da9cb4a5b2959f5d6c1768a5e20540db",
+          "find": "j9.autoUpdater.autoDownload=!1,j9.autoUpdater.autoRunAppAfterInstall=!0",
+          "replacement": "j9.autoUpdater.autoDownload=!1,j9.autoUpdater.autoInstallOnAppQuit=!1,j9.autoUpdater.autoRunAppAfterInstall=!0",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
+          "entry": "dist-electron/electron/main.js",
+          "entrySha256": "9781715efe843f763240bf27874f9604da9cb4a5b2959f5d6c1768a5e20540db",
+          "find": "q9.checkForUpdates(e.forceInstall)",
+          "replacement": "this.client.assetServerModule.logger.info(`Server-requested launcher update blocked by Patchwork.`)",
           "count": 1
         }
       ]

@@ -1,4 +1,14 @@
-# Lunar 0.1.1 validation — 2026-10-10
+# Lunar 0.1.2 validation — 2026-10-10
+
+## Automatic launcher updates
+
+Pack 0.1.2 adds the optional `disable-auto-updates` patch (version 0.1.0) for both inspected launcher builds. Existing ads/cosmetics operations remain byte-identical to pack 0.1.1. It blocks non-manual checks in the shared updater method, disables `autoInstallOnAppQuit`, and blocks the server-push handler even when its `forceInstall` flag is true. Startup, timer and channel-change callers use the guarded method; manual IPC and user deep-link checks retain their original behavior. Game/runtime downloads and Overwolf updates are separate and unchanged.
+
+`source/lunar/test-updates.cjs` executes each build's actual original and transformed updater class/server handler with an isolated updater. Both builds passed: original automatic/server calls reached the fake updater; patched startup/timer/channel/server calls made none; install on exit was disabled; automatic pending-download calls did not install; manual IPC check/pending install worked; timers preserved an in-flight manual request. These tests perform no network calls or real installations.
+
+Both full-sized packs passed preview, deterministic JAR output, injected partial-write rollback, direct 0.1.1→0.1.2 upgrade, updater deselection/reselection, cosmetic removal and byte-exact final restore. Deselection recovered exactly the 0.1.1 patched archive. Archive integrity, JS syntax, unchanged members, JAR CRCs and the existing ad/game guard probes passed; the game digest is unchanged.
+
+On the user's Windows PC, applied all three selections with Patchwork's validated worker and restarted Lunar 3.7.24-ow through computer use. Launchpad opened normally; its log recorded `Automatic launcher updates disabled by Patchwork.` at startup. Its archive exactly matched the tested staged result. The existing patched executable/game remained unchanged. Real update installation was not attempted; timer/channel/server paths and manual update behavior were tested in isolation. The three patches remain applied. The earlier Minecraft/locker test below was not repeated for this launcher-only revision.
 
 ## Reproduced failure and fix
 
