@@ -1,4 +1,18 @@
-# Validation: Blitz Clean Desktop 1.1.0 / Patchwork 0.8.2 prerelease
+# Validation: Blitz Clean Desktop 1.1.1 / Patchwork 0.8.2 prerelease
+
+## Remaining Go ad free banners — October 10, 2026
+
+The user reported upgrade banners on player-history and match-detail pages. Inspection of the public, supported 3.0.8-ota.0 frontend identifies the shared `LeaderboardButton` component: `a.button.leaderboard-promo.svelte-x9c7ob`, linking to `/premium?ref=leaderboard-GAME`. Page layouts place it alongside an ad slot in a `leaderboard-container`. Existing rules hid the ad slot but missed this separate promotion and its parent padding.
+
+Clean desktop 1.1.1 hides this exact scoped promotion and collapses `leaderboard-container` elements with a direct child matching that promotion or a verified money-symbol leaderboard ad slot. Standalone promotions also collapse. The supported frontend/domain and desktop-view guards remain unchanged; no text-based or generic button/banner hiding is added. Compact window remains 1.1.0, with unchanged checksum repair and automatic-update guards.
+
+Headless Chromium fixtures pass at **800 and 1500 pixels**: history/match Go ad free banners, their padded/min-height wrappers, standalone promotions and ad-only wrappers have no bounding box or click target. Dynamically inserted promotions collapse. History rows, scores, normal player rankings, unrelated leaderboard links, login, settings, news and billing remain visible; ordinary controls remain clickable. Hook reload/navigation/recreation and unsupported-version/view checks pass.
+
+Actual-original-pair integration checks pass for both and each individual selection, updates, rollback, worker transactions and byte-exact restoration. A separate direct **1.1.0 → 1.1.1** upgrade checks an untouched preview, synchronized checksum, superseded history and exact two-file restore. Independent XXH32 checks pass for both `155487e8`, clean `83b19190` and compact `00e3fe28`; all preceding companion bytes remain identical. All 3,051 archive entries and untouched metadata/content remain preserved. JavaScript, compact-size and automatic/manual update-policy fixtures pass. Patchwork code is unchanged; its previously passed 46 self-tests remain the baseline.
+
+This update was published without applying it to the installed client. The user's report confirms most cleanup works in their live session; the new banner rules have controlled browser evidence and have not yet been verified on their live account pages.
+
+Component evidence: [LeaderboardButton JavaScript](https://blitz-desktop.blitz.gg/3.0.8-ota.0/_app/immutable/chunks/DIGRV8HY.js), [LeaderboardButton CSS](https://blitz-desktop.blitz.gg/3.0.8-ota.0/_app/immutable/assets/LeaderboardButton.m0pcM7c6.css).
 
 ## Startup repair and update policy — October 10, 2026
 

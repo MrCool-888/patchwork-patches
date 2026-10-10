@@ -2,14 +2,14 @@
 
 Separate patch definitions for [Patchwork](https://github.com/MrCool-888/patchwork). Never bundled in the patcher installer.
 
-The [combined r2 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r2) contains **Blitz Clean Desktop 1.1.0** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2), then add this repository as a Patchwork source with **Include pre-release patch packs** enabled. One source offers both apps; exact original fingerprints determine compatibility.
+The [combined r3 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains **Blitz Clean Desktop 1.1.1** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2), then add this repository as a Patchwork source with **Include pre-release patch packs** enabled. One source offers both apps; exact original fingerprints determine compatibility.
 
 | App | Pack | Required target | Changes |
 | --- | --- | --- | --- |
-| Blitz | 1.1.0 | Client 3.0.7.134; frontend 3.0.8-ota.0 | Clean desktop and Compact window (940 × 500); native checksum repair; automatic updates off by default. |
+| Blitz | 1.1.1 | Client 3.0.7.134; frontend 3.0.8-ota.0 | Clean desktop, including history/match Go ad free banners; Compact window (940 × 500); native checksum repair; automatic updates off by default. |
 | Proton VPN | 1.5.1 | Windows 5.1.8.0 | Existing guest, free-server, presentation, settings and color patches. |
 
-Blitz 1.0.0 omitted a native companion checksum and caused an E6 startup exit. Version 1.1.0 maintains that checksum with the archive in one recoverable transaction. Controlled checks pass; corrected installed-client startup and full live account/game-flow testing remain pending. See [Blitz installation and restore](docs/blitz/README.md) and [Blitz validation](docs/blitz/VALIDATION.md). The pack includes executable JavaScript client code. Game overlays are outside its scope.
+Blitz 1.0.0 omitted a native companion checksum and caused an E6 startup exit. Versions 1.1.0 and later maintain that checksum with the archive in one recoverable transaction. Version 1.1.1 removes the separate Go ad free promotion and its reserved space on player-history and match-detail pages. Controlled checks pass; this revision has not been applied to the installed client and full live account/game-flow testing remains pending. See [Blitz installation and restore](docs/blitz/README.md) and [Blitz validation](docs/blitz/VALIDATION.md). The pack includes executable JavaScript client code. Game overlays are outside its scope.
 
 Proton VPN 1.5.1 remains unchanged from release **proton-vpn-5.1.8-r7** and can still be used with stable **Patchwork 0.7.0+**. The real Windows guest tunnel test remains pending. Guest session is patch **1.0.1**, free selection **1.3.0**, promotions **1.2.0**, and other available patches **1.0.0**. The pack and individual versions appear in the patcher library, preview and applied history.
 

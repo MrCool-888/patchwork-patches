@@ -85,6 +85,9 @@ function patchworkInstallDesktopCleanup(browserView, initialURL) {
     [class~="🤑-rectangle"], [class~="🤑-placeholder"],
     [data-primis-placement-id], #display-desktop-anchor, [id^="display-rr-"],
     li:has(> a.get-premium-btn), .get-premium-btn, .ads-toggle,
+    .leaderboard-promo.svelte-x9c7ob,
+    .leaderboard-container:has(> .leaderboard-promo.svelte-x9c7ob),
+    .leaderboard-container:has(> [class~="🤑-leaderboard"]),
     .latest-feature-container.svelte-1lr1kw5, .blitz3-promo.svelte-lj7rjc {
       display: none !important; pointer-events: none !important;
     }

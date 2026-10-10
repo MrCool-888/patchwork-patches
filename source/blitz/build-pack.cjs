@@ -39,11 +39,11 @@ const accountEnd = original.indexOf('\n\n  windows.client._initialURL', accountS
 assert.ok(accountStart >= 0 && accountEnd > accountStart);
 const pack = {
   schemaVersion: 1, id: 'blitz-clean-desktop-3-0-7', appId: 'blitz', appName: 'Blitz',
-  appVersion: '3.0.7.134 (frontend 3.0.8-ota.0)', packVersion: '1.1.0', minimumPatcherVersion: '0.8.2',
+  appVersion: '3.0.7.134 (frontend 3.0.8-ota.0)', packVersion: '1.1.1', minimumPatcherVersion: '0.8.2',
   versionFile: 'resources/app.asar', versionSha256: hash(archive.bytes), author: 'Local build', source: 'Local Blitz Clean Desktop pack',
   patches: [
-    { id: 'clean-desktop', name: 'Clean desktop', category: 'Desktop', version: '1.1.0', status: 'ready',
-      description: 'Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits.',
+    { id: 'clean-desktop', name: 'Clean desktop', category: 'Desktop', version: '1.1.1', status: 'ready',
+      description: 'Blocks verified display/video ad loaders, collapses ad spaces, and hides verified banners and upgrade buttons on frontend 3.0.8-ota.0, including Go ad free banners and their reserved space on player-history and match-detail pages. Supported desktop views bypass cache so cached ad scripts are filtered too. Unknown frontends retain original behavior. Contains executable JavaScript client edits. See validation notes for runtime limits.',
       operations: [edit(start, hook + '\n\n' + start), edit(load, '  patchworkInstallDesktopCleanup(browserView, url);\n' + load), ...automaticUpdates, checksum] },
     { id: 'compact-window', name: 'Compact window', category: 'Local features', version: '1.1.0', status: 'ready',
       description: 'Allows a 940 x 500 minimum desktop window for every account, bounded by the screen size. Does not change account roles or stored minimum-size preferences. Contains executable JavaScript client edits.',

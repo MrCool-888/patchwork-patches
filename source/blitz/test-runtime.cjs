@@ -126,21 +126,33 @@ async function verifyLayout(css) {
       <div class="blitz-app" style="--right-rail-width:308px;--rail-gap:16px"><article id="content"><button id="settings">Settings</button><button id="login">Login</button></article><aside id="rail" class="🤑-wrapper ad"><div class="🤑-column"><div class="🤑-rectangle"><button id="ad-click">Ad</button></div></div></aside></div>
       <div id="leaderboard" class="🤑-leaderboard ad"></div><div id="video" data-primis-placement-id="123" class="ad"></div>
       <ul><li id="upgrade"><a class="get-premium-btn" href="/premium">Upgrade</a></li></ul><div id="banner" class="latest-feature-container svelte-1lr1kw5 promo">Promotion</div><button id="blitz3" class="blitz3-promo svelte-lj7rjc">Promotion</button>
-      <section id="news" class="latest-feature-container">News</section><div id="billing" class="premium-purchase-modal">Account billing</div>`;
-    for (const warm of [false, true]) {
+      <section id="news" class="latest-feature-container">News</section><div id="billing" class="premium-purchase-modal">Account billing</div>
+      <section id="history"><button id="history-row">Open match</button></section>
+      <div id="history-promo-space" class="leaderboard-container" style="display:flex;padding-top:20px;min-height:90px"><a id="history-promo" class="button leaderboard-promo svelte-x9c7ob" href="/premium?ref=leaderboard-lol"><span>Go ad free</span></a><div class="🤑-leaderboard"></div></div>
+      <section id="scores"><button id="score-details">Match scores</button></section>
+      <div id="match-promo-space" class="leaderboard-container" style="display:flex;padding-top:20px;min-height:90px"><a id="match-promo" class="button leaderboard-promo svelte-x9c7ob" href="/premium?ref=leaderboard-tft"><span>Go ad free</span></a></div>
+      <a id="standalone-promo" class="leaderboard-promo svelte-x9c7ob" href="/premium?ref=leaderboard-valorant">Go ad free</a>
+      <div id="ad-only-space" class="leaderboard-container" style="min-height:90px"><div class="🤑-leaderboard"></div></div>
+      <section id="rankings" class="leaderboard-container"><button id="ranking-row">Player rankings</button></section>
+      <a id="unrelated-promo" class="leaderboard-promo" href="/leaderboards">Tournament leaderboard</a>`;
+    for (const width of [800, 1500]) {
+      await page.setViewportSize({ width, height: 800 });
       await page.setContent(markup); const before = await page.locator('#content').boundingBox();
       await page.addStyleTag({ content: css }); const after = await page.locator('#content').boundingBox();
       assert.ok(after.width > before.width + 300, 'Ad column was not reclaimed');
-      for (const name of ['rail', 'leaderboard', 'video', 'upgrade', 'banner', 'blitz3']) {
+      for (const name of ['rail', 'leaderboard', 'video', 'upgrade', 'banner', 'blitz3', 'history-promo-space', 'history-promo', 'match-promo-space', 'match-promo', 'standalone-promo', 'ad-only-space']) {
         assert.equal(await page.locator('#' + name).isVisible(), false, name + ' still visible');
         assert.equal(await page.locator('#' + name).boundingBox(), null);
       }
-      for (const name of ['settings', 'login', 'news', 'billing']) assert.equal(await page.locator('#' + name).isVisible(), true);
+      for (const name of ['settings', 'login', 'news', 'billing', 'history', 'history-row', 'scores', 'score-details', 'rankings', 'ranking-row', 'unrelated-promo']) assert.equal(await page.locator('#' + name).isVisible(), true);
       await page.evaluate(() => { const dynamic = document.createElement('div'); dynamic.id = 'dynamic'; dynamic.className = '🤑-rectangle'; dynamic.innerHTML = '<button>Ad</button>'; document.body.appendChild(dynamic); });
       assert.equal(await page.locator('#dynamic').isVisible(), false);
+      await page.evaluate(() => { const dynamic = document.createElement('div'); dynamic.id = 'dynamic-promo-space'; dynamic.className = 'leaderboard-container'; dynamic.innerHTML = '<a class="leaderboard-promo svelte-x9c7ob" href="/premium?ref=leaderboard-lol">Go ad free</a>'; document.body.appendChild(dynamic); });
+      assert.equal(await page.locator('#dynamic-promo-space').boundingBox(), null);
       await page.locator('#settings').click(); await page.locator('#login').click();
+      await page.locator('#history-row').click(); await page.locator('#score-details').click(); await page.locator('#ranking-row').click();
     }
-    console.log('PASS Chromium layout fixtures: ad spaces reclaimed, no hidden hit targets, dynamic elements collapsed and normal controls retained');
+    console.log('PASS Chromium layout fixtures: Go ad free banners and reserved space removed at 800/1500px; dynamic promotions collapsed, history/score/ranking controls retained, no hidden hit targets');
   } finally { await browser.close(); }
 }
 (async () => { verifyArchives(); verifyCompact(); await verifyLayout(await verifyHook()); })().catch(error => { console.error(error); process.exitCode = 1; });

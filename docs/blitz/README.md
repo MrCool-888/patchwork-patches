@@ -1,6 +1,6 @@
-# Blitz Clean Desktop pack 1.1.0
+# Blitz Clean Desktop pack 1.1.1
 
-Requires [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2). The [combined prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r2) contains this Blitz pack and the unchanged Proton VPN 1.5.1 pack. Version 1.0.0 caused an E6 startup exit because it omitted Blitz's native archive companion checksum. This version updates that checksum together with the archive; it leaves the native comparison intact. Validation used workspace copies; this fix was not applied to the installed Blitz client.
+Requires [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2). The [combined prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains this Blitz pack and the unchanged Proton VPN 1.5.1 pack. Version 1.1.1 removes the remaining **Go ad free** banners and their reserved space on player-history and match-detail pages. It retains 1.1.0's native companion-checksum repair and automatic-update policy. Validation used workspace copies; this update was not applied to the installed Blitz client.
 
 ## Included patches
 
@@ -8,7 +8,7 @@ Select either patch independently, or select both.
 
 | Patch | Changes |
 | --- | --- |
-| Clean desktop | Cancels the verified CloudFront display-ad and Primis video-ad loaders; hides verified ad slots, upgrade controls and scoped promotional banners; sets the desktop rail width and gap to zero. |
+| Clean desktop | Cancels the verified CloudFront display-ad and Primis video-ad loaders; hides verified ad slots, upgrade controls and scoped promotional banners, including Go ad free banners on history/match pages; removes their reserved containers and sets the desktop rail width and gap to zero. |
 | Compact window | Uses the existing 940 × 500 premium minimum for every account, bounded by screen size. It ignores saved larger minimums without rewriting stored preferences or account roles. |
 
 Web cleanup supports frontend **3.0.8-ota.0** on Blitz's recognized HTTPS desktop domains. Unknown frontends retain their original behavior and emit a `[Patchwork]` compatibility diagnostic in Blitz's log. Game overlays are outside this pack's scope. Compact sizing is a local window change; other premium features are not included.
@@ -38,7 +38,7 @@ The version label alone is insufficient. A different archive requires a matching
 
 To change the selection later, choose the desired patches and review the update preview. Patchwork rebuilds from verified originals and removes deselected changes during the update transaction.
 
-For an already-applied 1.0.0 pack: update Patchwork to 0.8.2 first, use **Patch sources → Check now**, then select the desired Blitz patches and **Preview changes → Update patches** with Blitz closed. Verified old backups support this direct update; no manual restore is required.
+For an already-applied 1.0.0 or 1.1.0 pack: use Patchwork 0.8.2, choose **Patch sources → Check now**, then select the desired Blitz patches and **Preview changes → Update patches** with Blitz closed. Keep **Clean desktop** selected for banner cleanup. Verified old backups support a direct update; no manual restore is required.
 
 ## Restore and interrupted transactions
 
