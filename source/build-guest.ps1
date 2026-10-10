@@ -10,14 +10,16 @@ if (!$taskRuntime) {
 if (!$taskRuntime -or !(Test-Path -LiteralPath (Join-Path $taskRuntime 'System.Runtime.dll'))) { throw 'A .NET 8 runtime reference directory is required.' }
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 $taskRefs = @(Get-ChildItem -LiteralPath $taskRuntime -Filter 'System*.dll' | Where-Object Name -NotLike '*.Native.dll' | ForEach-Object { '/r:' + $_.FullName })
-$taskNames = @('Microsoft.WinUI.dll','WinRT.Runtime.dll','Microsoft.Windows.SDK.NET.dll','Microsoft.InteractiveExperiences.Projection.dll','ProtonVPN.Common.Legacy.dll','ProtonVPN.Common.Core.dll','ProtonVPN.Client.Logic.Auth.dll','ProtonVPN.Api.dll')
+$taskNames = @('Microsoft.WinUI.dll','WinRT.Runtime.dll','Microsoft.Windows.SDK.NET.dll','Microsoft.InteractiveExperiences.Projection.dll','CommunityToolkit.Mvvm.dll','ProtonVPN.Common.Legacy.dll','ProtonVPN.Common.Core.dll','ProtonVPN.Client.Core.dll','ProtonVPN.Client.Logic.Auth.dll','ProtonVPN.Api.dll')
 $taskRefs += $taskNames | ForEach-Object { '/r:' + (Join-Path $OriginalApp $_) }
 $taskRefs += Get-ChildItem -LiteralPath $OriginalApp -Filter 'ProtonVPN.*Contracts.dll' | ForEach-Object { '/r:' + $_.FullName }
 $taskTarget = if ($Tests -or $Live -or $Ui) { 'exe' } else { 'library' }
 $taskSources = @((Join-Path $PSScriptRoot 'GuestClient.cs'))
 if ($Tests) { $taskSources += Join-Path $PSScriptRoot 'GuestLifecycleProbe.cs' }
 if ($Live) { $taskSources += Join-Path $PSScriptRoot 'GuestLiveProbe.cs' }
-if ($Ui) { $taskSources += Join-Path $PSScriptRoot 'GuestUiProbe.cs' }
+if ($Ui) { $taskSources += Join-Path $PSScriptRoot 'GuestNavigationProbe.cs'; $taskSources += Join-Path $PSScriptRoot 'GuestLifecycleProbe.cs' }
 $taskOutput = Join-Path $OutputDirectory $(if ($Live) { 'GuestLiveProbe.dll' } elseif ($Tests) { 'GuestLifecycleProbe.dll' } elseif ($Ui) { 'GuestUiProbe.dll' } else { 'Patchwork.ProtonGuest.dll' })
-& $taskCompiler /nologo /noconfig /nostdlib+ ('/target:' + $taskTarget) /optimize+ /platform:x64 ('/out:' + $taskOutput) @taskRefs @taskSources
+$taskMain = @()
+if ($Ui) { $taskMain += '/main:GuestUiProbe' }
+& $taskCompiler /nologo /noconfig /nostdlib+ ('/target:' + $taskTarget) /optimize+ /platform:x64 ('/out:' + $taskOutput) @taskMain @taskRefs @taskSources
 if ($LASTEXITCODE -ne 0) { throw 'Guest module compilation failed.' }

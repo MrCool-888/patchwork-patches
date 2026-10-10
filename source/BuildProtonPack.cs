@@ -199,11 +199,12 @@ class BuildProtonPack
         Add("hide-paid-modes", "Hide paid country modes", "Hides Secure Core, P2P and Tor country tabs on free accounts, keeping All countries and free server selection. Paid accounts retain their mode tabs. This changes navigation only; it does not grant access to paid servers. Restart Proton after an account-plan change.", "Interface", modes);
         byte[] guestModule = File.ReadAllBytes(args[2]);
         const string authFile = "ProtonVPN.Client.Logic.Auth.dll", authType = "ProtonVPN.Client.Logic.Auth.UserAuthenticator";
-        Add("no-sign-in", "Guest VPN session", "Adds Continue as guest with cancellation, encrypted session storage and native VPN authorization, certificate renewal, refresh, restart and logout. Contains executable managed client code; source: source/GuestClient.cs. Normal sign-in remains available. Guest accounts retain backend free-server limits.", "Guest client code",
+        Add("no-sign-in", "Guest VPN session", "Adds Continue as guest with native loading-page cancellation, bounded requests, encrypted session storage and native VPN authorization, certificate renewal, refresh, restart and logout. Fixes sign-in cancelling itself when the page unloads. Contains executable managed client code; source: source/GuestClient.cs. Normal sign-in remains available. Guest accounts retain backend free-server limits.", "Guest client code",
             GuestHook(client, "ProtonVPN.Client.UI.Login.Pages.SignInPageView", ".ctor", "AddButton", "after", guestModule),
             GuestHook(authFile, authType, "GetUserAsync", "GuestUser", "fallback", guestModule),
             GuestHook(authFile, authType, "AutoLoginUserAsync", "Resume", "fallback", guestModule),
             Return("ProtonVPN.Api.dll", "ProtonVPN.Api.TokenClient", "LogRefreshToken", "void", null));
+        ((Dictionary<string, object>)patches.Last())["version"] = "1.0.1";
         var accent = new List<object>();
         foreach (string theme in new[] { "Light", "Dark" })
         {
@@ -223,12 +224,12 @@ class BuildProtonPack
         var pack = new Dictionary<string, object> {
             { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
             { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
-            { "packVersion", "1.5.0" }, { "minimumPatcherVersion", "0.7.0" },
+            { "packVersion", "1.5.1" }, { "minimumPatcherVersion", "0.7.0" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built local candidate pack v1.5.0: 15 available; guest requires validation before publication."); return 0;
+        Console.WriteLine("Built prerelease pack v1.5.1: 15 available; installed guest tunnel validation is tracked separately."); return 0;
     }
 }

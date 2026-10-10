@@ -13,7 +13,7 @@ class GuestCandidateProbe
     static int Main(string[] args) { try {
         var bundle = PatchBundle.Parse(File.ReadAllText(args[0])); string root = Path.GetFullPath(args[1]);
         var engine = new PatchEngine(args[2]); var current = engine.ActiveSession(root);
-        Check(current != null && current.PackVersion == "1.5.0", "candidate applied history identifies pack 1.5.0");
+        Check(current != null && current.PackVersion == "1.5.1", "candidate applied history identifies pack 1.5.1");
         Check(!bundle.Patches.Any(x => x.Id == "amoled-theme" || x.Name.IndexOf("AMOLED", StringComparison.OrdinalIgnoreCase) >= 0), "AMOLED absent from patch catalog");
         var entry = current.Files.Single(x => x.RelativePath == "ProtonVPN.Client.dll");
         using (var original = ModuleDefinition.ReadModule(Path.Combine(current.DirectoryPath, entry.BackupFile))) using (var client = ModuleDefinition.ReadModule(Path.Combine(root, entry.RelativePath))) {

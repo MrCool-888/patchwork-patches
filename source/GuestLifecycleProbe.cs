@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,8 +25,9 @@ public class GuestSettingsProxy : DispatchProxy
 }
 public class GuestApiProxy : DispatchProxy
 {
-    public bool Authorized = true;
+    public bool Authorized = true, Timeout;
     protected override object Invoke(MethodInfo method, object[] args) {
+        if (method.Name == "GetVpnInfoResponse" && Timeout) return Task.FromException<ApiResponseResult<VpnInfoWrapperResponse>>(new TaskCanceledException("FAKE API TIMEOUT"));
         if (method.Name == "GetVpnInfoResponse") return Task.FromResult(Authorized
             ? ApiResponseResult<VpnInfoWrapperResponse>.Ok(new HttpResponseMessage(HttpStatusCode.OK), new VpnInfoWrapperResponse { Code = 1000, Vpn = new VpnInfoResponse { Status = 1, MaxConnect = 1, MaxTier = 0 } })
             : ApiResponseResult<VpnInfoWrapperResponse>.Fail(new HttpResponseMessage(HttpStatusCode.Unauthorized), "Expired"));
@@ -47,8 +49,10 @@ class GuestFakeAuth
     public ISettings _settings; public IApiClient _apiClient; public GuestFakeCertificate _connectionCertificateManager;
     public CancellationTokenSource _cts = new CancellationTokenSource();
     public AuthenticationStatus AuthenticationStatus; public bool IsLoggedIn { get { return AuthenticationStatus == AuthenticationStatus.LoggedIn; } }
-    public int Completions, Logouts; public bool CompleteSuccess = true;
-    public void SetAuthenticationStatus(AuthenticationStatus status, LogoutReason? reason) { AuthenticationStatus = status; }
+    public int Completions, Logouts, Cancellations; public bool CompleteSuccess = true;
+    public Action<AuthenticationStatus> OnStatus;
+    public void SetAuthenticationStatus(AuthenticationStatus status, LogoutReason? reason) { AuthenticationStatus = status; if (OnStatus != null) OnStatus(status); }
+    public void CancelAuth() { Cancellations++; _cts.Cancel(); }
     public void ResetCancellationTokenIfCancelled() { if (_cts.IsCancellationRequested) { _cts.Dispose(); _cts = new CancellationTokenSource(); } }
     public bool HasAuthenticatedSessionData() { return !string.IsNullOrEmpty(_settings.AccessToken) && !string.IsNullOrEmpty(_settings.RefreshToken) && !string.IsNullOrEmpty(_settings.UniqueSessionId); }
     public void ClearAuthSessionDetails() { _settings.UserId = null; _settings.UniqueSessionId = null; _settings.AccessToken = null; _settings.RefreshToken = null; }
@@ -57,26 +61,36 @@ class GuestFakeAuth
 }
 class GuestFakeHttp : HttpMessageHandler
 {
-    public int Creates, Guests, Revokes; public bool Challenge, Incomplete, Partial, Cancel, Fail, SameUid, MissingAccess;
+    public int Creates, Guests, Revokes; public bool Challenge, Incomplete, Partial, Cancel, Fail, SameUid, MissingAccess, StallHeaders, StallBody;
     public CancellationTokenSource Cancellation;
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token) {
+    public GuestStalledStream BodyStream;
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token) {
         if (request.Headers.GetValues("x-pm-appversion").GetEnumerator().MoveNext() == false) throw new Exception("No app identity");
         string body;
         if (request.Method == HttpMethod.Delete) { Revokes++; body = "{\"Code\":1000}"; }
         else if (request.RequestUri.AbsolutePath.EndsWith("credentialless")) {
             Guests++;
+            if (StallHeaders) await Task.Delay(Timeout.Infinite, token);
+            if (StallBody) { BodyStream = new GuestStalledStream(); return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(BodyStream) }; }
             if (Fail) throw new HttpRequestException("FAKE NETWORK FAILURE");
             if (Cancel) Cancellation.Cancel();
             body = Challenge ? "{\"Code\":9001}" : Incomplete ? "{\"Code\":1000}" : "{\"Code\":1000,\"UID\":\"" + (SameUid ? "BOOTSTRAP" : "GUEST") + "\",\"UserID\":\"" + (Partial ? "" : "TEST_USER") + "\",\"AccessToken\":\"" + (MissingAccess ? "" : "TEST_GUEST_ACCESS") + "\",\"RefreshToken\":\"TEST_GUEST_REFRESH\"}";
         } else { Creates++; body = "{\"Code\":1000,\"UID\":\"BOOTSTRAP\",\"AccessToken\":\"TEST_BOOTSTRAP_ACCESS\",\"RefreshToken\":\"TEST_BOOTSTRAP_REFRESH\"}"; }
-        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body) });
+        return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body) };
     }
+}
+class GuestStalledStream : Stream {
+    public bool ReadStarted, ReadCancelled; public override bool CanRead=>true; public override bool CanSeek=>false; public override bool CanWrite=>false;
+    public override long Length=>throw new NotSupportedException(); public override long Position { get=>throw new NotSupportedException(); set=>throw new NotSupportedException(); }
+    public override int Read(byte[] buffer,int offset,int count)=>throw new NotSupportedException();
+    public override async Task<int> ReadAsync(byte[] buffer,int offset,int count,CancellationToken token) { ReadStarted=true; try { await Task.Delay(Timeout.Infinite,token);return 0; } catch(OperationCanceledException){ReadCancelled=true;throw;} }
+    public override void Flush(){} public override long Seek(long offset,SeekOrigin origin)=>throw new NotSupportedException(); public override void SetLength(long length)=>throw new NotSupportedException(); public override void Write(byte[] buffer,int offset,int count)=>throw new NotSupportedException();
 }
 class GuestLifecycleProbe
 {
     static int checks;
     static void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; Console.WriteLine("PASS " + label); }
-    static GuestFakeAuth Auth() {
+    internal static GuestFakeAuth Auth() {
         var settings = DispatchProxy.Create<ISettings, GuestSettingsProxy>(); var api = DispatchProxy.Create<IApiClient, GuestApiProxy>();
         return new GuestFakeAuth { _settings = settings, _apiClient = api, _connectionCertificateManager = new GuestFakeCertificate { Settings = settings } };
     }
@@ -114,6 +128,33 @@ class GuestLifecycleProbe
         Check(!(await (Task<AuthResult>)GuestClient.Resume(auth, new object[] { true })).Success && auth.Logouts == 1 && !auth.HasAuthenticatedSessionData(), "expired guest resumes fail closed through native logout");
         auth = Auth(); http = new GuestFakeHttp { SameUid = true, MissingAccess = true };
         using (var protocol = new GuestProtocol(new HttpClient(http))) Check(!(await GuestClient.LoginAsync(auth, protocol)).Success && http.Revokes == 1 && !auth.HasAuthenticatedSessionData(), "incomplete promoted session still revokes its bootstrap");
+        foreach (bool body in new[] { false, true }) {
+            auth=Auth();http=new GuestFakeHttp { StallHeaders=!body, StallBody=body };
+            using(var protocol=new GuestProtocol(new HttpClient(http),TimeSpan.FromMilliseconds(80))) {
+                var result=await GuestClient.LoginAsync(auth,protocol);
+                Check(!result.Success&&result.Value==AuthError.Unknown&&result.Error.Contains("timed out")&&!result.Error.Contains("cancelled"),body?"response-body deadline reports timeout":"response-header deadline reports timeout");
+                Check(!auth._cts.IsCancellationRequested&&!auth.HasAuthenticatedSessionData()&&http.Revokes==1,"timeout preserves native token and revokes bootstrap");
+                if(body)Check(http.BodyStream.ReadStarted&&http.BodyStream.ReadCancelled,"response body reading observes request deadline");
+                http.StallHeaders=false;http.StallBody=false;
+                Check((await GuestClient.LoginAsync(auth,protocol)).Success,"timeout can retry successfully");
+            }
+        }
+        auth=Auth();http=new GuestFakeHttp();((GuestApiProxy)auth._apiClient).Timeout=true;
+        using(var protocol=new GuestProtocol(new HttpClient(http))) {
+            var result=await GuestClient.LoginAsync(auth,protocol);
+            Check(!result.Success&&result.Value==AuthError.Unknown&&result.Error.Contains("timed out")&&!auth._cts.IsCancellationRequested,"native API timeout is not user cancellation");
+            Check(!auth.HasAuthenticatedSessionData()&&auth.Logouts==1&&http.Revokes==2,"native API timeout clears and revokes issued credentials");
+        }
+        auth=Auth();auth._cts.Cancel();bool resetBeforeStatus=false;
+        auth.OnStatus=s=>{if(s==AuthenticationStatus.LoggingIn)resetBeforeStatus=!auth._cts.IsCancellationRequested;};
+        using(var protocol=new GuestProtocol(new HttpClient(new GuestFakeHttp())))Check((await GuestClient.LoginAsync(auth,protocol)).Success&&resetBeforeStatus,"cancelled token resets before LoggingIn notification");
+        auth=Auth();auth.OnStatus=s=>{if(s==AuthenticationStatus.LoggingIn)auth.CancelAuth();};http=new GuestFakeHttp();
+        using(var protocol=new GuestProtocol(new HttpClient(http))) {
+            var result=await GuestClient.LoginAsync(auth,protocol);
+            Check(!result.Success&&result.Error=="Guest sign-in cancelled."&&!auth.HasAuthenticatedSessionData(),"cancel during LoggingIn is retained by captured token");
+            auth.OnStatus=null;
+            Check((await GuestClient.LoginAsync(auth,protocol)).Success,"explicit cancellation can retry with fresh native token");
+        }
         Console.WriteLine(checks + " guest lifecycle checks passed.");
     }
     static int Main() { try { Run().GetAwaiter().GetResult(); return 0; } catch (Exception error) { Console.Error.WriteLine(error); return 1; } }

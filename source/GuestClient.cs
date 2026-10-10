@@ -16,6 +16,9 @@ using ProtonVPN.Api.Contracts.Users;
 using ProtonVPN.Client.Logic.Auth.Contracts.Enums;
 using ProtonVPN.Client.Logic.Auth.Contracts.Models;
 using ProtonVPN.Client.Settings.Contracts;
+using ProtonVPN.Client.Core.Enums;
+using ProtonVPN.Client.Core.Messages;
+using ProtonVPN.Client.EventMessaging.Contracts;
 
 namespace Patchwork.ProtonGuest
 {
@@ -90,13 +93,15 @@ namespace Patchwork.ProtonGuest
         {
             var settings = (ISettings)Field(auth, "_settings");
             if (!(bool)Call(auth, "HasAuthenticatedSessionData")) { Call(auth, "ClearAuthSessionDetails"); return AuthResult.Ok(); }
-            Status(auth, AuthenticationStatus.LoggingIn); Call(auth, "ResetCancellationTokenIfCancelled");
+            Call(auth, "ResetCancellationTokenIfCancelled");
+            var token = Token(auth);
+            Status(auth, AuthenticationStatus.LoggingIn);
             try {
-                await RequireVpnAsync(auth, Token(auth)); // Native HTTP pipeline handles refresh/rotation.
+                await RequireVpnAsync(auth, token); // Native HTTP pipeline handles refresh/rotation.
                 var result = await (Task<AuthResult>)Call(auth, "CompleteLoginAsync", startup, false);
                 if (!result.Success) { await EndFailedSessionAsync(auth); return result; }
-                await RequireCertificateAsync(auth, Token(auth));
-                Token(auth).ThrowIfCancellationRequested();
+                await RequireCertificateAsync(auth, token);
+                token.ThrowIfCancellationRequested();
                 Status(auth, AuthenticationStatus.LoggedIn);
                 return result;
             } catch (Exception) {
@@ -108,21 +113,24 @@ namespace Patchwork.ProtonGuest
         {
             var settings = (ISettings)Field(auth, "_settings");
             if ((bool)Call(auth, "HasAuthenticatedSessionData")) return AuthResult.Fail(AuthError.Unknown, "Sign out of the current session before continuing as guest.");
-            Status(auth, AuthenticationStatus.LoggingIn); Call(auth, "ResetCancellationTokenIfCancelled");
+            Call(auth, "ResetCancellationTokenIfCancelled");
+            var token = Token(auth);
             GuestSession session = null; bool accepted = false, stored = false;
             try {
-                session = await protocol.CreateAsync(Token(auth));
-                Token(auth).ThrowIfCancellationRequested();
+                Status(auth, AuthenticationStatus.LoggingIn);
+                session = await protocol.CreateAsync(token);
+                token.ThrowIfCancellationRequested();
                 settings.UserId = Prefix + session.UserId;
                 settings.AccessToken = session.AccessToken; settings.RefreshToken = session.RefreshToken; settings.UniqueSessionId = session.Uid;
                 stored = true;
-                await RequireVpnAsync(auth, Token(auth));
+                await RequireVpnAsync(auth, token);
                 var result = await (Task<AuthResult>)Call(auth, "CompleteLoginAsync", false, false);
                 if (!result.Success) return result;
-                await RequireCertificateAsync(auth, Token(auth));
-                Token(auth).ThrowIfCancellationRequested();
+                await RequireCertificateAsync(auth, token);
+                token.ThrowIfCancellationRequested();
                 Status(auth, AuthenticationStatus.LoggedIn); accepted = true; return result;
-            } catch (OperationCanceledException) { return AuthResult.Fail(AuthError.None, "Guest sign-in cancelled."); }
+            } catch (OperationCanceledException) when (token.IsCancellationRequested) { return AuthResult.Fail(AuthError.None, "Guest sign-in cancelled."); }
+            catch (OperationCanceledException) { return AuthResult.Fail(AuthError.Unknown, "Guest sign-in timed out. Check your connection and try again."); }
             catch (GuestFailure error) { return AuthResult.Fail(AuthError.Unknown, error.Message); }
             catch (Exception) { return AuthResult.Fail(AuthError.Unknown, "Guest sign-in failed. Check your connection and try again, or sign in normally."); }
             finally {
@@ -136,6 +144,11 @@ namespace Patchwork.ProtonGuest
         }
         public static object AddButton(object page, object[] args)
         {
+            return AddButtonCore(page, () => new GuestProtocol());
+        }
+        // The factory is internal and used only by isolated UI tests with fake HTTP.
+        internal static object AddButtonCore(object page, Func<GuestProtocol> createProtocol)
+        {
             var signIn = (Button)Field(page, "SignInButton"); var panel = signIn.Parent as StackPanel ?? FindPanel((UIElement)page, signIn, 0);
             if (panel == null) throw new InvalidOperationException("Guest button parent mismatch.");
             foreach (var child in panel.Children) if (child is FrameworkElement && ((FrameworkElement)child).Name == "PatchworkGuestButton") return null;
@@ -144,21 +157,27 @@ namespace Patchwork.ProtonGuest
             var message = new TextBlock { TextWrapping = TextWrapping.Wrap, Visibility = Visibility.Collapsed };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(button, "PatchworkGuestButton");
             button.Click += async delegate {
-                if (busy) { Call(auth, "CancelAuth"); button.Content = "Cancelling…"; button.IsEnabled = false; return; }
-                if ((bool)Get(vm, "IsSigningIn")) return;
-                busy = true; Set(vm, "IsSigningIn", true); button.Content = "Cancel guest sign-in"; message.Visibility = Visibility.Collapsed;
+                if (busy || (bool)Get(vm, "IsSigningIn")) return;
+                busy = true; Set(vm, "IsSigningIn", true); button.Content = "Starting guest sign-in…"; button.IsEnabled = false; message.Visibility = Visibility.Collapsed;
                 try {
-                    using (var protocol = new GuestProtocol()) {
+                    ((IEventMessageSender)Field(vm, "_eventMessageSender")).Send(new LoginStateChangedMessage(LoginState.Authenticating));
+                    using (var protocol = createProtocol()) {
                         var result = await LoginAsync(auth, protocol);
-                        busy = false;
                         if (result.Success) Call(vm, "HandleSuccess");
                         else { Call(vm, "HandleError", result); message.Text = result.Error; message.Visibility = Visibility.Visible; }
                     }
-                } catch (Exception) { message.Text = "Guest mode could not start. Please try again or sign in normally."; message.Visibility = Visibility.Visible; }
-                finally { busy = false; Set(vm, "IsSigningIn", false); button.Content = "Continue as guest"; button.IsEnabled = true; }
+                } catch (Exception) {
+                    var result = AuthResult.Fail(AuthError.Unknown, "Guest mode could not start. Please try again or sign in normally.");
+                    Call(vm, "HandleError", result); message.Text = result.Error; message.Visibility = Visibility.Visible;
+                }
+                finally { busy = false; Set(vm, "IsSigningIn", false); button.Content = "Continue as guest"; button.IsEnabled = !(bool)Get(vm, "IsSigningIn"); }
             };
-            ((INotifyPropertyChanged)vm).PropertyChanged += delegate(object sender, PropertyChangedEventArgs e) { if (e.PropertyName == "IsSigningIn") button.IsEnabled = busy || !(bool)Get(vm, "IsSigningIn"); };
-            ((FrameworkElement)page).Unloaded += delegate { if (busy && !(bool)Get(auth, "IsLoggedIn")) Call(auth, "CancelAuth"); };
+            var changes = (INotifyPropertyChanged)vm; bool listening = true;
+            PropertyChangedEventHandler changed = delegate(object sender, PropertyChangedEventArgs e) { if (e.PropertyName == "IsSigningIn") button.IsEnabled = !busy && !(bool)Get(vm, "IsSigningIn"); };
+            changes.PropertyChanged += changed;
+            ((FrameworkElement)page).Loaded += delegate { if (!listening) { changes.PropertyChanged += changed; listening = true; } button.IsEnabled = !busy && !(bool)Get(vm, "IsSigningIn"); };
+            // LoggingIn navigates away to Proton's loading page. Unloading is not cancellation.
+            ((FrameworkElement)page).Unloaded += delegate { if (listening) { changes.PropertyChanged -= changed; listening = false; } };
             panel.Children.Add(button); panel.Children.Add(message); return null;
         }
         static StackPanel FindPanel(UIElement root, Button button, int depth)
@@ -184,22 +203,30 @@ namespace Patchwork.ProtonGuest
     {
         internal const string BaseUrl = "https://vpn-api.proton.me";
         readonly HttpClient client;
+        readonly TimeSpan requestTimeout;
         internal GuestProtocol() : this(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false })) { }
-        internal GuestProtocol(HttpClient client) { this.client = client; client.Timeout = TimeSpan.FromSeconds(30); }
+        internal GuestProtocol(HttpClient client) : this(client, TimeSpan.FromSeconds(30)) { }
+        internal GuestProtocol(HttpClient client, TimeSpan requestTimeout) {
+            if (requestTimeout <= TimeSpan.Zero || requestTimeout > TimeSpan.FromSeconds(30)) throw new ArgumentOutOfRangeException(nameof(requestTimeout));
+            this.client = client; this.requestTimeout = requestTimeout; client.Timeout = Timeout.InfiniteTimeSpan;
+        }
         static string Text(JsonElement body, string name) { JsonElement item; return body.TryGetProperty(name, out item) && item.ValueKind == JsonValueKind.String ? item.GetString() : null; }
         async Task<JsonDocument> RequestAsync(string endpoint, HttpMethod method, GuestSession session, object payload, CancellationToken token)
         {
-            using (var request = new HttpRequestMessage(method, BaseUrl + endpoint)) {
+            using (var deadline = CancellationTokenSource.CreateLinkedTokenSource(token)) {
+            deadline.CancelAfter(requestTimeout);
+            var requestToken = deadline.Token;
+            try { using (var request = new HttpRequestMessage(method, BaseUrl + endpoint)) {
                 request.Headers.Add("x-pm-appversion", "android-vpn@5.20.57.0"); request.Headers.Add("x-pm-apiversion", "3"); request.Headers.Add("Accept", "application/json");
                 request.Headers.Add("User-Agent", "Patchwork Proton guest client");
                 if (session != null) { request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", session.AccessToken); request.Headers.Add("x-pm-uid", session.Uid); }
                 if (payload != null) request.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-                using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false)) {
+                using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, requestToken).ConfigureAwait(false)) {
                     if (response.Content.Headers.ContentLength > 256 * 1024) throw new GuestFailure("Unexpected guest service response.");
                     byte[] bytes;
-                    using (var input = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false)) using (var buffer = new MemoryStream()) {
+                    using (var input = await response.Content.ReadAsStreamAsync(requestToken).ConfigureAwait(false)) using (var buffer = new MemoryStream()) {
                         var block = new byte[4096]; int count;
-                        while ((count = await input.ReadAsync(block, 0, block.Length, token).ConfigureAwait(false)) != 0) {
+                        while ((count = await input.ReadAsync(block, 0, block.Length, requestToken).ConfigureAwait(false)) != 0) {
                             if (buffer.Length + count > 256 * 1024) throw new GuestFailure("Unexpected guest service response.");
                             buffer.Write(block, 0, count);
                         }
@@ -212,6 +239,9 @@ namespace Patchwork.ProtonGuest
                     }
                     return body;
                 }
+            } } catch (OperationCanceledException) when (!token.IsCancellationRequested) {
+                throw new GuestFailure("Guest service request timed out. Check your connection and try again.");
+            }
             }
         }
         static GuestSession Session(JsonElement body)

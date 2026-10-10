@@ -1,5 +1,19 @@
 # Proton VPN 5.1.8 patch validation
 
+## Experimental 1.5.1 / r7 prerelease — October 10, 2026
+
+The native WinUI navigation regression first reproduced r6's exact `Guest sign-in cancelled.` failure with fake HTTP: LoggingIn switches to a loading control and unloads the sign-in page, whose old handler cancels the shared authenticator token. The baseline differs only by injecting the fake protocol; no real sessions are created by the regression test.
+
+The fixed helper passes **21 native WinUI checks** covering controls/accessibility, duplicate prevention, normal sign-in busy state, a real Unloaded transition while the login remains pending, the native Authenticating message, one attempt per click sequence, login completion after navigation, loading-page Cancel, cleanup and retry on the cached page. It preserves the native UI synchronization context.
+
+**52 lifecycle checks** pass, including request-header and response-body deadlines, timeout distinction from deliberate cancellation, native API timeout cleanup, resetting a previously cancelled token before LoggingIn and retaining cancellation delivered by that notification. Request deadlines default to 30 seconds; fixtures use 80 milliseconds. Failed bootstrap/guest sessions are revoked, and errors contain no credentials.
+
+A direct **1.5.0-to-1.5.1** update against copied 5.1.8 originals passes with the legacy journal format and no manual restore. Ten output assemblies match the preview, parent history is Superseded, both embedded helper hashes match, AMOLED is absent, original theme selection remains intact, and byte-exact restoration plus deterministic re-preview pass. The actual copied DLL checks pass: **55 selector**, **13 settings**, **19 runtime** and **3 auth-hook** checks.
+
+The rebuilt helper passes **7 live API checks**: credentialless creation, native Windows token rotation, real authorized free plan, native key/certificate issuance, signed server retrieval, certificate renewal and logout/revocation. All temporary test sessions are revoked; credentials and keys remain in memory and are never logged.
+
+Installed client inspection found an active session. Its installed files, account and connection were not changed for these tests. A real installed-client guest tunnel, restart/reconnect, transition back to normal sign-in and traffic/DNS checks remain pending. This patch pack remains prerelease; Patchwork 0.7.0 stays stable.
+
 ## Experimental 1.5.0 / r6 prerelease
 
 Requires Patchwork 0.7.0. Guest sessions are implemented in independently written GuestClient.cs; AMOLED is absent from the candidate. Stable release is held pending a real guest tunnel, restart/reconnect, normal sign-in transition and traffic/DNS tests from the installed client.

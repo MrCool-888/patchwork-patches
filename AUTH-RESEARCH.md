@@ -34,7 +34,7 @@ The [Windows 5.1.8 UserAuthenticator](https://github.com/ProtonVPN/win-app/blob/
 
 The independent [GuestClient.cs](source/GuestClient.cs) now implements:
 
-1. Continue as guest beside normal sign-in, with cancellation and generic errors. Real WinUI tests cover insertion before parent materialization, accessibility, busy state and duplicate prevention.
+1. Continue as guest beside normal sign-in, with native loading-page cancellation and generic errors. In r7, navigation unloading the sign-in page no longer cancels authentication. A single captured native token spans the attempt, and 30-second bootstrap deadlines cover headers and body reads. Timeout errors are distinct from user cancellation. Real WinUI tests cover insertion, accessibility, busy state, duplicate prevention, loading-page navigation, Cancel and retry.
 2. Session storage through the existing protected ISettings contract. Only the local user ID receives a guest namespace for separate preferences; API credentials and UID remain unchanged. Active sessions cannot be overwritten.
 3. The native CompleteLoginAsync workflow, real free VPN authorization and unexpired native certificate validation before publishing the logged-in event. Normal accounts fall through to their original methods.
 4. Startup resume through the native refresh pipeline, fail-closed expiry, and native logout/disconnect/key removal. Temporary bootstrap and failed guest sessions are revoked. Token-prefix logging is suppressed when the guest patch is selected.
