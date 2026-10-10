@@ -162,6 +162,35 @@ class SelectorProbe
         var searchType = T("ProtonVPN.Client.Logic.Searches.dll", "ProtonVPN.Client.Logic.Searches.GlobalSearch"); var search = Blank(searchType); Set(search, "_serversLoader", loader);
         Check(List(Call(search, "SearchServers", "NL-FREE#100", null)).Any(x => Object.ReferenceEquals(x, nl)), "Actual server search finds the selectable exact free server name");
         Check(List(Call(search, "SearchServers", "NL-FREE", null)).Count == 1, "Searching a free-server country prefix exposes its cached rows");
+        var loaderInterface = T(serversFile, "ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader");
+        var stateModel = T(serversFile, "ProtonVPN.Client.Logic.Servers.Contracts.Models.State"); var cityModel = T(serversFile, "ProtonVPN.Client.Logic.Servers.Contracts.Models.City");
+        var cityData = Activator.CreateInstance(cityModel); bool usedPaidList = false;
+        var countryLoader = SelectorProxy.Make(loaderInterface, (method, data) => {
+            if (method.Name == "GetFreeServers") return Call(loader, "GetFreeServers");
+            if (method.Name == "GetStatesByCountryCode") { usedPaidList = true; return Items(stateModel); }
+            if (method.Name == "GetCitiesByCountryCode") { usedPaidList = true; return Items(cityModel, cityData); }
+            return Default(method.ReturnType);
+        });
+        var factoryInterface = T("ProtonVPN.Client.dll", "ProtonVPN.Client.Factories.ILocationItemFactory"); bool searchArgument = false;
+        var countryFactory = SelectorProxy.Make(factoryInterface, (method, data) => {
+            if (method.Name == "GetServer") {
+                searchArgument = (bool)data[1]; var row = Blank(childType); Set(row, "<Server>k__BackingField", data[0]);
+                var serverInfo = infoType.GetMethod("From", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { Get(data[0], "Id"), Get(data[0], "Name") });
+                Set(row, "<LocationIntent>k__BackingField", Activator.CreateInstance(serverIntentType, new object[] { location, serverInfo })); Set(row, "ConnectionManager", fakeManager); Call(row, "InvalidateIsRestricted", false); return row;
+            }
+            if (method.Name == "GetCity") return city;
+            return Default(method.ReturnType);
+        });
+        Set(item, "ServersLoader", countryLoader); Set(item, "LocationItemFactory", countryFactory); Set(item, "<Country>k__BackingField", countryList[0]); Set(item, "<IsSearchItem>k__BackingField", true);
+        Call(item, "InvalidateIsRestricted", false); var expanded = List(Call(item, "GetSubItems"));
+        Check(expanded.Select(x => (string)Get(Get(x, "Server"), "Id")).SequenceEqual(new[] { "nl-free", "nl-offline" }), "Expanding NL on a free account returns its actual individual free-server rows");
+        Check(!usedPaidList && searchArgument, "Free country expansion bypasses paid city/state lists and retains the row context");
+        Check(expanded.All(x => !(bool)Get(x, "IsRestricted")), "Expanded free-server Connect actions have no local upgrade gate");
+        ((Task)Call(expanded[0], "ToggleConnectionAsync")).GetAwaiter().GetResult();
+        Check((string)Get(Get(Get(clickedIntent, "Location"), "Server"), "Id") == "nl-free", "Clicking an expanded free server sends its exact ID to the connection manager");
+        Property(countryList[0], "Code", "DE"); Check(List(Call(item, "GetSubItems")).Count == 0, "Country expansion never substitutes another country's servers"); Property(countryList[0], "Code", "NL");
+        Call(item, "InvalidateIsRestricted", true); expanded = List(Call(item, "GetSubItems"));
+        Check(usedPaidList && expanded.Count == 1 && Object.ReferenceEquals(expanded[0], city), "Paid country expansion preserves the original city/state factory path");
         Console.WriteLine(checks + " selector checks passed. No account, network, service, settings file or installed app was changed."); return 0;
     }
     static object GetRawCountries(object cache) { return cache.GetType().GetField("_countries", Instance).GetValue(cache); }

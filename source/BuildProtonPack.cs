@@ -45,6 +45,17 @@ class BuildProtonPack
         if (operations.Length != 0) patch["version"] = "1.0.0";
         patches.Add(patch);
     }
+    static string Field(string type, string name) { return ManagedPatches.Types(modules["ProtonVPN.Client.dll"].Types).Single(x => x.FullName == type).Fields.Single(x => x.Name == name).FullName; }
+    static object Resource(string theme, string key, string type, string value) { return new Dictionary<string, object> { { "theme", theme }, { "key", key }, { "type", type }, { "value", value } }; }
+    static Dictionary<string, object> Theme(params object[] colors)
+    {
+        var op = Op("ProtonVPN.Client.dll", "ProtonVPN.Client.App", "LoadTypographyResourceDictionary", "managedThemeResources"); op["resources"] = colors; return op;
+    }
+    static void ColorPair(List<object> resources, string theme, string key, string value) { resources.Add(Resource(theme, key, "color", value)); resources.Add(Resource(theme, key + "Brush", "brush", value)); }
+    static void Options(params string[] fields)
+    {
+        var options = new List<object>(); for (int i = 0; i < fields.Length; i += 3) options.Add(new Dictionary<string, object> { { "id", fields[i] }, { "label", fields[i + 1] }, { "type", "color" }, { "default", fields[i + 2] } }); ((Dictionary<string, object>)patches.Last())["options"] = options;
+    }
     static int Main(string[] args)
     {
         root = Path.GetFullPath(args[0]);
@@ -131,21 +142,46 @@ class BuildProtonPack
         serverRow["condition"] = new[] { "System.Boolean ProtonVPN.Client.Models.Connections.ServerLocationItemBase::get_IsFree()" }; serverRow["value"] = false;
         var serverIntent = Op("ProtonVPN.Client.Logic.Connection.Contracts.dll", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.ServerLocationIntentBase", "get_IsForPaidUsersOnly", "managedOverrideBoolean");
         serverIntent["type"] = "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.SingleServerLocationIntent"; serverIntent["value"] = false;
-        Add("free-locations", "Free country and individual server selection", "Lists eligible free countries and enables individual free-server Connect actions in Proton's Search. Search a free server name or country prefix (for example NL-FREE), then choose its Connect action. Preserves the exact server ID and uses strict free non-business candidates without fallback. Paid-server rows stay restricted for free accounts; city rows keep their original restrictions. Requires sign-in; live VPN connectivity is not yet verified.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent);
-        ((Dictionary<string, object>)patches.Last())["version"] = "1.1.0";
-        Add("no-sign-in", "Guest VPN session (not implemented)", "Not implemented: Android has an official credentialless guest authentication flow. Windows 5.1.8 needs a port that obtains, stores and refreshes a real guest session and connection credentials. Existing guest-hole recovery is not that flow. Sign-in is retained; this entry has no patch operations.", "Connections");
-        Add("amoled-theme", "AMOLED dark theme", "Not implemented: the Windows client uses compiled WinUI resources rather than Android theme resources.", "Appearance");
-        Add("accent-color", "Custom accent color", "Not implemented for Windows compiled WinUI resources.", "Appearance");
-        Add("switch-style", "Styled switches", "Not implemented for native Windows WinUI switches.", "Appearance");
+        var countryServers = Op(client, "ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem", "GetSubItems", "managedEnumerableFactory");
+        countryServers["condition"] = new[] { Field("ProtonVPN.Client.Models.Connections.HostLocationItemBase`1", "_lastKnownIsPaidUser") };
+        countryServers["source"] = new[] { Field("ProtonVPN.Client.Models.Connections.ConnectionItemBase", "ServersLoader"), "System.Collections.Generic.IEnumerable`1<ProtonVPN.Client.Logic.Servers.Contracts.Models.Server> ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()" };
+        countryServers["filter"] = new[] { "System.String ProtonVPN.Client.Models.Connections.CountryLocationItemBase::get_ExitCountryCode()" };
+        countryServers["factory"] = new[] { Field("ProtonVPN.Client.Models.Connections.HostLocationItemBase`1", "LocationItemFactory") };
+        countryServers["argument"] = new[] { "System.Boolean ProtonVPN.Client.Models.Connections.ConnectionItemBase::get_IsSearchItem()" };
+        countryServers["elementGetter"] = "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.Server::get_ExitCountry()";
+        countryServers["factoryMethod"] = "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem ProtonVPN.Client.Factories.ILocationItemFactory::GetServer(ProtonVPN.Client.Logic.Servers.Contracts.Models.Server,System.Boolean)";
+        Add("free-locations", "Free country and individual server selection", "Expand a free country to see its individual free servers and use their Connect actions. Also enables free server results in Search. Preserves the selected server ID and restricts connection candidates to free non-business servers without fallback. Paid accounts retain city/state browsing. Offline servers retain maintenance controls. Requires sign-in; live VPN connectivity is not yet verified.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers);
+        ((Dictionary<string, object>)patches.Last())["version"] = "1.2.0";
+        Add("no-sign-in", "Guest VPN session (Windows API rejected)", "Attempted with a real temporary Windows unauthenticated session on 2026-10-09. Proton's credentialless endpoint returned HTTP 422, Code 5003: Platform expected to be in [Android, iOS]. The temporary session was revoked. No usable Windows guest session was obtained; sign-in remains required. See AUTH-RESEARCH.md in the separate patch repository.", "Connections");
+        var black = new List<object>();
+        string[] backgrounds = { "BackgroundNormColor", "#000000", "BackgroundWeakColor", "#080808", "BackgroundStrongColor", "#141414", "InteractionWeakColor", "#101010", "InteractionWeakHoverColor", "#202020", "InteractionWeakActiveColor", "#282828", "BorderNormColor", "#282828", "BorderWeakColor", "#202020", "MapNormColor", "#050505", "MapHighlightColor", "#181818" };
+        for (int i = 0; i < backgrounds.Length; i += 2) ColorPair(black, "Dark", backgrounds[i], backgrounds[i + 1]);
+        Add("amoled-theme", "AMOLED dark theme", "Uses black and near-black app surfaces and forces Proton's dark theme. Disabling this patch restores normal theme selection. Resource overrides load before the app windows; High Contrast resources are not overridden.", "Appearance", Theme(black.ToArray()), Return(client, "ProtonVPN.Client.Services.Selection.ApplicationThemeSelector", "GetTheme", "enum", 2));
+        var accent = new List<object>();
+        foreach (string theme in new[] { "Light", "Dark" })
+        {
+            foreach (string key in new[] { "PrimaryColor", "LinkNormColor", "LinkHoverColor", "LinkActiveColor", "InteractionNormColor", "InteractionNormHoverColor", "InteractionNormActiveColor", "BorderFocusColor" }) ColorPair(accent, theme, key, "$accent");
+            ColorPair(accent, theme, "TextOnPrimaryColor", "$foreground");
+        }
+        Add("accent-color", "Custom accent color", "Choose the color used by primary buttons, links, focus borders and accent brushes, plus its foreground text color. Applies to Light and Dark themes. Choose contrasting colors for readable controls.", "Appearance", Theme(accent.ToArray()));
+        Options("accent", "Accent", "#8A66FF", "foreground", "Button text", "#FFFFFF");
+        var switches = new List<object>();
+        foreach (string theme in new[] { "Light", "Dark" })
+        {
+            foreach (string key in new[] { "ToggleSwitchFillOn", "ToggleSwitchFillOnPointerOver", "ToggleSwitchFillOnPressed", "ToggleSwitchStrokeOn", "ToggleSwitchStrokeOnPointerOver", "ToggleSwitchStrokeOnPressed" }) switches.Add(Resource(theme, key, "brush", "$track"));
+            foreach (string key in new[] { "ToggleSwitchKnobFillOn", "ToggleSwitchKnobFillOnPointerOver", "ToggleSwitchKnobFillOnPressed" }) switches.Add(Resource(theme, key, "brush", "$knob"));
+        }
+        Add("switch-style", "Custom switch colors", "Choose enabled toggle-switch track and knob colors while keeping the native switch layout, disabled states and keyboard controls. Applies to Light and Dark themes.", "Appearance", Theme(switches.ToArray()));
+        Options("track", "Switch track", "#36C9A0", "knob", "Switch knob", "#FFFFFF");
         var pack = new Dictionary<string, object> {
             { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
             { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
-            { "packVersion", "1.2.0" }, { "minimumPatcherVersion", "0.4.2" },
+            { "packVersion", "1.3.0" }, { "minimumPatcherVersion", "0.6.0" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built standalone pack v1.2.0: 11 available, 4 unavailable."); return 0;
+        Console.WriteLine("Built standalone pack v1.3.0: 14 available, guest sessions unavailable."); return 0;
     }
 }
