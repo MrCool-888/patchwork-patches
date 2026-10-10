@@ -2,6 +2,8 @@
 
 Separate patch definitions for [Patchwork](https://github.com/MrCool-888/patchwork). Never bundled in the patcher installer.
 
+The [Lunar 0.1.0 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/lunar-client-0.1.0) adds separate importable JSON files for inspected Lunar **3.7.17-ow** and **3.7.24-ow** builds. Install [Patchwork 0.9.0 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.9.0) first. Includes experimental launcher/status promotion cleanup and local cosmetic handlers. See [Lunar instructions and limitations](docs/lunar/README.md). Existing Blitz/Proton releases remain available through the same source.
+
 The [combined r3 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains **Blitz Clean Desktop 1.1.1** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2), then add this repository as a Patchwork source with **Include pre-release patch packs** enabled. One source offers both apps; exact original fingerprints determine compatibility.
 
 | App | Pack | Required target | Changes |
