@@ -10,7 +10,7 @@ from pathlib import Path
 parser=argparse.ArgumentParser(description='Build the declarative Lunar Patchwork pack from exact local originals.')
 parser.add_argument('--version', choices=['3.7.17-ow','3.7.24-ow'],default='3.7.17-ow')
 parser.add_argument('--original-dir',type=Path,default=Path('work/patch-test/backup'))
-parser.add_argument('--game-sha1',default='5b2b40dac44c0976b60ea4c4cb843fd0e88f5447')
+parser.add_argument('--game-sha1',default='bd3d081b9c8556a1b0c98c156bc0c1b783ec5bad')
 parser.add_argument('--output-dir',type=Path,default=Path('outputs'))
 args=parser.parse_args()
 root = Path(__file__).parent if (Path(__file__).parent/'patch_lunar.py').exists() else Path('outputs/LunarLocalPatch')
@@ -80,7 +80,7 @@ with zipfile.ZipFile(game) as z:
         old = z.read(name); new = lunar.patch_stub(old,badge_mode)
         jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,name))
     old = z.read(lunar.COSMETIC_MANAGER)
-    new = lunar.ClassFile(old).replace_methods({('IRHRIRCIOHRICHOIIIHCRIRICHOCIC','()V'):(b'\xb1',0,1)})
+    new = lunar.ClassFile(old).replace_methods({(lunar.COSMETIC_PUSH_METHOD,'()V'):(b'\xb1',0,1)})
     jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,lunar.COSMETIC_MANAGER))
     for name in ['LocalCosmetics.class','LocalCosmetics$1.class']:
         data = (root/'helper'/name).read_bytes()
@@ -101,7 +101,7 @@ if args.version=='3.7.17-ow':
     lunar.patch_asar(asar_data,game_sha1)
 else:
     layout='return{alert:aWe(e.alert),blogPosts:oWe(e.blogPosts,W9.getReadPosts()),serversCta:e.serversCta,servers:e.shelfServers,navItems:e.navItems,videoPromotion:e.videoPromotion,ads:e.ads,theme:`default`,carousel:e.carousel,announcements:e.announcements}'
-    guard='SS=async e=>{let t=await bS(e.location);if((0,S.basename)(e.location)===`lunar.jar`){if(e.expectedHash===`06972a91537f8048cf77a6f0c691105467203d84`&&t===`'+game_sha1+'`)return{reason:yS.Matched};throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}if(!t)'
+    guard='SS=async e=>{let t=await bS(e.location);if((0,S.basename)(e.location)===`lunar.jar`){if(e.expectedHash===`'+lunar.ORIGINAL_GAME_SHA1+'`&&t===`'+game_sha1+'`)return{reason:yS.Matched};throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}if(!t)'
     pairs=[
       (layout,'return{alert:void 0,blogPosts:[],serversCta:void 0,servers:[],navItems:[],videoPromotion:void 0,ads:[],theme:`default`,carousel:[],announcements:[]}'),
       ('SS=async e=>{let t=await bS(e.location);if(!t)',guard),
@@ -122,9 +122,9 @@ for old,new in pairs:
     name=names[0]
     op=dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=old,replacement=new,count=1)
     (cosmetic_ops if old.startswith(('Jme=','SS=async')) else clean_ops).append(op)
-pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / inspected multiver game build',packVersion='0.1.0',minimumPatcherVersion='0.9.0',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
-    dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.0',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Tested on copies; live launcher coverage remains unverified.',operations=clean_ops),
-    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Experimental: enables the local all-cosmetics rendering path, handles outfit and badge mutations locally and suppresses the outgoing cosmetic push. Requires default account outfit/catalog assets. Unequip existing online cosmetics BEFORE applying; previously saved online outfits can remain visible to others. Login/assets still use the network; emotes/sprays are outside scope. Favorite clicks are acknowledged without persistence. Exact patched-JAR guard stops launch if game/version changes. No live Minecraft or multiplayer privacy verification.',operations=cosmetic_ops)
+pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.1',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
+    dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.1',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.',operations=clean_ops),
+    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.1',status='ready',dependencies=['clean-launcher'],description='Experimental: handles outfit and badge mutations locally and suppresses the inspected outgoing cosmetic push. Requires default account outfit/catalog assets. Minecraft 1.21.11 launch, locker rendering and local equip/unequip verified with launcher 3.7.24-ow; 3.7.17 tested on copies. Open Locker using the main menu shirt icon, wait for the catalog, select Local Outfit and Equip. Unequip existing online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope. Favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops)
 ])
 args.output_dir.mkdir(parents=True,exist_ok=True)
 out=args.output_dir/('LunarClient-'+args.version+'.patchwork.json'); out.write_text(json.dumps(pack,indent=2)+'\n',encoding='utf-8',newline='\n')

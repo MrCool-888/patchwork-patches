@@ -14,10 +14,12 @@ import zipfile
 ROOT = Path(__file__).resolve().parent
 EXPECTED = {
     'app.asar': 'cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4',
-    'lunar.jar': '67bf574f5de677cc25b89b580773b292eda2a7514ee56b1339954364e76c1103',
+    'lunar.jar': 'f4a6a62df2d548906f272d2d0dc906b6caae6f3592f9e2dae918783324bf3cca',
 }
-COSMETIC_MANAGER = ('com/moonsworth/lunar/client/HICRRICCHCCROOHHCHOCOCCHOIHHOC/'
-                    'RIOOCHICIHRHOHCCCCCHOCCCOHCRHI/CORCOCICIRIOHROHROIIOOHICCHCRR.class')
+COSMETIC_MANAGER = ('com/moonsworth/lunar/client/IHCHHIIIHROCIROHROCHRCIROHOICH/'
+                    'IHIRRHORRRRHICCOHOHORCHIHHHIOO/OOIOHHHCIICRRRCICOIIIRRRICOCIC.class')
+COSMETIC_PUSH_METHOD = 'CIOIIHIROORCOCIHHRHCROOHHCHOOO'
+ORIGINAL_GAME_SHA1 = '3a30454c0e076f6feee2246c5969d006414f4307'
 HELPER = 'local/lunar/LocalCosmetics'
 CALLBACK = 'Lcom/google/protobuf/RpcCallback;'
 
@@ -68,7 +70,7 @@ def patch_asar(blob, game_hash):
               'carousel:e.carousel,announcements:e.announcements}')
     guard = ('Jme=async e=>{let t=await GS(e.location);'
         'if((0,S.basename)(e.location)===`lunar.jar`){'
-        'if(e.expectedHash===`06972a91537f8048cf77a6f0c691105467203d84`&&'
+        'if(e.expectedHash===`' + ORIGINAL_GAME_SHA1 + '`&&'
         't===`' + game_hash + '`)return{reason:WS.Matched};'
         'throw Error(`Local cosmetics patch: game file or version changed. '
         'Restore the patch before updating.`)}if(!t)')
@@ -252,7 +254,7 @@ def patch_jar(blob):
         changes[badge] = patch_stub(source.read(badge), badge=True)
         manager = ClassFile(source.read(COSMETIC_MANAGER))
         changes[COSMETIC_MANAGER] = manager.replace_methods({
-            ('IRHRIRCIOHRICHOIIIHCRIRICHOCIC', '()V'): (b'\xb1', 0, 1)
+            (COSMETIC_PUSH_METHOD, '()V'): (b'\xb1', 0, 1)
         })
         for name in ('LocalCosmetics.class', 'LocalCosmetics$1.class'):
             changes['local/lunar/' + name] = (ROOT / 'helper' / name).read_bytes()
