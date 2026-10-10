@@ -57,10 +57,6 @@ class ProbeApp : Application
                     if (brush == null || brush.Color.R != 0x36 || brush.Color.G != 0xC9 || brush.Color.B != 0xA0) throw new Exception("Switch resource lookup failed for " + theme);
                     Console.WriteLine("PASS WinUI " + theme + " theme resolves the custom switch track.");
                 }
-                var black = (Microsoft.UI.Xaml.Controls.Grid)XamlReader.Load("<Grid xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" RequestedTheme=\"Dark\"><Rectangle Fill=\"{ThemeResource BackgroundNormColorBrush}\"/></Grid>");
-                var background = ((Microsoft.UI.Xaml.Shapes.Rectangle)black.Children[0]).Fill as SolidColorBrush;
-                if (background == null || background.Color.R != 0 || background.Color.G != 0 || background.Color.B != 0) throw new Exception("AMOLED background lookup failed.");
-                Console.WriteLine("PASS WinUI Dark theme resolves the black AMOLED surface.");
                 VerifyPromotions();
             } catch (Exception error) { Failure = error; Console.Error.WriteLine(error); }
             finally { Exit(); }

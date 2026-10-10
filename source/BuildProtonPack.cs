@@ -24,6 +24,11 @@ class BuildProtonPack
         var op = Op(file, type, method, "managedReturn"); op["returnType"] = returnType;
         if (value != null) op["value"] = value; return op;
     }
+    static object GuestHook(string file, string type, string method, string entry, string mode, byte[] module)
+    {
+        var op = Op(file, type, method, "managedEmbeddedHook"); op["moduleBase64"] = Convert.ToBase64String(module); op["moduleSha256"] = PatchEngine.Hash(module);
+        op["entryType"] = "Patchwork.ProtonGuest.GuestClient"; op["entryMethod"] = entry; op["mode"] = mode; return op;
+    }
     static object Call(string file, string type, string method, string calledName, bool suppress = false)
     {
         var op = Op(file, type, method, suppress ? "managedSuppressCall" : "managedBooleanCall");
@@ -186,17 +191,19 @@ class BuildProtonPack
         recentRow["type"] = recentType; recentRow["setterMethod"] = "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)"; recentRow["value"] = false; recentRow["conditionExpected"] = false;
         recentRow["condition"] = new[] { "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection " + recentType + "::get_RecentConnection()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection::get_ConnectionIntent()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.ILocationIntent ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent::get_Location()", "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IIntent::get_IsForPaidUsersOnly()" };
         recentRow["exclusions"] = new[] { "IsSecureCore", "IsP2P", "IsTor", "IsB2B", "IsProfileIntent" }.Select(x => new[] { "System.Boolean " + recentType + "::get_" + x + "()" }).ToArray();
-        Add("free-locations", "Free country and individual server selection", "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires sign-in.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers, recentRow);
+        Add("free-locations", "Free country and individual server selection", "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires a signed-in or guest VPN session.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers, recentRow);
         ((Dictionary<string, object>)patches.Last())["version"] = "1.3.0";
         var modes = Op(client, "ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel", "get_CountriesComponents", "managedEnumFilter");
         modes["elementGetter"] = "ProtonVPN.Client.Core.Enums.CountriesConnectionType ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent::get_ConnectionType()"; modes["value"] = 0;
         modes["condition"] = new[] { "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.UI.Main.Sidebar.Bases.ConnectionListViewModelBase`1::get_Settings()", planGetter, paidGetter };
         Add("hide-paid-modes", "Hide paid country modes", "Hides Secure Core, P2P and Tor country tabs on free accounts, keeping All countries and free server selection. Paid accounts retain their mode tabs. This changes navigation only; it does not grant access to paid servers. Restart Proton after an account-plan change.", "Interface", modes);
-        Add("no-sign-in", "Guest VPN session (port under development)", "Android client identity successfully obtained a temporary guest session, VPN credentials and a Windows-identity connection certificate on 2026-10-09. All temporary sessions were revoked. This is compatibility research, not an integrated Windows guest connection. Protected storage, refresh, logout, client workflow and tunnel validation remain; sign-in is still required in this pack. See AUTH-RESEARCH.md.", "Connections");
-        var black = new List<object>();
-        string[] backgrounds = { "BackgroundNormColor", "#000000", "BackgroundWeakColor", "#080808", "BackgroundStrongColor", "#141414", "InteractionWeakColor", "#101010", "InteractionWeakHoverColor", "#202020", "InteractionWeakActiveColor", "#282828", "BorderNormColor", "#282828", "BorderWeakColor", "#202020", "MapNormColor", "#050505", "MapHighlightColor", "#181818" };
-        for (int i = 0; i < backgrounds.Length; i += 2) ColorPair(black, "Dark", backgrounds[i], backgrounds[i + 1]);
-        Add("amoled-theme", "AMOLED dark theme", "Uses black and near-black app surfaces and forces Proton's dark theme. Disabling this patch restores normal theme selection. Resource overrides load before the app windows; High Contrast resources are not overridden.", "Appearance", Theme(black.ToArray()), Return(client, "ProtonVPN.Client.Services.Selection.ApplicationThemeSelector", "GetTheme", "enum", 2));
+        byte[] guestModule = File.ReadAllBytes(args[2]);
+        const string authFile = "ProtonVPN.Client.Logic.Auth.dll", authType = "ProtonVPN.Client.Logic.Auth.UserAuthenticator";
+        Add("no-sign-in", "Guest VPN session", "Adds Continue as guest with cancellation, encrypted session storage and native VPN authorization, certificate renewal, refresh, restart and logout. Contains executable managed client code; source: source/GuestClient.cs. Normal sign-in remains available. Guest accounts retain backend free-server limits.", "Guest client code",
+            GuestHook(client, "ProtonVPN.Client.UI.Login.Pages.SignInPageView", ".ctor", "AddButton", "after", guestModule),
+            GuestHook(authFile, authType, "GetUserAsync", "GuestUser", "fallback", guestModule),
+            GuestHook(authFile, authType, "AutoLoginUserAsync", "Resume", "fallback", guestModule),
+            Return("ProtonVPN.Api.dll", "ProtonVPN.Api.TokenClient", "LogRefreshToken", "void", null));
         var accent = new List<object>();
         foreach (string theme in new[] { "Light", "Dark" })
         {
@@ -216,12 +223,12 @@ class BuildProtonPack
         var pack = new Dictionary<string, object> {
             { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
             { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
-            { "packVersion", "1.4.0" }, { "minimumPatcherVersion", "0.6.1" },
+            { "packVersion", "1.5.0" }, { "minimumPatcherVersion", "0.7.0" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built standalone pack v1.4.0: 15 available, guest port still planned."); return 0;
+        Console.WriteLine("Built local candidate pack v1.5.0: 15 available; guest requires validation before publication."); return 0;
     }
 }

@@ -1,5 +1,17 @@
 # Proton VPN 5.1.8 patch validation
 
+## Experimental 1.5.0 / r6 prerelease
+
+Requires Patchwork 0.7.0. Guest sessions are implemented in independently written GuestClient.cs; AMOLED is absent from the candidate. Stable release is held pending a real guest tunnel, restart/reconnect, normal sign-in transition and traffic/DNS tests from the installed client.
+
+All 15 patches preview independently and apply together to ten copied assemblies. A direct 1.4.0-to-1.5.0 update, including an older journal without patch IDs, passes without manual restore; previous history becomes Superseded and output hashes match. The copied actual methods pass **55 selector checks**, **13 settings checks**, **19 earlier runtime checks** and **3 native authentication hook checks**. No installed app, production account files or services were changed.
+
+The guest lifecycle probe passes **40 checks** for login, certificate validation before success, protected settings contract usage, resume, normal-account fallthrough, active-session preservation, cancellation, challenge refusal, missing/partial credentials, failed authorization, expired/missing certificates and revocation. An isolated native WinUI host passes guest button insertion, accessible label, normal-login busy state and duplicate prevention. The fixture found and fixed the unavailable button Parent during construction.
+
+The real API probe passes **7 checks**: guest session creation, native Windows token refresh/rotation, authorized free plan, native key/certificate issuance, signed logical-server retrieval, native certificate renewal and native logout. Session and key material stays in memory; all temporary sessions are revoked. This is API integration evidence, not an actual tunnel test. The service's installed-process-path authorization remains intact.
+
+## Published 1.4.0 / r5 checks
+
 Pack **1.4.0**, release **r5**, requires **Patchwork 0.6.1+**. Free selection is patch 1.3.0, promotions 1.2.0, and other available patches 1.0.0. Tested October 9, 2026.
 
 ## File transformations and updates

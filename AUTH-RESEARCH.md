@@ -1,6 +1,6 @@
 # Guest session research
 
-Reviewed October 9, 2026. Pack 1.4.0 still requires sign-in. The new Android-identity probe succeeded through guest session, VPN credentials and connection certificate issuance; the Windows client has not yet been integrated with that workflow.
+Reviewed October 9, 2026. Experimental prerelease 1.5.0 integrates credentialless sessions with Windows authentication and certificate managers. The actual installed-client guest tunnel test remains pending. This is not yet ready for a stable release.
 
 ## Official Android workflow
 
@@ -28,16 +28,19 @@ Requested Android-identity attempt, using android-vpn@5.20.57.0 (the [official A
 
 The change was the client identity header. No Android device telemetry or challenge answers were fabricated. The optional probe stops on human verification without solving or bypassing it. These results establish that the tested mobile session can authorize Windows API requests; they do not establish a working tunnel, certificate renewal, reconnect or restart behavior. The earlier conclusion that Windows-platform rejection alone prevented a port is superseded by this successful test.
 
-## Windows integration still needed
+## Windows integration in the local candidate
 
 The [Windows 5.1.8 UserAuthenticator](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Client/Logic/Auth/ProtonVPN.Client.Logic.Auth/UserAuthenticator.cs) uses its SRP login path before CompleteLoginAsync. Guest-hole recovery still performs normal login. [ApiClient](https://github.com/ProtonVPN/win-app/blob/v5.1.8/src/Api/ProtonVPN.Api/ApiClient.cs) obtains VPN info and connection certificates through the current authorized session.
 
-A complete port needs:
+The independent [GuestClient.cs](source/GuestClient.cs) now implements:
 
-1. An explicit Continue as guest action that handles unavailable service, cancellation and human verification.
-2. Integration of the guest session and credentialless account state into the Windows auth workflow, with protected token storage, refresh, revocation and recovery. Existing accounts must remain intact.
-3. Use of the existing connection-key/certificate manager and service, preserving certificate checks and free-server/protocol eligibility.
-4. Restart, expiry, refresh, reconnect, logout and transition-to-normal-sign-in behavior.
-5. A real free-server tunnel and traffic/DNS verification on a test machine.
+1. Continue as guest beside normal sign-in, with cancellation and generic errors. Real WinUI tests cover insertion before parent materialization, accessibility, busy state and duplicate prevention.
+2. Session storage through the existing protected ISettings contract. Only the local user ID receives a guest namespace for separate preferences; API credentials and UID remain unchanged. Active sessions cannot be overwritten.
+3. The native CompleteLoginAsync workflow, real free VPN authorization and unexpired native certificate validation before publishing the logged-in event. Normal accounts fall through to their original methods.
+4. Startup resume through the native refresh pipeline, fail-closed expiry, and native logout/disconnect/key removal. Temporary bootstrap and failed guest sessions are revoked. Token-prefix logging is suppressed when the guest patch is selected.
 
-The current declarative patch operations cannot supply the complete asynchronous network/session lifecycle. A reviewable client-code delivery mechanism is required before shipping that integration. The compatibility probe is separate research source, never run by patch application and never bundled into the installer. The catalog entry remains planned, accurately indicating that the API experiment succeeded but the guest client is not implemented.
+Patchwork 0.7.0 supplies managedEmbeddedHook: explicitly declared, hash-verified executable managed code embedded in the target assemblies. Library and preview identify it. Import, preview and patch application never execute the helper. The patcher installer includes neither this helper nor Proton patches.
+
+GuestLifecycleProbe covers cancellation, incomplete credentials, certificate failure/expiry, failed authorization, resume, normal-account preservation and cleanup. An actual patched UserAuthenticator DLL passes guest-user dispatch, native CompleteLogin/resume and normal-user fallthrough. GuestLiveProbe passes real native Windows token rotation, free-plan authorization, key/certificate issuance, signed server retrieval, certificate renewal and logout. Live test sessions were revoked; tokens, keys and identifiers were held in memory and never logged.
+
+Still required for stable release: an actual installed-client guest connection, restart/reconnect, normal sign-in transition, and traffic/DNS verification. The service requires its installed executable path; a copied client cannot test a tunnel, and service authorization has not been weakened. No production account files or installed assemblies have been changed by these probes.
