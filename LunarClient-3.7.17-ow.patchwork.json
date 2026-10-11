@@ -4,8 +4,8 @@
   "appId": "lunar-client",
   "appName": "Lunar Client",
   "appVersion": "3.7.17-ow / multiver 29a43e6",
-  "packVersion": "0.1.4",
-  "minimumPatcherVersion": "0.9.1",
+  "packVersion": "0.1.5",
+  "minimumPatcherVersion": "0.9.2",
   "versionFile": "AppData/Local/Programs/Lunar Client/resources/app.asar",
   "versionSha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
   "author": "MrCool-888",
@@ -440,6 +440,104 @@
           "entrySha256": "1f9b6e362341a09fff60f961869c709b0730ee9d2ab613272ef0204d4e978a77",
           "find": "if(t===e.expectedHash)return{reason:WS.Matched};",
           "replacement": "if((0,S.basename)(e.location)===`genesis-0.1.0-SNAPSHOT-all.jar`){if(e.expectedHash===`ea2f19ae5fcb3941df77637b184a1ff02157d6b1`&&t===`106f52481af4a63ba559bb817e9ccea087f387f7`)return{reason:WS.Matched};throw Error(`Bootstrap download patch: bootstrap file or version changed. Restore the patch before updating.`)}if(t===e.expectedHash)return{reason:WS.Matched};",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "clean-game-promotions",
+      "name": "Remove in-game promotions",
+      "category": "Game",
+      "version": "0.1.0",
+      "status": "ready",
+      "description": "Experimental: hides main-menu Store/Discover buttons, news carousel, coin purchase control, Medal quests/rewards, promotional video and Discord reward cards, countdown, Wrapped card and partner radio widget. Removes the Locker shop/Purchase Lunar+ link and preview checkout/back-to-store controls. Keeps Singleplayer, Multiplayer, Locker/local outfits, theme selector, ordinary alerts and preview exit controls. Requires the exact inspected extracted UI bundle b6d39b2; changing UI builds or re-extracting the cache can remove the cleanup. No launcher/game/bootstrap verification bypass is added. Automated checks passed; live game testing is requested from the user.",
+      "operations": [
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "S2(O.home,y=>{l(y.buttons)})",
+          "replacement": "S2(O.home,y=>{l(y.buttons.filter(w=>w.id!==\"settings.labels.store\"&&w.id!==\"gui.components.discover\"))})",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "i.jsx(TM2,{coins:R,onMouseDown:()=>{O.playClickSound(),O.home.theme.openStoreCoins()}})",
+          "replacement": "null",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "C1&&i.jsx(Sc0,{reward:C1,onSuccess:r1=>{n1(r1)}})",
+          "replacement": "null",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "v1&&i.jsx(jc0,{})",
+          "replacement": "null",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "(F==null?void 0:F.includes(\"blog\"))&&u.length>0&&!e.minimal&&i.jsx(EM2,{posts:u,duration:5})",
+          "replacement": "null",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "x.includes(Gt.PROMOTION_TYPE_VIDEO)?i.jsx(Bc0,{uuid:o==null?void 0:o.uuid}):i.jsx(qa0,{showDiscordCta:p,uuid:o==null?void 0:o.uuid})",
+          "replacement": "null",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "i.jsx(Cb2,{children:i.jsx(g2,{icon:",
+          "replacement": "false&&i.jsx(Cb2,{children:i.jsx(g2,{icon:",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "showBackToStore:!0,showInstantCheckout:r!==void 0,showPreviewCosmetics:o",
+          "replacement": "showBackToStore:!1,showInstantCheckout:!1,showPreviewCosmetics:o",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "(F==null?void 0:F.includes(\"radio\"))&&!e.minimal&&i.jsx(XO2,",
+          "replacement": "false&&i.jsx(XO2,",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "z&&(F==null?void 0:F.includes(\"countdown\"))&&i.jsx(Hc0,",
+          "replacement": "false&&i.jsx(Hc0,",
+          "count": 1
+        },
+        {
+          "kind": "textReplace",
+          "file": ".lunarclient/ui/b6d39b271abae35e95be9bdadf2270e908d59548/static/index.js",
+          "sha256": "5dfea0b2b0c331971827d97f4a8ee12b2406d005e9d5e954180ce5db328ac7db",
+          "find": "(d==null?void 0:d.includes(\"wrapped\"))&&i.jsx(yl,{title:a.year+\" Wrapped\"",
+          "replacement": "false&&i.jsx(yl,{title:a.year+\" Wrapped\"",
           "count": 1
         }
       ]

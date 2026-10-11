@@ -68,13 +68,34 @@ class ValidatePack
             if (args.Length == 4)
             {
                 var previous = PatchBundle.Parse(File.ReadAllText(args[3]));
-                var expected = new PatchEngine(Path.Combine(scratch, "startup-removal-history")).Preview(previous, Path.Combine(scratch, "original-target"), previous.Patches.Select(x => x.Id));
+                var expected = new PatchEngine(Path.Combine(scratch, "startup-removal-history")).Preview(previous, Path.Combine(scratch, "original-target"), previous.Patches.Select(x => x.Id).Where(x => x != "bootstrap-download-fallback"));
                 Assert(withoutStartup.Files.Single(x => x.RelativePath.EndsWith("app.asar")).AfterHash == expected.Files.Single(x => x.RelativePath.EndsWith("app.asar")).AfterHash, "Removing startup patch did not recover the previous launcher without its bootstrap exception.");
             }
             engine.Apply(withoutStartup);
             engine.Apply(engine.Preview(bundle, target, selected));
             foreach (var file in plan.Files) Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(target, file.RelativePath))) == file.AfterHash, "Startup reselection mismatch.");
             Console.WriteLine("PASS startup patch deselection restores original Genesis and reselection matches staged output.");
+        }
+        if (selected.Contains("clean-game-promotions"))
+        {
+            var ui = plan.Files.Single(x => x.RelativePath.EndsWith("/static/index.js"));
+            var withoutPromotions = engine.Preview(bundle, target, selected.Where(x => x != "clean-game-promotions"));
+            Assert(withoutPromotions.Files.Single(x => x.RelativePath == ui.RelativePath).AfterHash == ui.BeforeHash, "Removing promotions did not restore the original UI.");
+            engine.Apply(withoutPromotions);
+            engine.Apply(engine.Preview(bundle, target, selected));
+            foreach (var file in plan.Files) Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(target, file.RelativePath))) == file.AfterHash, "Promotion reselection mismatch.");
+            var cleanRoot = Path.Combine(scratch, "promotions-only-target");
+            foreach (var file in plan.Files)
+            {
+                string dest = PatchEngine.Resolve(cleanRoot, file.RelativePath); Directory.CreateDirectory(Path.GetDirectoryName(dest));
+                File.WriteAllBytes(dest, file.BeforeBytes);
+            }
+            var isolatedEngine = new PatchEngine(Path.Combine(scratch, "promotions-only-history"));
+            var isolatedPlan = isolatedEngine.Preview(bundle, cleanRoot, new[] { "clean-game-promotions" });
+            Assert(isolatedPlan.Files.Count == 1 && isolatedPlan.Files[0].AfterHash == ui.AfterHash, "Promotions-only selection changed unrelated files.");
+            var isolatedJournal = isolatedEngine.Apply(isolatedPlan); isolatedEngine.Restore(isolatedJournal);
+            Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(cleanRoot, ui.RelativePath))) == ui.BeforeHash, "Promotions-only restore mismatch.");
+            Console.WriteLine("PASS promotion deselection/reselection and independent one-file apply/restore.");
         }
         var remaining = selected.Where(x => x != "local-cosmetics").ToArray();
         var update = engine.Preview(bundle, target, remaining);
