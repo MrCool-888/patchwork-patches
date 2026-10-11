@@ -4,7 +4,7 @@
   "appId": "lunar-client",
   "appName": "Lunar Client",
   "appVersion": "3.7.24-ow / multiver 29a43e6",
-  "packVersion": "0.1.5",
+  "packVersion": "0.1.6",
   "minimumPatcherVersion": "0.9.2",
   "versionFile": "AppData/Local/Programs/Lunar Client/resources/app.asar",
   "versionSha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
@@ -365,12 +365,12 @@
       "id": "bootstrap-download-fallback",
       "name": "Faster bootstrap download fallback",
       "category": "Game",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "status": "ready",
       "dependencies": [
         "clean-launcher"
       ],
-      "description": "Optional: limits connection establishment to 15 seconds and tries each existing Maven repository once, avoiding long repeated waits on an unreachable repository during Starting JVM. Keeps the 180-second request deadline, repository order, cached archive checks and download validation. Supports only the exact tested Genesis fingerprint. Restore before updating Lunar. Cannot recover a dependency unavailable from every repository.",
+      "description": "Optional: limits connection establishment to 15 seconds and tries each existing Maven repository once. After a repository connection times out, skips that origin for subsequent Maven artifacts in the same JVM, avoiding repeated 15-second waits on cold-cache launches such as 26.3. A fresh launch retries all origins. Keeps the 180-second request deadline, reachable repository order, cached archive checks and download validation. Single-URL retry behavior remains unchanged. Supports only the exact tested Genesis fingerprint. Restore before updating Lunar. Cannot recover a dependency unavailable from every remaining repository.",
       "operations": [
         {
           "kind": "jarEntrySplice",
@@ -378,17 +378,22 @@
           "sha256": "40797ad1d1449ffff7c6e7342b79a3edc8d08517505dc2d57ce9d97e0669389c",
           "entry": "com/moonsworth/lunar/ICCRRCCIOOIRICIHHCIOROHHROOHHR/RCHICCCIHRCRCHCIRRIIRRHICORHHO/OOIOHHHCIICRRRCICOIIIRRRICOCIC.class",
           "entrySha256": "2a632ea44b11be790f80d530a3e31828dcff2cf97dbf05e2cfbed35db8bf4cdc",
-          "resultSha256": "ac3829a2f5d0b501c319ddb7106f86d61f60d89a67c669a8bcba055c452ab8a5",
+          "resultSha256": "8af4d0221d1b4657f3a5cb58964ea812c966cef0d857ff8bbea94ca0afd6b423",
           "edits": [
             {
               "offset": 9,
               "length": 1,
-              "dataBase64": "Tg=="
+              "dataBase64": "Uw=="
             },
             {
               "offset": 5112,
               "length": 0,
-              "dataBase64": "BQAAAAAAADqY"
+              "dataBase64": "AQAebG9jYWwvbHVuYXIvQm9vdHN0cmFwRG93bmxvYWRzBwFMAQB7KExqYXZhL25ldC9odHRwL0h0dHBDbGllbnQ7TGphdmEvbmV0L2h0dHAvSHR0cFJlcXVlc3Q7TGphdmEvbmV0L2h0dHAvSHR0cFJlc3BvbnNlJEJvZHlIYW5kbGVyOylMamF2YS9uZXQvaHR0cC9IdHRwUmVzcG9uc2U7DAFBAU4KAU0BTwUAAAAAAAA6mA=="
+            },
+            {
+              "offset": 6351,
+              "length": 3,
+              "dataBase64": "uAFQ"
             },
             {
               "offset": 6531,
@@ -413,7 +418,7 @@
             {
               "offset": 7216,
               "length": 2,
-              "dataBase64": "OhQBTLgAWbM="
+              "dataBase64": "OhQBUbgAWbM="
             },
             {
               "offset": 7220,
@@ -433,13 +438,29 @@
           ]
         },
         {
+          "kind": "jarEntryAdd",
+          "file": ".lunarclient/offline/multiver/genesis-0.1.0-SNAPSHOT-all.jar",
+          "sha256": "40797ad1d1449ffff7c6e7342b79a3edc8d08517505dc2d57ce9d97e0669389c",
+          "entry": "local/lunar/BootstrapDownloads.class",
+          "entrySha256": "dcdbab3f061a5dd95c5ba409d1de41439c718be80993800af846e8751b81ef8c",
+          "dataBase64": "yv66vgAAAD0ATwcAAgEAHmxvY2FsL2x1bmFyL0Jvb3RzdHJhcERvd25sb2FkcwcABAEAEGphdmEvbGFuZy9PYmplY3QBAA5GQUlMRURfT1JJR0lOUwEAD0xqYXZhL3V0aWwvU2V0OwEACVNpZ25hdHVyZQEAOExqYXZhL3V0aWwvU2V0PExsb2NhbC9sdW5hci9Cb290c3RyYXBEb3dubG9hZHMkT3JpZ2luOz47AQAIPGNsaW5pdD4BAAMoKVYBAARDb2RlCgANAA8HAA4BACZqYXZhL3V0aWwvY29uY3VycmVudC9Db25jdXJyZW50SGFzaE1hcAwAEAARAQAJbmV3S2V5U2V0AQA1KClMamF2YS91dGlsL2NvbmN1cnJlbnQvQ29uY3VycmVudEhhc2hNYXAkS2V5U2V0VmlldzsJAAEAEwwABQAGAQAPTGluZU51bWJlclRhYmxlAQAGPGluaXQ+CgADABcMABUACgEABHNlbmQBAHsoTGphdmEvbmV0L2h0dHAvSHR0cENsaWVudDtMamF2YS9uZXQvaHR0cC9IdHRwUmVxdWVzdDtMamF2YS9uZXQvaHR0cC9IdHRwUmVzcG9uc2UkQm9keUhhbmRsZXI7KUxqYXZhL25ldC9odHRwL0h0dHBSZXNwb25zZTsBAApFeGNlcHRpb25zBwAcAQATamF2YS9pby9JT0V4Y2VwdGlvbgcAHgEAHmphdmEvbGFuZy9JbnRlcnJ1cHRlZEV4Y2VwdGlvbgEAmzxUOkxqYXZhL2xhbmcvT2JqZWN0Oz4oTGphdmEvbmV0L2h0dHAvSHR0cENsaWVudDtMamF2YS9uZXQvaHR0cC9IdHRwUmVxdWVzdDtMamF2YS9uZXQvaHR0cC9IdHRwUmVzcG9uc2UkQm9keUhhbmRsZXI8VFQ7PjspTGphdmEvbmV0L2h0dHAvSHR0cFJlc3BvbnNlPFRUOz47CgAhACMHACIBABlqYXZhL25ldC9odHRwL0h0dHBSZXF1ZXN0DAAkACUBAAN1cmkBABAoKUxqYXZhL25ldC9VUkk7CgAnACkHACgBACVsb2NhbC9sdW5hci9Cb290c3RyYXBEb3dubG9hZHMkT3JpZ2luDAAqACsBAAJvZgEANyhMamF2YS9uZXQvVVJJOylMbG9jYWwvbHVuYXIvQm9vdHN0cmFwRG93bmxvYWRzJE9yaWdpbjsLAC0ALwcALgEADWphdmEvdXRpbC9TZXQMADAAMQEACGNvbnRhaW5zAQAVKExqYXZhL2xhbmcvT2JqZWN0OylaBwAzAQApamF2YS9uZXQvaHR0cC9IdHRwQ29ubmVjdFRpbWVvdXRFeGNlcHRpb24IADUBAEFBIHByZXZpb3VzIGNvbm5lY3Rpb24gYXR0ZW1wdCB0byB0aGlzIHJlcG9zaXRvcnkgb3JpZ2luIHRpbWVkIG91dAoAMgA3DAAVADgBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYKADoAPAcAOwEAGGphdmEvbmV0L2h0dHAvSHR0cENsaWVudAwAGAA9AQBhKExqYXZhL25ldC9odHRwL0h0dHBSZXF1ZXN0O0xqYXZhL25ldC9odHRwL0h0dHBSZXNwb25zZSRCb2R5SGFuZGxlcjspTGphdmEvbmV0L2h0dHAvSHR0cFJlc3BvbnNlOwsALQA/DABAADEBAANhZGQBAA1TdGFja01hcFRhYmxlAQAKU291cmNlRmlsZQEAF0Jvb3RzdHJhcERvd25sb2Fkcy5qYXZhAQAMSW5uZXJDbGFzc2VzBwBGAQAmamF2YS9uZXQvaHR0cC9IdHRwUmVzcG9uc2UkQm9keUhhbmRsZXIHAEgBABpqYXZhL25ldC9odHRwL0h0dHBSZXNwb25zZQEAC0JvZHlIYW5kbGVyBwBLAQAxamF2YS91dGlsL2NvbmN1cnJlbnQvQ29uY3VycmVudEhhc2hNYXAkS2V5U2V0VmlldwEACktleVNldFZpZXcBAAZPcmlnaW4BAAtOZXN0TWVtYmVycwAxAAEAAwAAAAEAGgAFAAYAAQAHAAAAAgAIAAMACAAJAAoAAQALAAAAHwABAAAAAAAHuAAMswASsQAAAAEAFAAAAAYAAQAAAA4AAgAVAAoAAQALAAAAHQABAAEAAAAFKrcAFrEAAAABABQAAAAGAAEAAAAQAAkAGAAZAAMAGgAAAAYAAgAbAB0ABwAAAAIAHwALAAAAfgADAAUAAAA0K7YAILgAJk6yABItuQAsAgCZAA27ADJZEjS3ADa/KisstgA5sDoEsgASLbkAPgIAVxkEvwABAB4AJAAlADIAAgAUAAAAHgAHAAAAFQAIABYAFAAXAB4AGQAlABoAJwAbADEAHABBAAAADAAC/AAeBwAnRgcAMgADAEIAAAACAEMARAAAABoAAwBFAEcASQYJAEoADQBMABkAJwABAE0AGgBOAAAABAABACc="
+        },
+        {
+          "kind": "jarEntryAdd",
+          "file": ".lunarclient/offline/multiver/genesis-0.1.0-SNAPSHOT-all.jar",
+          "sha256": "40797ad1d1449ffff7c6e7342b79a3edc8d08517505dc2d57ce9d97e0669389c",
+          "entry": "local/lunar/BootstrapDownloads$Origin.class",
+          "entrySha256": "3d9c2d4bf23195360cc0a566f3c8472c9f37964a9df642ac9b3eb06bc0872927",
+          "dataBase64": "yv66vgAAAD0AagcAAgEAJWxvY2FsL2x1bmFyL0Jvb3RzdHJhcERvd25sb2FkcyRPcmlnaW4HAAQBABBqYXZhL2xhbmcvUmVjb3JkAQAGc2NoZW1lAQASTGphdmEvbGFuZy9TdHJpbmc7AQAEaG9zdAEABHBvcnQBAAFJAQAGPGluaXQ+AQAoKExqYXZhL2xhbmcvU3RyaW5nO0xqYXZhL2xhbmcvU3RyaW5nO0kpVgEABENvZGUKAAMADgwACgAPAQADKClWCQABABEMAAUABgkAAQATDAAHAAYJAAEAFQwACAAJAQAPTGluZU51bWJlclRhYmxlAQAQTWV0aG9kUGFyYW1ldGVycwEAAm9mAQA3KExqYXZhL25ldC9VUkk7KUxsb2NhbC9sdW5hci9Cb290c3RyYXBEb3dubG9hZHMkT3JpZ2luOwoAGwAdBwAcAQAMamF2YS9uZXQvVVJJDAAeAB8BAAlnZXRTY2hlbWUBABQoKUxqYXZhL2xhbmcvU3RyaW5nOwoAGwAhDAAiAB8BAAdnZXRIb3N0BwAkAQAiamF2YS9sYW5nL0lsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbggAJgEAJ1JlcXVlc3QgVVJJIG11c3QgaGF2ZSBhIHNjaGVtZSBhbmQgaG9zdAoAIwAoDAAKACkBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYJACsALQcALAEAEGphdmEvdXRpbC9Mb2NhbGUMAC4ALwEABFJPT1QBABJMamF2YS91dGlsL0xvY2FsZTsKADEAMwcAMgEAEGphdmEvbGFuZy9TdHJpbmcMADQANQEAC3RvTG93ZXJDYXNlAQAmKExqYXZhL3V0aWwvTG9jYWxlOylMamF2YS9sYW5nL1N0cmluZzsKABsANwwAOAA5AQAHZ2V0UG9ydAEAAygpSQgAOwEABWh0dHBzCgAxAD0MAD4APwEABmVxdWFscwEAFShMamF2YS9sYW5nL09iamVjdDspWggAQQEABGh0dHAKAAEAQwwACgALAQANU3RhY2tNYXBUYWJsZQEACHRvU3RyaW5nEgAAAEcMAEUASAEAOyhMbG9jYWwvbHVuYXIvQm9vdHN0cmFwRG93bmxvYWRzJE9yaWdpbjspTGphdmEvbGFuZy9TdHJpbmc7AQAIaGFzaENvZGUSAAAASwwASQBMAQAqKExsb2NhbC9sdW5hci9Cb290c3RyYXBEb3dubG9hZHMkT3JpZ2luOylJEgAAAE4MAD4ATwEAPChMbG9jYWwvbHVuYXIvQm9vdHN0cmFwRG93bmxvYWRzJE9yaWdpbjtMamF2YS9sYW5nL09iamVjdDspWgEAClNvdXJjZUZpbGUBABdCb290c3RyYXBEb3dubG9hZHMuamF2YQEAEEJvb3RzdHJhcE1ldGhvZHMKAFQAVgcAVQEAH2phdmEvbGFuZy9ydW50aW1lL09iamVjdE1ldGhvZHMMAFcAWAEACWJvb3RzdHJhcAEAsShMamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGVzJExvb2t1cDtMamF2YS9sYW5nL1N0cmluZztMamF2YS9sYW5nL2ludm9rZS9UeXBlRGVzY3JpcHRvcjtMamF2YS9sYW5nL0NsYXNzO0xqYXZhL2xhbmcvU3RyaW5nO1tMamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGU7KUxqYXZhL2xhbmcvT2JqZWN0Ow8GAFMIAFsBABBzY2hlbWU7aG9zdDtwb3J0DwEAEA8BABIPAQAUAQAMSW5uZXJDbGFzc2VzBwBhAQAlamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGVzJExvb2t1cAcAYwEAHmphdmEvbGFuZy9pbnZva2UvTWV0aG9kSGFuZGxlcwEABkxvb2t1cAcAZgEAHmxvY2FsL2x1bmFyL0Jvb3RzdHJhcERvd25sb2FkcwEABk9yaWdpbgEACE5lc3RIb3N0AQAGUmVjb3JkADAAAQADAAAAAwASAAUABgAAABIABwAGAAAAEgAIAAkAAAAIAAIACgALAAIADAAAACwAAgAEAAAAFCq3AA0qK7UAECostQASKh21ABSxAAAAAQAWAAAABgABAAAAIAAXAAAADQMABQAAAAcAAAAIAAAACAAYABkAAQAMAAAAsQAFAAQAAABfKrYAGkwqtgAgTSvGAAcsxwANuwAjWRIltwAnvyuyACq2ADBMLLIAKrYAME0qtgA2Ph2cACIrEjq2ADyZAAkRAbunABIrEkC2ADyZAAgQUKcABAI+uwABWSssHbcAQrAAAAACABYAAAAmAAkAAAAiAAUAIwAKACQAEgAlABwAJgAkACcALAAoADEAKQBUACoARAAAABQABv0AEgcAMQcAMQn8ACcBDUABAAABAAUAHwABAAwAAAAdAAEAAQAAAAUqtAAQsAAAAAEAFgAAAAYAAQAAACAAAQAHAB8AAQAMAAAAHQABAAEAAAAFKrQAErAAAAABABYAAAAGAAEAAAAgAAEACAA5AAEADAAAAB0AAQABAAAABSq0ABSsAAAAAQAWAAAABgABAAAAIAARAEUAHwABAAwAAAAfAAIAAQAAAAcqugBGAACwAAAAAQAWAAAABgABAAAAAQARAEkAOQABAAwAAAAfAAIAAQAAAAcqugBKAACsAAAAAQAWAAAABgABAAAAAQARAD4APwABAAwAAAAgAAIAAgAAAAgqK7oATQAArAAAAAEAFgAAAAYAAQAAAAEABQBQAAAAAgBRAFIAAAAQAAEAWQAFAAEAWgBcAF0AXgBfAAAAEgACAGAAYgBkABkAAQBlAGcAGgBoAAAAAgBlAGkAAAAUAAMABQAGAAAABwAGAAAACAAJAAA="
+        },
+        {
           "kind": "asarTextReplace",
           "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
           "sha256": "506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4",
           "entry": "dist-electron/electron/main.js",
           "entrySha256": "9781715efe843f763240bf27874f9604da9cb4a5b2959f5d6c1768a5e20540db",
           "find": "if(t===e.expectedHash)return{reason:yS.Matched};",
-          "replacement": "if((0,S.basename)(e.location)===`genesis-0.1.0-SNAPSHOT-all.jar`){if(e.expectedHash===`ea2f19ae5fcb3941df77637b184a1ff02157d6b1`&&t===`106f52481af4a63ba559bb817e9ccea087f387f7`)return{reason:yS.Matched};throw Error(`Bootstrap download patch: bootstrap file or version changed. Restore the patch before updating.`)}if(t===e.expectedHash)return{reason:yS.Matched};",
+          "replacement": "if((0,S.basename)(e.location)===`genesis-0.1.0-SNAPSHOT-all.jar`){if(e.expectedHash===`ea2f19ae5fcb3941df77637b184a1ff02157d6b1`&&t===`12ec07a090a9d071363d1884a958682cd00c7d91`)return{reason:yS.Matched};throw Error(`Bootstrap download patch: bootstrap file or version changed. Restore the patch before updating.`)}if(t===e.expectedHash)return{reason:yS.Matched};",
           "count": 1
         }
       ]

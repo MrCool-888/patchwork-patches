@@ -12,7 +12,7 @@ const name = legacy ? 'Jme' : 'SS', next = legacy ? 'KS' : 'CS';
 const status = legacy ? 'WS' : 'yS', diff = legacy ? 'US' : 'vS';
 const genesis = 'genesis-0.1.0-SNAPSHOT-all.jar';
 const upstream = 'ea2f19ae5fcb3941df77637b184a1ff02157d6b1';
-const result = '106f52481af4a63ba559bb817e9ccea087f387f7';
+const result = '12ec07a090a9d071363d1884a958682cd00c7d91';
 function verifier(text, hash) {
   const start = text.indexOf(name + '=async e=>');
   assert(start >= 0);
