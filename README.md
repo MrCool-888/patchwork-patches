@@ -4,7 +4,7 @@ Project-authored source, documentation, and patch definitions are licensed under
 
 Separate patch definitions for [Patchwork](https://github.com/MrCool-888/patchwork). Never bundled in the patcher installer.
 
-Authors can follow the [patch authoring guide](docs/AUTHORING.md) and run the five [synthetic fixture examples](examples/README.md) against a built Patchwork executable. The fixtures exercise 0.10.0 operations and update/restore behavior; they are not real-product compatibility packs.
+Authors can follow the [patch authoring guide](docs/AUTHORING.md) and run the five [synthetic fixture examples](examples/README.md) against a built Patchwork executable. The fixtures exercise 1.0.0 operations and update/restore behavior; they are not real-product compatibility packs.
 
 The stable [Lunar 0.1.6 release](https://github.com/MrCool-888/patchwork-patches/releases/tag/lunar-client-0.1.6) improves **Faster bootstrap download fallback**: after a repository connection times out, later dependencies skip that origin for the rest of the launch. This addresses the repeated waits observed during Minecraft 26.3 startup. Install [Patchwork 0.9.3 stable](https://github.com/MrCool-888/patchwork/releases/tag/v0.9.3). Launcher cleanup, local cosmetics/cloth cape physics, automatic-update blocking and in-game promotion removal are unchanged from 0.1.5. Both exact-build JSON packs support inspected Lunar **3.7.17-ow**/**3.7.24-ow**, multiver **29a43e6** and UI **b6d39b2**. See [instructions and limits](docs/lunar/README.md) and [startup validation](docs/lunar/STARTUP-BATCH-VALIDATION.md). Existing Blitz/Proton releases remain available through the same source.
 
@@ -13,7 +13,7 @@ The stable [combined r3 release](https://github.com/MrCool-888/patchwork-patches
 | Use case | Patcher | Patch source setting |
 | --- | --- | --- |
 | Stable Lunar 0.1.6 and combined Blitz/Proton r3 assets | Patchwork 0.9.3 stable | Pre-release patch assets can remain off. |
-| Synthetic examples and packs using new 0.10.0 file/ZIP/ASAR operations | Patchwork 0.10.0 prerelease | Build from the patcher's `community-patches` branch (or `v0.10.0` after publication); set `minimumPatcherVersion` to `0.10.0`. |
+| Synthetic examples and packs using new 1.0.0 file/ZIP/ASAR operations | Patchwork 1.0.0 prerelease | Build from the patcher's `community-patches` branch (or `v1.0.0` after publication); set `minimumPatcherVersion` to `1.0.0`. |
 
 | App | Pack | Required target | Changes |
 | --- | --- | --- | --- |

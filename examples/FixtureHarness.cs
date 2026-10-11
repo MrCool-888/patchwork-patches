@@ -38,7 +38,7 @@ internal static class FixtureHarness
         return D("schemaVersion", 1, "id", id, "appId", app, "appName", app + " fixture", "appVersion", "1.0",
             "versionFile", versionFile, "versionSha256", H(marker), "author", "Patchwork fixture examples",
             "source", "Synthetic local fixture; no live app compatibility claim", "packVersion", packVersion,
-            "minimumPatcherVersion", "0.10.0", "patches", patches);
+            "minimumPatcherVersion", "1.0.0", "patches", patches);
     }
     static Dictionary<string, object> Patch(string id, string name, params object[] operations)
     {

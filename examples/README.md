@@ -1,6 +1,6 @@
 # Synthetic Patchwork examples
 
-These five fixtures teach the schema and provide isolated targets for Patchwork's production recipe validator. Each example directory includes a complete `pack.json` with real SHA-256 values and the source fixtures needed to reproduce its target. The managed assembly's generated DLL/EXE are omitted from the repository; the builder compiles them and writes matching hashes into fresh recipes. The fixtures contain no third-party application binaries and make no claims about live application behavior. Each pack uses a synthetic `appId`, stable patch IDs and Patchwork 0.10.0 minimum version.
+These five fixtures teach the schema and provide isolated targets for Patchwork's production recipe validator. Each example directory includes a complete `pack.json` with real SHA-256 values and the source fixtures needed to reproduce its target. The managed assembly's generated DLL/EXE are omitted from the repository; the builder compiles them and writes matching hashes into fresh recipes. The fixtures contain no third-party application binaries and make no claims about live application behavior. Each pack uses a synthetic `appId`, stable patch IDs and Patchwork 1.0.0 minimum version.
 
 | Example | Demonstrates |
 | --- | --- |

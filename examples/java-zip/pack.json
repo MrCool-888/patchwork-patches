@@ -9,7 +9,7 @@
   "author": "Patchwork fixture examples",
   "source": "Synthetic local fixture; no live app compatibility claim",
   "packVersion": "1.0.0",
-  "minimumPatcherVersion": "0.10.0",
+  "minimumPatcherVersion": "1.0.0",
   "patches": [
     {
       "id": "a",

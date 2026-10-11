@@ -2,7 +2,7 @@
 
 Patch packs are separate JSON release assets. They are not bundled with Patchwork and are not automatically applied when downloaded. Keep every pack tied to exact original SHA-256 fingerprints, preview it against an isolated copy of the supported build, and include reproducible source and validation instructions.
 
-The complete beginner workflow, schema outline, field limits, source publishing rules, and 0.10.0 operation reference are in [Patchwork's authoring guide](https://github.com/MrCool-888/patchwork/blob/main/docs/AUTHORING.md) and [patch format](https://github.com/MrCool-888/patchwork/blob/main/PATCH-FORMAT.md). New file, ZIP-member and ASAR payload operations require `minimumPatcherVersion: "0.10.0"`.
+The complete beginner workflow, schema outline, field limits, source publishing rules, and 1.0.0 operation reference are in [Patchwork's authoring guide](https://github.com/MrCool-888/patchwork/blob/main/docs/AUTHORING.md) and [patch format](https://github.com/MrCool-888/patchwork/blob/main/PATCH-FORMAT.md). New file, ZIP-member and ASAR payload operations require `minimumPatcherVersion: "1.0.0"`.
 
 ## Release checklist
 
