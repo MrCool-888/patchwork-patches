@@ -1,5 +1,7 @@
 # Patchwork patches
 
+Project-authored source, documentation, and patch definitions are licensed under **GPL-2.0-only**; see [LICENSE](LICENSE). Third-party material retains its applicable terms.
+
 Separate patch definitions for [Patchwork](https://github.com/MrCool-888/patchwork). Never bundled in the patcher installer.
 
 The [combined r3 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains **Blitz Clean Desktop 1.1.1** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2), then add this repository as a Patchwork source with **Include pre-release patch packs** enabled. One source offers both apps; exact original fingerprints determine compatibility.
