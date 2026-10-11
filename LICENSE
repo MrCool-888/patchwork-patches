@@ -121,3 +121,4 @@ Project licensing scope
 SPDX-License-Identifier: GPL-2.0-only
 
 This project licenses its original source code, documentation, and patch definitions under GPL-2.0-only. This does not relicense third-party software targeted by the patch definitions or third-party material included in them; such material retains its applicable terms.
+
