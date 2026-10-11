@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "raw-binary-demo",
+  "appId": "raw-binary-demo",
+  "appName": "raw-binary-demo fixture",
+  "appVersion": "1.0",
+  "versionFile": "table.bin",
+  "versionSha256": "46f7dbd3634a8c6b41200d00631aa09f14b211d320f49c4729e1107642f09105",
+  "author": "Patchwork fixture examples",
+  "source": "Synthetic local fixture; no live app compatibility claim",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.10.0",
+  "patches": [
+    {
+      "id": "a",
+      "name": "Change synthetic header byte",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "binarySplice",
+          "file": "table.bin",
+          "sha256": "46f7dbd3634a8c6b41200d00631aa09f14b211d320f49c4729e1107642f09105",
+          "resultSha256": "f72f268fef256c12e5013ee21a2c12543cd7c5839b03a344001af75b48c34ee9",
+          "edits": [
+            {
+              "offset": 4,
+              "length": 1,
+              "dataBase64": "WA=="
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Change synthetic payload byte",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "binarySplice",
+          "file": "payload.bin",
+          "sha256": "fb9519b6470d57373f8769e328e7568b39805aaa2188c36d525f6745370df8a2",
+          "resultSha256": "87ea593f1b2ce8cc1feb584beef20e7f426b1aac227d7f955cd69b9986983694",
+          "edits": [
+            {
+              "offset": 18,
+              "length": 1,
+              "dataBase64": "WQ=="
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

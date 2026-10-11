@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "managed-assembly-demo",
+  "appId": "managed-assembly-demo",
+  "appName": "managed-assembly-demo fixture",
+  "appVersion": "1.0",
+  "versionFile": "build-id.txt",
+  "versionSha256": "6c67a1a02941e1aa486c4dc21d896ee03af2c4ceae3848065405ff1efee57d3e",
+  "author": "Patchwork fixture examples",
+  "source": "Synthetic local fixture; no live app compatibility claim",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.10.0",
+  "patches": [
+    {
+      "id": "a",
+      "name": "Change DLL getter",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "FixtureAssembly.dll",
+          "sha256": "ff7b41caee10e00a669b380e944aea16e5efb90358a32e562dfc2a8f31bd4f48",
+          "method": "System.Boolean Demo.Feature::get_Alpha()",
+          "returnType": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Change EXE getter",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "FixtureAssembly.exe",
+          "sha256": "69969ee92df7233485893be233abfb092df15446c15ead6fcce5168a84e29168",
+          "method": "System.Boolean Demo.Feature::get_Beta()",
+          "returnType": "boolean",
+          "value": false
+        }
+      ]
+    }
+  ]
+}

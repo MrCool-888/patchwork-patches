@@ -3,6 +3,9 @@ work/
 *.exe
 *.dll
 *.pdb
+examples/managed-assembly/target/FixtureAssembly.dll
+examples/java-zip/target/Demo.class
+!examples/config-resources/target/settings.json
 .env*
 settings.json
 backups/

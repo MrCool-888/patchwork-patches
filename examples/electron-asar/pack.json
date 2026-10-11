@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "electron-asar-demo",
+  "appId": "electron-asar-demo",
+  "appName": "electron-asar-demo fixture",
+  "appVersion": "1.0",
+  "versionFile": "app.asar",
+  "versionSha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+  "author": "Patchwork fixture examples",
+  "source": "Synthetic local fixture; no live app compatibility claim",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.10.0",
+  "patches": [
+    {
+      "id": "a",
+      "name": "Edit packed resources",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "asarTextReplace",
+          "file": "app.asar",
+          "sha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+          "entry": "main.js",
+          "entrySha256": "5e39b3fff9234c7b1b3a8cb5caf35cceaa66e71abd210edfb0d5bbf51cf3874d",
+          "find": "hello",
+          "replacement": "welcome",
+          "count": 1
+        },
+        {
+          "kind": "asarEntryReplace",
+          "file": "app.asar",
+          "sha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+          "entry": "assets/icon.bin",
+          "entrySha256": "039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81",
+          "dataBase64": "AwIBBA==",
+          "resultSha256": "2169a4a162e4f9b724d8abb345d7f26e06b4efc739960ad43b2c88265fea9628"
+        },
+        {
+          "kind": "asarChecksum",
+          "file": "resource.dat",
+          "sha256": "2dce9ed297aa0bfe2adc4f2dc2884b1a7df088ff13618b12587c7b70a479d17b",
+          "archive": "app.asar",
+          "archiveSha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+          "algorithm": "xxhash32",
+          "offset": 8
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Add sidecar",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "asarEntryAdd",
+          "file": "app.asar",
+          "sha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+          "entry": "assets/help.txt",
+          "dataBase64": "U3ludGhldGljIEFTQVIgcmVzb3VyY2UK",
+          "resultSha256": "dfd63695f74e4beebc21be75e5995b472064ee239d892399571ba241c351a528"
+        },
+        {
+          "kind": "fileAdd",
+          "file": "fixture-note.txt",
+          "dataBase64": "c3ludGhldGljIHNpZGVjYXIK",
+          "resultSha256": "20a361da9e1e8ccbe7890d0b77ba6db0393b6b152c4449e49c270c16fc0b5190"
+        },
+        {
+          "kind": "asarChecksum",
+          "file": "resource.dat",
+          "sha256": "2dce9ed297aa0bfe2adc4f2dc2884b1a7df088ff13618b12587c7b70a479d17b",
+          "archive": "app.asar",
+          "archiveSha256": "5de12f2c8cc3ec21fb6e3b9acff42e8b518cbf72a25b638db508e748656940a9",
+          "algorithm": "xxhash32",
+          "offset": 8
+        }
+      ]
+    }
+  ]
+}

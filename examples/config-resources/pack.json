@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "config-resources-demo",
+  "appId": "config-resources-demo",
+  "appName": "config-resources-demo fixture",
+  "appVersion": "1.0",
+  "versionFile": "app.version",
+  "versionSha256": "f70aeec7bf60dfbb0ff36d3d439b5efa7638f218108415b4da2d98457f740e24",
+  "author": "Patchwork fixture examples",
+  "source": "Synthetic local fixture; no live app compatibility claim",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.10.0",
+  "patches": [
+    {
+      "id": "a",
+      "name": "Replace a setting",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "fileReplace",
+          "file": "settings.json",
+          "sha256": "476e05ec043009a32a0f624e6b1976be52c3ed3c594c286d81fe259de5bda701",
+          "dataBase64": "eyJ0aGVtZSI6ImRhcmsifQo=",
+          "resultSha256": "057c817c6a65ba4c95e68d754eaf8323b5714e95d5ecb624049f5afe95e47ba4"
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Add a resource",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "fileAdd",
+          "file": "resources/theme.txt",
+          "dataBase64": "YWNjZW50PSM3QjYxRkYK",
+          "resultSha256": "08c2875faf6fd570ecc5c45d8d209f6d9d4bdb6144295ccc4d22dcf4ca898c34"
+        }
+      ]
+    }
+  ]
+}

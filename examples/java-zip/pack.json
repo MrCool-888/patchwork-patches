@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "java-zip-demo",
+  "appId": "java-zip-demo",
+  "appName": "java-zip-demo fixture",
+  "appVersion": "1.0",
+  "versionFile": "fixture.jar",
+  "versionSha256": "733608772798d3726a459f9312cea06c3becedb22687ef14d42657c4a903a13f",
+  "author": "Patchwork fixture examples",
+  "source": "Synthetic local fixture; no live app compatibility claim",
+  "packVersion": "1.0.0",
+  "minimumPatcherVersion": "0.10.0",
+  "patches": [
+    {
+      "id": "a",
+      "name": "Edit Java source metadata and ZIP text",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "jarEntrySplice",
+          "file": "fixture.jar",
+          "sha256": "733608772798d3726a459f9312cea06c3becedb22687ef14d42657c4a903a13f",
+          "entry": "Demo.class",
+          "entrySha256": "4298170d6985103900a0aa4528a4ad129c767737a9e9729a3cdf91a866cfa2b9",
+          "resultSha256": "4b77450a783c3a80cf39d60b92fd25f2704214074f66cba45f99d922536c3ae8",
+          "edits": [
+            {
+              "offset": 224,
+              "length": 2,
+              "dataBase64": "AAs="
+            }
+          ]
+        },
+        {
+          "kind": "zipTextReplace",
+          "file": "fixture.jar",
+          "sha256": "733608772798d3726a459f9312cea06c3becedb22687ef14d42657c4a903a13f",
+          "entry": "settings.properties",
+          "entrySha256": "11e478735afc1d6a4c4d1f733dce11168e1fee4b596d2d9eaf42ccfeef745c51",
+          "find": "mode=default",
+          "replacement": "mode=safe",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Edit and add ZIP data resources",
+      "description": "Synthetic format demonstration on an isolated fixture.",
+      "dependencies": [],
+      "conflicts": [],
+      "operations": [
+        {
+          "kind": "zipEntrySplice",
+          "file": "fixture.jar",
+          "sha256": "733608772798d3726a459f9312cea06c3becedb22687ef14d42657c4a903a13f",
+          "entry": "data.bin",
+          "entrySha256": "8a851ff82ee7048ad09ec3847f1ddf44944104d2cbd17ef4e3db22c6785a0d45",
+          "resultSha256": "a1dda712455bef100dfc3b3d8fce750cd271f40742fa3e00a9460c4a3319b975",
+          "edits": [
+            {
+              "offset": 3,
+              "length": 1,
+              "dataBase64": "fw=="
+            }
+          ]
+        },
+        {
+          "kind": "zipEntryAdd",
+          "file": "fixture.jar",
+          "sha256": "733608772798d3726a459f9312cea06c3becedb22687ef14d42657c4a903a13f",
+          "entry": "META-INF/example.txt",
+          "dataBase64": "U3ludGhldGljIGFyY2hpdmUgcmVzb3VyY2UK",
+          "resultSha256": "18bd2160582fb683e2e516f268f279a6780f5da8b79daa60a651b7f55681a97a"
+        }
+      ]
+    }
+  ]
+}

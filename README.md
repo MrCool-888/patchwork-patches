@@ -1,10 +1,19 @@
 # Patchwork patches
 
+Project-authored source, documentation, and patch definitions are licensed under **GPL-2.0-only**; see [LICENSE](LICENSE). Third-party material retains its applicable terms.
+
 Separate patch definitions for [Patchwork](https://github.com/MrCool-888/patchwork). Never bundled in the patcher installer.
 
-The [Lunar 0.1.6 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/lunar-client-0.1.6) improves **Faster bootstrap download fallback**: after a repository connection times out, later dependencies skip that origin for the rest of the launch. This addresses the repeated waits observed during Minecraft 26.3 startup. Install [Patchwork 0.9.2](https://github.com/MrCool-888/patchwork/releases/tag/v0.9.2) first. Launcher cleanup, local cosmetics/cloth cape physics, automatic-update blocking and in-game promotion removal are unchanged from 0.1.5. Both exact-build JSON packs support inspected Lunar **3.7.17-ow**/**3.7.24-ow**, multiver **29a43e6** and UI **b6d39b2**. See [instructions and limits](docs/lunar/README.md) and [startup validation](docs/lunar/STARTUP-BATCH-VALIDATION.md). Existing Blitz/Proton releases remain available through the same source.
+Authors can follow the [patch authoring guide](docs/AUTHORING.md) and run the five [synthetic fixture examples](examples/README.md) against a built Patchwork executable. The fixtures exercise 0.10.0 operations and update/restore behavior; they are not real-product compatibility packs.
 
-The [combined r3 prerelease](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains **Blitz Clean Desktop 1.1.1** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.8.2 prerelease](https://github.com/MrCool-888/patchwork/releases/tag/v0.8.2), then add this repository as a Patchwork source with **Include pre-release patch packs** enabled. One source offers both apps; exact original fingerprints determine compatibility.
+The stable [Lunar 0.1.6 release](https://github.com/MrCool-888/patchwork-patches/releases/tag/lunar-client-0.1.6) improves **Faster bootstrap download fallback**: after a repository connection times out, later dependencies skip that origin for the rest of the launch. This addresses the repeated waits observed during Minecraft 26.3 startup. Install [Patchwork 0.9.3 stable](https://github.com/MrCool-888/patchwork/releases/tag/v0.9.3). Launcher cleanup, local cosmetics/cloth cape physics, automatic-update blocking and in-game promotion removal are unchanged from 0.1.5. Both exact-build JSON packs support inspected Lunar **3.7.17-ow**/**3.7.24-ow**, multiver **29a43e6** and UI **b6d39b2**. See [instructions and limits](docs/lunar/README.md) and [startup validation](docs/lunar/STARTUP-BATCH-VALIDATION.md). Existing Blitz/Proton releases remain available through the same source.
+
+The stable [combined r3 release](https://github.com/MrCool-888/patchwork-patches/releases/tag/blitz-3.0.7-proton-5.1.8-r3) contains **Blitz Clean Desktop 1.1.1** and the unchanged **Proton VPN 1.5.1** pack. Install [Patchwork 0.9.3 stable](https://github.com/MrCool-888/patchwork/releases/tag/v0.9.3), then add this repository as a Patchwork source. The release is stable, so **Include pre-release patch packs** can remain off. One source offers both apps; exact original fingerprints determine compatibility.
+
+| Use case | Patcher | Patch source setting |
+| --- | --- | --- |
+| Stable Lunar 0.1.6 and combined Blitz/Proton r3 assets | Patchwork 0.9.3 stable | Pre-release patch assets can remain off. |
+| Synthetic examples and packs using new 0.10.0 file/ZIP/ASAR operations | Patchwork 0.10.0 prerelease | Build from the patcher's `community-patches` branch (or `v0.10.0` after publication); set `minimumPatcherVersion` to `0.10.0`. |
 
 | App | Pack | Required target | Changes |
 | --- | --- | --- | --- |
@@ -13,13 +22,13 @@ The [combined r3 prerelease](https://github.com/MrCool-888/patchwork-patches/rel
 
 Blitz 1.0.0 omitted a native companion checksum and caused an E6 startup exit. Versions 1.1.0 and later maintain that checksum with the archive in one recoverable transaction. Version 1.1.1 removes the separate Go ad free promotion and its reserved space on player-history and match-detail pages. Controlled checks pass; this revision has not been applied to the installed client and full live account/game-flow testing remains pending. See [Blitz installation and restore](docs/blitz/README.md) and [Blitz validation](docs/blitz/VALIDATION.md). The pack includes executable JavaScript client code. Game overlays are outside its scope.
 
-Proton VPN 1.5.1 remains unchanged from release **proton-vpn-5.1.8-r7** and can still be used with stable **Patchwork 0.7.0+**. The real Windows guest tunnel test remains pending. Guest session is patch **1.0.1**, free selection **1.3.0**, promotions **1.2.0**, and other available patches **1.0.0**. The pack and individual versions appear in the patcher library, preview and applied history.
+Proton VPN 1.5.1 remains unchanged from release **proton-vpn-5.1.8-r7** and can still be used with stable **Patchwork 0.7.0+**. The experimental guest-session feature's real Windows tunnel test remains pending. Guest session is patch **1.0.1**, free selection **1.3.0**, promotions **1.2.0**, and other available patches **1.0.0**. The pack and individual versions appear in the patcher library, preview and applied history.
 
 ## Install the patch pack
 
-1. Install **Patchwork 0.8.2 prerelease** for both apps. In **About this build → App updates**, enable prerelease app updates and choose **Check for updates → Download and install**, or download its installer directly. Proton alone remains compatible with stable 0.7.0.
-2. In **Patch sources**, paste `https://github.com/MrCool-888/patchwork-patches` and choose **Add source** with pre-releases enabled. It checks immediately and automatically about once an hour while open. With an earlier pack applied and verified Patchwork history, preview and choose **Update patches** directly; no manual restore is needed. Older 0.4.x patchers still require restore first.
-3. For a manual import instead, download **Blitz-3.0.7.patchwork.json** and/or **ProtonVPN-5.1.8.patchwork.json** from the combined prerelease assets. The source ZIP is for developers.
+1. Install **Patchwork 0.9.3 stable**. Both packs in the combined release work with this version; the Proton pack also works with stable Patchwork 0.7.0 and later.
+2. In **Patch sources**, paste `https://github.com/MrCool-888/patchwork-patches` and choose **Add source**. Pre-release patch assets are not needed for this stable release. It checks immediately and automatically about once an hour while open. With an earlier pack applied and verified Patchwork history, preview and choose **Update patches** directly; no manual restore is needed. Older 0.4.x patchers still require restore first.
+3. For a manual import instead, download **Blitz-3.0.7.patchwork.json** and/or **ProtonVPN-5.1.8.patchwork.json** from the combined r3 release assets. The source ZIP is for developers.
 4. Choose **Add patch file** in Patchwork and import the JSON. The stable bundle ID replaces the older catalog entry without creating a duplicate.
 5. Select the matching app's program folder, choose patches and review **Preview changes**. Close the target app before applying, updating or restoring. Writes to Program Files use the Windows administrator prompt.
 
@@ -71,7 +80,7 @@ The design follows the filtering and selected-location ideas in [Morphe's Androi
 
 The optional **Guest VPN session** patch adds **Continue as guest** alongside normal sign-in. Sign out first if an account is active. It creates a real guest session, stores credentials through Proton's existing protected settings, retrieves the authorized free plan, and uses the native key/certificate managers. The sign-in page unloading during navigation no longer cancels the attempt; use **Cancel sign-in** on Proton's loading page. Repeated clicks do not start or cancel another attempt. Each bootstrap request has a 30-second deadline covering headers and body reads; a timeout displays a retryable error instead of claiming you cancelled. Resume uses the existing refresh pipeline; logout uses native disconnect, revocation and key removal. Failure and cancellation discard credentials. Human verification stops guest mode and directs the user to normal sign-in.
 
-The bootstrap requests use the Android app identity; subsequent VPN, refresh and certificate requests use the native Windows pipeline. The backend still controls eligibility. The patch contains independently written executable code from [source/GuestClient.cs](source/GuestClient.cs), embedded with a SHA-256 checked by Patchwork. Review that code before applying. Local lifecycle, actual DLL hook, native WinUI and live API checks passed; this experimental prerelease still needs a real installed-client tunnel test. See [AUTH-RESEARCH.md](AUTH-RESEARCH.md).
+The bootstrap requests use the Android app identity; subsequent VPN, refresh and certificate requests use the native Windows pipeline. The backend still controls eligibility. The patch contains independently written executable code from [source/GuestClient.cs](source/GuestClient.cs), embedded with a SHA-256 checked by Patchwork. Review that code before applying. Local lifecycle, actual DLL hook, native WinUI and live API checks passed; a real installed-client tunnel test remains pending. See [AUTH-RESEARCH.md](AUTH-RESEARCH.md).
 
 ## Custom themes
 
