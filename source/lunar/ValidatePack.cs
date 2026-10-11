@@ -35,7 +35,7 @@ class ValidatePack
         if (args.Length == 4)
         {
             var previous = PatchBundle.Parse(File.ReadAllText(args[3]));
-            engine.Apply(engine.Preview(previous, target, new[] { "clean-launcher", "local-cosmetics" }));
+            engine.Apply(engine.Preview(previous, target, previous.Patches.Select(x => x.Id).ToArray()));
         }
         engine.Apply(engine.Preview(bundle, target, selected));
         foreach (var file in plan.Files) Assert(PatchEngine.Hash(PatchEngine.Read(PatchEngine.Resolve(target, file.RelativePath))) == file.AfterHash, "Apply mismatch.");
@@ -46,15 +46,14 @@ class ValidatePack
             Assert(archive.AfterHash != archive.BeforeHash, "Removing update patch did not change launcher.");
             if (args.Length == 4)
             {
-                var prior = PatchBundle.Parse(File.ReadAllText(args[3]));
                 var cleanRoot = Path.Combine(scratch, "original-target");
                 foreach (var file in plan.Files)
                 {
                     string dest = PatchEngine.Resolve(cleanRoot, file.RelativePath); Directory.CreateDirectory(Path.GetDirectoryName(dest));
                     File.WriteAllBytes(dest, file.BeforeBytes);
                 }
-                var oldPlan = new PatchEngine(Path.Combine(scratch, "prior-history")).Preview(prior, cleanRoot, new[] { "clean-launcher", "local-cosmetics" });
-                Assert(archive.AfterHash == oldPlan.Files.Single(x => x.RelativePath.EndsWith("app.asar")).AfterHash, "Deselection did not recover the previous launcher patch.");
+                var withoutUpdater = new PatchEngine(Path.Combine(scratch, "selection-history")).Preview(bundle, cleanRoot, new[] { "clean-launcher", "local-cosmetics" });
+                Assert(archive.AfterHash == withoutUpdater.Files.Single(x => x.RelativePath.EndsWith("app.asar")).AfterHash, "Deselection did not recover the selected launcher patch.");
             }
             engine.Apply(removal);
             engine.Apply(engine.Preview(bundle, target, selected));

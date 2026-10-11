@@ -19,6 +19,9 @@ EXPECTED = {
 COSMETIC_MANAGER = ('com/moonsworth/lunar/client/IHCHHIIIHROCIROHROCHRCIROHOICH/'
                     'IHIRRHORRRRHICCOHOHORCHIHHHIOO/OOIOHHHCIICRRRCICOIIIRRRICOCIC.class')
 COSMETIC_PUSH_METHOD = 'CIOIIHIROORCOCIHHRHCROOHHCHOOO'
+CLOTH_MENU = ('com/moonsworth/lunar/client/CIRIIHCCROCIOIRORIOIOCHHIIHRCC/'
+              'CICOHIIRRHHIIHRROHOICOCRHHHHOO/ROHIOOCICRORHRCIHHHHHHRICCCRRC/'
+              'CRRHRIRIHOHRHRCCHRCOICHOOIHOIC/ORCOIHCCICICIHRCCCCHHHRICHHICI.class')
 ORIGINAL_GAME_SHA1 = '3a30454c0e076f6feee2246c5969d006414f4307'
 HELPER = 'local/lunar/LocalCosmetics'
 CALLBACK = 'Lcom/google/protobuf/RpcCallback;'
@@ -243,6 +246,40 @@ def patch_stub(data, badge=False):
     return cf.replace_methods(bodies)
 
 
+def patch_cloth_menu(data):
+    """Allow only the cloak option's two local checks; preserve code sizes/stack maps."""
+    cf = ClassFile(data)
+    refs = []
+    for i, entry in enumerate(cf.cp):
+        if entry and entry[0] == 10:
+            _, nt = struct.unpack_from('>HH', entry, 1)
+            n, d = struct.unpack_from('>HH', cf.cp[nt], 1)
+            if cf.utf(n) == 'CRHRRORHHOCOCHHOHIRIIHOIHIIIOI' and cf.utf(d) == '()Z':
+                refs.append(i)
+    if len(refs) != 1: raise ValueError('Unsupported cloth cloak check')
+    pattern = b'\xb6' + struct.pack('>H', refs[0])
+    methods = {
+        ('CRRHRIRIHOHRHRCCHRCOICHOOIHOIC', '(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'),
+        ('ROICRHIOIOCHHICCROCHHCRIORRIRH', '(Lcom/moonsworth/lunar/client/HIRCHOCCIROORHOHOOHOIOHOOIHRCR/'
+         'CICOHIIRRHHIIHRROHOICOCRHHHHOO/RCHICCCIHRCRCHCIRRIIRRHICORHHO;)Ljava/lang/String;'),
+    }
+    edits = []
+    tail_start = len(data) - len(cf.tail)
+    for kind, name, descriptor, attrs in cf.members:
+        if kind != 'method' or (name, descriptor) not in methods: continue
+        for start, _, attr, _ in attrs:
+            if attr != 'Code': continue
+            size = struct.unpack_from('>I', cf.tail, start + 10)[0]
+            code = cf.tail[start + 14:start + 14 + size]
+            if code.count(pattern) != 1: raise ValueError('Unsupported cloth cloak menu method')
+            # pop consumes the manager; iconst_1 supplies permission with the original stack effect.
+            edits.append((tail_start + start + 14 + code.index(pattern), 3, b'\x57\x04\x00'))
+    if len(edits) != 2: raise ValueError('Missing cloth cloak menu checks')
+    result = bytearray(data)
+    for offset, size, replacement in edits: result[offset:offset + size] = replacement
+    return bytes(result), sorted(edits)
+
+
 def patch_jar(blob):
     changes = {}
     with zipfile.ZipFile(io.BytesIO(blob)) as source:
@@ -256,6 +293,7 @@ def patch_jar(blob):
         changes[COSMETIC_MANAGER] = manager.replace_methods({
             (COSMETIC_PUSH_METHOD, '()V'): (b'\xb1', 0, 1)
         })
+        changes[CLOTH_MENU], _ = patch_cloth_menu(source.read(CLOTH_MENU))
         for name in ('LocalCosmetics.class', 'LocalCosmetics$1.class'):
             changes['local/lunar/' + name] = (ROOT / 'helper' / name).read_bytes()
         output = io.BytesIO()

@@ -4,7 +4,7 @@
   "appId": "lunar-client",
   "appName": "Lunar Client",
   "appVersion": "3.7.17-ow / multiver 29a43e6",
-  "packVersion": "0.1.2",
+  "packVersion": "0.1.3",
   "minimumPatcherVersion": "0.9.1",
   "versionFile": "AppData/Local/Programs/Lunar Client/resources/app.asar",
   "versionSha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
@@ -15,9 +15,9 @@
       "id": "clean-launcher",
       "name": "Remove ads and promotions",
       "category": "Launcher",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "ready",
-      "description": "Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.",
+      "description": "Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Centers the Home launch card and Friends panel in a bounded two-column layout. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.",
       "operations": [
         {
           "kind": "binarySplice",
@@ -131,6 +131,36 @@
           "find": "$D=({notification:e})=>{let t=ZD[e.type]",
           "replacement": "$D=({notification:e})=>{if(e.type===HD.Notification_NotificationType.NOTIFICATION_TYPE_PROMOTION)return null;let t=ZD[e.type]",
           "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
+          "entry": "dist/assets/main.js",
+          "entrySha256": "ae9b1b4255bd9ac37479a28f227c6cd624442ac6843a8a113a4ea98bb7116061",
+          "find": "children:(0,B.jsxs)(Ul,{children:[(0,B.jsxs)(su,{children:[",
+          "replacement": "children:(0,B.jsxs)(Ul,{style:{gridTemplateColumns:`minmax(0, 1fr) minmax(240px, 28%)`,alignItems:`center`,gap:`24px`,maxWidth:`1200px`,marginInline:`auto`},children:[(0,B.jsxs)(su,{style:{gridColumn:`auto`,height:`auto`,marginRight:0},children:[",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
+          "entry": "dist/assets/main.js",
+          "entrySha256": "ae9b1b4255bd9ac37479a28f227c6cd624442ac6843a8a113a4ea98bb7116061",
+          "find": "(0,B.jsxs)(P,{display:`flex`,flexDirection:`column`,flexShrink:0,gridColumn:`span 2`,height:`100%`,minHeight:`0`,width:`400px`,children:[",
+          "replacement": "(0,B.jsxs)(P,{style:{gridColumn:`auto`,height:`min(400px, calc(100vh - 140px))`,width:`100%`},display:`flex`,flexDirection:`column`,flexShrink:0,gridColumn:`span 2`,height:`100%`,minHeight:`0`,width:`400px`,children:[",
+          "count": 1
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
+          "entry": "dist/assets/main.js",
+          "entrySha256": "ae9b1b4255bd9ac37479a28f227c6cd624442ac6843a8a113a4ea98bb7116061",
+          "find": "UR,{full:r===!1}",
+          "replacement": "UR,{full:!1}",
+          "count": 1
         }
       ]
     },
@@ -138,12 +168,12 @@
       "id": "local-cosmetics",
       "name": "Local cosmetics",
       "category": "Game",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "ready",
       "dependencies": [
         "clean-launcher"
       ],
-      "description": "Experimental: handles outfit and badge mutations locally and suppresses the inspected outgoing cosmetic push. Requires default account outfit/catalog assets. Minecraft 1.21.11 launch, locker rendering and local equip/unequip verified with launcher 3.7.24-ow; 3.7.17 tested on copies. Open Locker using the main menu shirt icon, wait for the catalog, select Local Outfit and Equip. Unequip existing online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope. Favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.",
+      "description": "Experimental: local outfit/badge mutations, inspected outgoing cosmetic push suppressed, and built-in cloth cloak physics available through Locker. Select Local Outfit, Equip a cloak, and enable Cloth Cloak beneath the character preview. Cloth settings save locally; Render Cloth Cloaks must be enabled in Lunar cosmetic settings. Requires account/default outfit/catalog assets. Unequip online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope and favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.",
       "operations": [
         {
           "kind": "jarEntrySplice",
@@ -241,6 +271,26 @@
           "entrySha256": "81ba4fd340bfeef4baab508054e0f489a9290143ef12c429241d198d1d7b3cad"
         },
         {
+          "kind": "jarEntrySplice",
+          "file": ".lunarclient/offline/multiver/lunar.jar",
+          "sha256": "f4a6a62df2d548906f272d2d0dc906b6caae6f3592f9e2dae918783324bf3cca",
+          "resultSha256": "f30ce6efbbd5ae6ba07898fc76000ab36c930afb4aee96dfd980ca0250f34174",
+          "edits": [
+            {
+              "offset": 39958,
+              "length": 3,
+              "dataBase64": "VwQA"
+            },
+            {
+              "offset": 41635,
+              "length": 3,
+              "dataBase64": "VwQA"
+            }
+          ],
+          "entry": "com/moonsworth/lunar/client/CIRIIHCCROCIOIRORIOIOCHHIIHRCC/CICOHIIRRHHIIHRROHOICOCRHHHHOO/ROHIOOCICRORHRCIHHHHHHRICCCRRC/CRRHRIRIHOHRHRCCHRCOICHOOIHOIC/ORCOIHCCICICIHRCCCCHHHRICHHICI.class",
+          "entrySha256": "e82d9853ffa5442cb4f515872d93ff2cd624f51d3801734c4e5c891e31277897"
+        },
+        {
           "kind": "jarEntryAdd",
           "file": ".lunarclient/offline/multiver/lunar.jar",
           "sha256": "f4a6a62df2d548906f272d2d0dc906b6caae6f3592f9e2dae918783324bf3cca",
@@ -263,7 +313,7 @@
           "entry": "dist-electron/electron/main.js",
           "entrySha256": "1f9b6e362341a09fff60f961869c709b0730ee9d2ab613272ef0204d4e978a77",
           "find": "Jme=async e=>{let t=await GS(e.location);if(!t)",
-          "replacement": "Jme=async e=>{let t=await GS(e.location);if((0,S.basename)(e.location)===`lunar.jar`){if(e.expectedHash===`3a30454c0e076f6feee2246c5969d006414f4307`&&t===`bd3d081b9c8556a1b0c98c156bc0c1b783ec5bad`)return{reason:WS.Matched};throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}if(!t)",
+          "replacement": "Jme=async e=>{let t=await GS(e.location);if((0,S.basename)(e.location)===`lunar.jar`){if(e.expectedHash===`3a30454c0e076f6feee2246c5969d006414f4307`&&t===`83127fc392298424f53eef71f6bdb8bb61a7a2b6`)return{reason:WS.Matched};throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}if(!t)",
           "count": 1
         }
       ]

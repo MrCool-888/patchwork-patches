@@ -1,4 +1,20 @@
-# Lunar 0.1.2 validation — 2026-10-10
+# Lunar 0.1.3 validation — 2026-10-11
+
+## Cloth cloak physics and centered Home
+
+Pack 0.1.3 bumps `local-cosmetics` and `clean-launcher` to 0.1.2. The optional automatic-update patch remains 0.1.0. Both inspected launchers target the same original multiver build as 0.1.2. The newly patched game SHA-1 is `83127fc392298424f53eef71f6bdb8bb61a7a2b6`; both launchers' game guards require that exact result and the matching upstream hash.
+
+The cloak settings class contains two subscription checks: its option builder resets the cloth flag for non-subscribers, and its update callback rejects changes. `patch_cloth_menu` replaces only these two `invokevirtual` checks with `pop; iconst_1; nop`. Both sequences have the same length and stack effect. All pool entries, method layouts, branches, exceptions and StackMapTables remain byte-identical. The existing renderer/simulator is unchanged and still respects the per-cloak flag and global Render Cloth Cloaks option. Global account/subscription state is unchanged. `test-cloth.py` verifies the actual six-byte delta and rejects an already-patched class.
+
+Home uses scoped inline styles on its existing grid/columns: centered, 1200px maximum width, proportional Friends column, balanced gap, vertical alignment and bounded Friends height. The Friends component's full-viewport mode is disabled only on Home. Shared styles/components and other pages are unchanged.
+
+Both full-sized packs passed three-file preview, deterministic JAR, partial-write rollback, direct 0.1.2→0.1.3 upgrade, updater removal/reselection, cosmetic removal and exact final restore. All unaffected archive/JAR members matched; edited JS syntax/integrity and JAR CRCs passed. Exactly one executable fuse byte changed, four original game classes changed and two independently written helpers were added. Modified service stubs passed local CRUD/persistence/unlock/corrupt-state tests under JVM verification. Both ad hooks, strict game guards and automatic/manual updater probes passed. These checks do not install real updates or connect to multiplayer servers.
+
+Live Windows test on 3.7.24-ow: Minecraft 1.21.11 (v2.23.2-2641) launched successfully with the new game bytes. The existing Local Outfit's Kanji Ocean cloak was selected through Locker; gear → Cosmetic Settings → Cloth Cloak could be enabled. The per-account protobuf changed and contained the Struct boolean `clothCloak=true`; existing outfit items were retained. The checked option and rotating character preview were observed with no crash or subscription dialog. Minecraft was closed normally. No world/server movement test was performed, so cape dynamics during gameplay remain unverified.
+
+Applied the final pack with the validated worker and restarted the installed launcher. Its archive/game matched the tested staged hashes. Home's launch card and Friends panel were centered at a normal 1455×801 window size and maximized 2560×1392 size, with controls visible and no overlapping panels. The three selections remain applied. Launcher 3.7.17 was tested on copies only. Friends with real contacts, active music and minimum-size windows were not checked live. Multiplayer privacy remains unverified.
+
+The sections below preserve the earlier updater/crash-fix evidence; their hashes and class counts describe those earlier revisions.
 
 ## Automatic launcher updates
 

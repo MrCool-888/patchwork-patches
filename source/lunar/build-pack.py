@@ -10,7 +10,7 @@ from pathlib import Path
 parser=argparse.ArgumentParser(description='Build the declarative Lunar Patchwork pack from exact local originals.')
 parser.add_argument('--version', choices=['3.7.17-ow','3.7.24-ow'],default='3.7.17-ow')
 parser.add_argument('--original-dir',type=Path,default=Path('work/patch-test/backup'))
-parser.add_argument('--game-sha1',default='bd3d081b9c8556a1b0c98c156bc0c1b783ec5bad')
+parser.add_argument('--game-sha1',default='83127fc392298424f53eef71f6bdb8bb61a7a2b6')
 parser.add_argument('--output-dir',type=Path,default=Path('outputs'))
 args=parser.parse_args()
 root = Path(__file__).parent if (Path(__file__).parent/'patch_lunar.py').exists() else Path('outputs/LunarLocalPatch')
@@ -82,6 +82,10 @@ with zipfile.ZipFile(game) as z:
     old = z.read(lunar.COSMETIC_MANAGER)
     new = lunar.ClassFile(old).replace_methods({(lunar.COSMETIC_PUSH_METHOD,'()V'):(b'\xb1',0,1)})
     jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,lunar.COSMETIC_MANAGER))
+    old = z.read(lunar.CLOTH_MENU)
+    new, edits = lunar.patch_cloth_menu(old)
+    class_edits[lunar.sha(old)] = [dict(offset=o,length=n,dataBase64=b64(v)) for o,n,v in edits]
+    jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,lunar.CLOTH_MENU))
     for name in ['LocalCosmetics.class','LocalCosmetics$1.class']:
         data = (root/'helper'/name).read_bytes()
         jar_ops.append(dict(kind='jarEntryAdd',file=jar_file,sha256=jar_hash,entry='local/lunar/'+name,entrySha256=lunar.sha(data),dataBase64=b64(data)))
@@ -115,6 +119,15 @@ else:
       ('CF=e=>{let{t}=O();return(0,H.jsxs)(_F,','CF=e=>{return null;let{t}=O();return(0,H.jsxs)(_F,'),
       ('uA=({notification:e})=>{let t=cA[e.type]','uA=({notification:e})=>{if(e.type===$k.Notification_NotificationType.NOTIFICATION_TYPE_PROMOTION)return null;let t=cA[e.type]')
     ]
+# Scope the compact layout to Home; shared grid components serve other pages.
+home_js, home_left, home_friends = ('B', 'su', 'UR') if args.version == '3.7.17-ow' else ('H', 'pu', 'YV')
+home_root = 'P' if args.version == '3.7.17-ow' else 'L'
+home_grid = 'children:(0,'+home_js+'.jsxs)(Ul,{children:[(0,'+home_js+'.jsxs)('+home_left+',{children:['
+home_grid_new = 'children:(0,'+home_js+'.jsxs)(Ul,{style:{gridTemplateColumns:`minmax(0, 1fr) minmax(240px, 28%)`,alignItems:`center`,gap:`24px`,maxWidth:`1200px`,marginInline:`auto`},children:[(0,'+home_js+'.jsxs)('+home_left+',{style:{gridColumn:`auto`,height:`auto`,marginRight:0},children:['
+friends_props = 'display:`flex`,flexDirection:`column`,flexShrink:0,gridColumn:`span 2`,height:`100%`,minHeight:`0`,'+('ref:a,' if args.version == '3.7.24-ow' else '')+'width:`400px`,children:['
+friends_old = '(0,'+home_js+'.jsxs)('+home_root+',{'+friends_props
+friends_new = '(0,'+home_js+'.jsxs)('+home_root+',{style:{gridColumn:`auto`,height:`min(400px, calc(100vh - 140px))`,width:`100%`},'+friends_props
+pairs += [(home_grid,home_grid_new),(friends_old,friends_new),(home_friends+',{full:r===!1}',home_friends+',{full:!1}')]
 clean_ops=[fuse]; cosmetic_ops=list(jar_ops)
 updater = 'M9' if args.version == '3.7.17-ow' else 'j9'
 update_pairs = [
@@ -136,9 +149,9 @@ for old,new in pairs:
     name=names[0]
     op=dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=old,replacement=new,count=1)
     (cosmetic_ops if old.startswith(('Jme=','SS=async')) else clean_ops).append(op)
-pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.2',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
-    dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.1',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.',operations=clean_ops),
-    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.1',status='ready',dependencies=['clean-launcher'],description='Experimental: handles outfit and badge mutations locally and suppresses the inspected outgoing cosmetic push. Requires default account outfit/catalog assets. Minecraft 1.21.11 launch, locker rendering and local equip/unequip verified with launcher 3.7.24-ow; 3.7.17 tested on copies. Open Locker using the main menu shirt icon, wait for the catalog, select Local Outfit and Equip. Unequip existing online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope. Favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops),
+pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.3',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
+    dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.2',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Centers the Home launch card and Friends panel in a bounded two-column layout. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.',operations=clean_ops),
+    dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.2',status='ready',dependencies=['clean-launcher'],description='Experimental: local outfit/badge mutations, inspected outgoing cosmetic push suppressed, and built-in cloth cloak physics available through Locker. Select Local Outfit, Equip a cloak, and enable Cloth Cloak beneath the character preview. Cloth settings save locally; Render Cloth Cloaks must be enabled in Lunar cosmetic settings. Requires account/default outfit/catalog assets. Unequip online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope and favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops),
     dict(id='disable-auto-updates',name='Disable automatic updates',category='Launcher',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Stops automatic launcher update checks at startup, on timers and after channel changes. Blocks server-requested launcher updates, including force-install requests, and disables installation on app exit. Manual Check for updates remains available; restore patches before updating Lunar. Requires Remove ads and promotions for its launcher archive compatibility change. Game/runtime downloads during Minecraft launch are separate and remain unchanged.',operations=update_ops)
 ])
 args.output_dir.mkdir(parents=True,exist_ok=True)
