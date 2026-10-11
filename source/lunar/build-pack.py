@@ -11,12 +11,14 @@ parser=argparse.ArgumentParser(description='Build the declarative Lunar Patchwor
 parser.add_argument('--version', choices=['3.7.17-ow','3.7.24-ow'],default='3.7.17-ow')
 parser.add_argument('--original-dir',type=Path,default=Path('work/patch-test/backup'))
 parser.add_argument('--game-sha1',default='83127fc392298424f53eef71f6bdb8bb61a7a2b6')
+parser.add_argument('--bootstrap-sha1',default='106f52481af4a63ba559bb817e9ccea087f387f7')
 parser.add_argument('--output-dir',type=Path,default=Path('outputs'))
 args=parser.parse_args()
 root = Path(__file__).parent if (Path(__file__).parent/'patch_lunar.py').exists() else Path('outputs/LunarLocalPatch')
 spec = importlib.util.spec_from_file_location('lunar', root/'patch_lunar.py')
 lunar = importlib.util.module_from_spec(spec); spec.loader.exec_module(lunar)
 game = args.original_dir/'lunar.jar'
+genesis = args.original_dir/'genesis-0.1.0-SNAPSHOT-all.jar'
 exe_data = (args.original_dir/'Lunar Client.exe').read_bytes()
 asar_data = (args.original_dir/'app.asar').read_bytes()
 jar_hash = hashlib.sha256(game.read_bytes()).hexdigest()
@@ -149,10 +151,26 @@ for old,new in pairs:
     name=names[0]
     op=dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=old,replacement=new,count=1)
     (cosmetic_ops if old.startswith(('Jme=','SS=async')) else clean_ops).append(op)
-pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.3',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
+startup_spec=importlib.util.spec_from_file_location('startup',root/'patch_startup.py')
+startup=importlib.util.module_from_spec(startup_spec); startup_spec.loader.exec_module(startup)
+assert lunar.sha(genesis.read_bytes())==startup.GENESIS_SHA256
+with zipfile.ZipFile(genesis) as z:
+    old=z.read(startup.HTTP_ENTRY)
+    new,edits=startup.patch_http(old,lunar.ClassFile)
+startup_ops=[dict(kind='jarEntrySplice',file='.lunarclient/offline/multiver/genesis-0.1.0-SNAPSHOT-all.jar',sha256=startup.GENESIS_SHA256,entry=startup.HTTP_ENTRY,entrySha256=lunar.sha(old),resultSha256=lunar.sha(new),edits=edits)]
+bootstrap_sha1=args.bootstrap_sha1
+assert len(bootstrap_sha1)==40 and all(c in '0123456789abcdef' for c in bootstrap_sha1)
+matched='WS' if args.version=='3.7.17-ow' else 'yS'
+verify_prefix='if(t===e.expectedHash)return{reason:'+matched+'.Matched};'
+verify_guard='if((0,S.basename)(e.location)===`genesis-0.1.0-SNAPSHOT-all.jar`){if(e.expectedHash===`'+startup.GENESIS_SHA1+'`&&t===`'+bootstrap_sha1+'`)return{reason:'+matched+'.Matched};throw Error(`Bootstrap download patch: bootstrap file or version changed. Restore the patch before updating.`)}'+verify_prefix
+name='dist-electron/electron/main.js'
+assert entries[name].decode('utf-8').count(verify_prefix)==1
+startup_ops.append(dict(kind='asarTextReplace',file=asar_file,sha256=lunar.sha(asar_data),entry=name,entrySha256=lunar.sha(entries[name]),find=verify_prefix,replacement=verify_guard,count=1))
+pack=dict(schemaVersion=1,id='lunar-local-'+args.version.replace('.','-'),appId='lunar-client',appName='Lunar Client',appVersion=args.version+' / multiver 29a43e6',packVersion='0.1.4',minimumPatcherVersion='0.9.1',versionFile=asar_file,versionSha256=lunar.sha(asar_data),author='MrCool-888',source='https://github.com/MrCool-888/patchwork-patches',patches=[
     dict(id='clean-launcher',name='Remove ads and promotions',category='Launcher',version='0.1.2',status='ready',description='Experimental: hides shared launcher/status-window ads, news, featured servers, carousel, marketing links, radio upsells and promotional inbox rows. Centers the Home launch card and Friends panel in a bounded two-column layout. Clears layout alerts including service announcements. Disables one Electron integrity fuse; this invalidates the executable signature and removes embedded ASAR validation. Both packs tested on copies; launchpad and Mission Control checked live on 3.7.24-ow. Full UI coverage remains unverified.',operations=clean_ops),
     dict(id='local-cosmetics',name='Local cosmetics',category='Game',version='0.1.2',status='ready',dependencies=['clean-launcher'],description='Experimental: local outfit/badge mutations, inspected outgoing cosmetic push suppressed, and built-in cloth cloak physics available through Locker. Select Local Outfit, Equip a cloak, and enable Cloth Cloak beneath the character preview. Cloth settings save locally; Render Cloth Cloaks must be enabled in Lunar cosmetic settings. Requires account/default outfit/catalog assets. Unequip online cosmetics BEFORE applying; saved online outfits can remain visible to others. Login/assets use the network; emotes/sprays are outside scope and favorites are not persisted. Restore before game updates. Multiplayer privacy remains unverified.',operations=cosmetic_ops),
-    dict(id='disable-auto-updates',name='Disable automatic updates',category='Launcher',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Stops automatic launcher update checks at startup, on timers and after channel changes. Blocks server-requested launcher updates, including force-install requests, and disables installation on app exit. Manual Check for updates remains available; restore patches before updating Lunar. Requires Remove ads and promotions for its launcher archive compatibility change. Game/runtime downloads during Minecraft launch are separate and remain unchanged.',operations=update_ops)
+    dict(id='disable-auto-updates',name='Disable automatic updates',category='Launcher',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Stops automatic launcher update checks at startup, on timers and after channel changes. Blocks server-requested launcher updates, including force-install requests, and disables installation on app exit. Manual Check for updates remains available; restore patches before updating Lunar. Requires Remove ads and promotions for its launcher archive compatibility change. Game/runtime downloads during Minecraft launch are separate and remain unchanged.',operations=update_ops),
+    dict(id='bootstrap-download-fallback',name='Faster bootstrap download fallback',category='Game',version='0.1.0',status='ready',dependencies=['clean-launcher'],description='Optional: limits connection establishment to 15 seconds and tries each existing Maven repository once, avoiding long repeated waits on an unreachable repository during Starting JVM. Keeps the 180-second request deadline, repository order, cached archive checks and download validation. Supports only the exact tested Genesis fingerprint. Restore before updating Lunar. Cannot recover a dependency unavailable from every repository.',operations=startup_ops)
 ])
 args.output_dir.mkdir(parents=True,exist_ok=True)
 out=args.output_dir/('LunarClient-'+args.version+'.patchwork.json'); out.write_text(json.dumps(pack,indent=2)+'\n',encoding='utf-8',newline='\n')

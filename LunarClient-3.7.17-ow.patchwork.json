@@ -4,7 +4,7 @@
   "appId": "lunar-client",
   "appName": "Lunar Client",
   "appVersion": "3.7.17-ow / multiver 29a43e6",
-  "packVersion": "0.1.3",
+  "packVersion": "0.1.4",
   "minimumPatcherVersion": "0.9.1",
   "versionFile": "AppData/Local/Programs/Lunar Client/resources/app.asar",
   "versionSha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
@@ -357,6 +357,89 @@
           "entrySha256": "1f9b6e362341a09fff60f961869c709b0730ee9d2ab613272ef0204d4e978a77",
           "find": "q9.checkForUpdates(e.forceInstall)",
           "replacement": "this.client.assetServerModule.logger.info(`Server-requested launcher update blocked by Patchwork.`)",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "bootstrap-download-fallback",
+      "name": "Faster bootstrap download fallback",
+      "category": "Game",
+      "version": "0.1.0",
+      "status": "ready",
+      "dependencies": [
+        "clean-launcher"
+      ],
+      "description": "Optional: limits connection establishment to 15 seconds and tries each existing Maven repository once, avoiding long repeated waits on an unreachable repository during Starting JVM. Keeps the 180-second request deadline, repository order, cached archive checks and download validation. Supports only the exact tested Genesis fingerprint. Restore before updating Lunar. Cannot recover a dependency unavailable from every repository.",
+      "operations": [
+        {
+          "kind": "jarEntrySplice",
+          "file": ".lunarclient/offline/multiver/genesis-0.1.0-SNAPSHOT-all.jar",
+          "sha256": "40797ad1d1449ffff7c6e7342b79a3edc8d08517505dc2d57ce9d97e0669389c",
+          "entry": "com/moonsworth/lunar/ICCRRCCIOOIRICIHHCIOROHHROOHHR/RCHICCCIHRCRCHCIRRIIRRHICORHHO/OOIOHHHCIICRRRCICOIIIRRRICOCIC.class",
+          "entrySha256": "2a632ea44b11be790f80d530a3e31828dcff2cf97dbf05e2cfbed35db8bf4cdc",
+          "resultSha256": "ac3829a2f5d0b501c319ddb7106f86d61f60d89a67c669a8bcba055c452ab8a5",
+          "edits": [
+            {
+              "offset": 9,
+              "length": 1,
+              "dataBase64": "Tg=="
+            },
+            {
+              "offset": 5112,
+              "length": 0,
+              "dataBase64": "BQAAAAAAADqY"
+            },
+            {
+              "offset": 6531,
+              "length": 2,
+              "dataBase64": "AgA="
+            },
+            {
+              "offset": 6543,
+              "length": 2,
+              "dataBase64": "AgA="
+            },
+            {
+              "offset": 7199,
+              "length": 1,
+              "dataBase64": "Qg=="
+            },
+            {
+              "offset": 7207,
+              "length": 1,
+              "dataBase64": "Ng=="
+            },
+            {
+              "offset": 7216,
+              "length": 2,
+              "dataBase64": "OhQBTLgAWbM="
+            },
+            {
+              "offset": 7220,
+              "length": 3,
+              "dataBase64": ""
+            },
+            {
+              "offset": 7262,
+              "length": 1,
+              "dataBase64": ""
+            },
+            {
+              "offset": 7264,
+              "length": 39,
+              "dataBase64": ""
+            }
+          ]
+        },
+        {
+          "kind": "asarTextReplace",
+          "file": "AppData/Local/Programs/Lunar Client/resources/app.asar",
+          "sha256": "cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4",
+          "entry": "dist-electron/electron/main.js",
+          "entrySha256": "1f9b6e362341a09fff60f961869c709b0730ee9d2ab613272ef0204d4e978a77",
+          "find": "if(t===e.expectedHash)return{reason:WS.Matched};",
+          "replacement": "if((0,S.basename)(e.location)===`genesis-0.1.0-SNAPSHOT-all.jar`){if(e.expectedHash===`ea2f19ae5fcb3941df77637b184a1ff02157d6b1`&&t===`106f52481af4a63ba559bb817e9ccea087f387f7`)return{reason:WS.Matched};throw Error(`Bootstrap download patch: bootstrap file or version changed. Restore the patch before updating.`)}if(t===e.expectedHash)return{reason:WS.Matched};",
           "count": 1
         }
       ]
