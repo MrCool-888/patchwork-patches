@@ -7,3 +7,4 @@
 *.py text eol=lf
 *.dll binary
 *.ico binary
+examples/**/target/** -text
