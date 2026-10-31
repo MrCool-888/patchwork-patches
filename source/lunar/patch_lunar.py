@@ -246,7 +246,7 @@ def patch_stub(data, badge=False):
     return cf.replace_methods(bodies)
 
 
-def patch_cloth_menu(data):
+def patch_cloth_menu(data, check_name='CRHRRORHHOCOCHHOHIRIIHOIHIIIOI', methods=None):
     """Allow only the cloak option's two local checks; preserve code sizes/stack maps."""
     cf = ClassFile(data)
     refs = []
@@ -254,11 +254,11 @@ def patch_cloth_menu(data):
         if entry and entry[0] == 10:
             _, nt = struct.unpack_from('>HH', entry, 1)
             n, d = struct.unpack_from('>HH', cf.cp[nt], 1)
-            if cf.utf(n) == 'CRHRRORHHOCOCHHOHIRIIHOIHIIIOI' and cf.utf(d) == '()Z':
+            if cf.utf(n) == check_name and cf.utf(d) == '()Z':
                 refs.append(i)
     if len(refs) != 1: raise ValueError('Unsupported cloth cloak check')
     pattern = b'\xb6' + struct.pack('>H', refs[0])
-    methods = {
+    if methods is None: methods = {
         ('CRRHRIRIHOHRHRCCHRCOICHOOIHOIC', '(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'),
         ('ROICRHIOIOCHHICCROCHHCRIORRIRH', '(Lcom/moonsworth/lunar/client/HIRCHOCCIROORHOHOOHOIOHOOIHRCR/'
          'CICOHIIRRHHIIHRROHOICOCRHHHHOO/RCHICCCIHRCRCHCIRRIIRRHICORHHO;)Ljava/lang/String;'),

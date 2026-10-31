@@ -1,5 +1,15 @@
 # Lunar pack source
 
+## Current local-cosmetics compatibility: 3.7.25-ow
+
+`build-pack.py --version 3.7.25-ow` generates pack 0.1.7 for the inspected original game SHA-256 `9d090fabdaeafcff91fce1bbc6ce9f96b43c88221dd874dedc4b3a466fe39942`. This branch needs only `Lunar Client.exe`, `app.asar` and `lunar.jar` in `--original-dir`. It provides local cosmetics and the required launcher compatibility operation; the older packs' promotion/updater/bootstrap options are not ported.
+
+The new manager/push method and two cloak-menu methods are pinned to this game. The existing helper is unchanged. Patchwork's .NET Framework transformer produces game SHA-1 `1a6b04f5ed06e9b33b08c09dd75f40a1de6fac0e`. The strict launcher guard accepts only that result with upstream SHA-1 `6772928bce2a69c44fd6de2b5e23ada5537bfdde`.
+
+All nine Electron fuses are preserved. The executable edit updates the existing embedded ASAR header digest to `f30869f0018d7875136b76ab2355f87f9181889262cd1f1a074bef9862efdebb`, as described in [Electron's Windows packaging documentation](https://www.electronjs.org/docs/latest/tutorial/asar-integrity). This still invalidates the publisher signature. Recompute both result digests through the real transformer after any helper/guard change; do not reuse them blindly.
+
+Run `ValidatePack.cs` on fresh private copies. Then run `test-cosmetics-pack.py ORIGINAL_JAR PATCHED_JAR PACK_JSON`, `test-launcher-integrity.py ORIGINAL_EXE PATCHED_EXE PATCHED_ASAR`, and `test-cosmetics-guard.cjs ORIGINAL_MAIN_JS PATCHED_MAIN_JS PATCHED_JAR`. Keep the Java service-stub test below. No original Lunar binaries belong in source/release archives.
+
 The JSON assets contain declarative text and byte-range edits plus our own Java helper. No original Lunar binaries/assets/classes are included. `patch_lunar.py` supplies the inspected class parser/stub code generator and the original 3.7.17 launcher transformations; `build-pack.py` adds the 3.7.24 rules and converts these transformations to Patchwork operations. The standalone Python installer's main function is not used by Patchwork.
 
 Run `python source/lunar/build-pack.py --version 3.7.24-ow --original-dir C:\path\to\original-copies --output-dir build` from the repository. The original directory must contain `app.asar`, `Lunar Client.exe`, `lunar.jar` and `genesis-0.1.0-SNAPSHOT-all.jar`; all hashes are checked against the inspected originals. Use `--version 3.7.17-ow` for that inspected version. Python 3 and its standard library are sufficient. The bundled helper classes are independently written code compiled for Java 17.

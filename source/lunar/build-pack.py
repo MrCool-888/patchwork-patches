@@ -8,15 +8,32 @@ import zipfile
 from pathlib import Path
 
 parser=argparse.ArgumentParser(description='Build the declarative Lunar Patchwork pack from exact local originals.')
-parser.add_argument('--version', choices=['3.7.17-ow','3.7.24-ow'],default='3.7.17-ow')
+parser.add_argument('--version', choices=['3.7.17-ow','3.7.24-ow','3.7.25-ow'],default='3.7.17-ow')
 parser.add_argument('--original-dir',type=Path,default=Path('work/patch-test/backup'))
-parser.add_argument('--game-sha1',default='83127fc392298424f53eef71f6bdb8bb61a7a2b6')
+parser.add_argument('--game-sha1')
 parser.add_argument('--bootstrap-sha1',default='12ec07a090a9d071363d1884a958682cd00c7d91')
 parser.add_argument('--output-dir',type=Path,default=Path('outputs'))
 args=parser.parse_args()
+if args.game_sha1 is None:
+    args.game_sha1 = ('1a6b04f5ed06e9b33b08c09dd75f40a1de6fac0e' if args.version == '3.7.25-ow'
+                     else '83127fc392298424f53eef71f6bdb8bb61a7a2b6')
 root = Path(__file__).parent if (Path(__file__).parent/'patch_lunar.py').exists() else Path('outputs/LunarLocalPatch')
 spec = importlib.util.spec_from_file_location('lunar', root/'patch_lunar.py')
 lunar = importlib.util.module_from_spec(spec); spec.loader.exec_module(lunar)
+cloth_options = {}
+if args.version == '3.7.25-ow':
+    lunar.EXPECTED['lunar.jar'] = '9d090fabdaeafcff91fce1bbc6ce9f96b43c88221dd874dedc4b3a466fe39942'
+    lunar.ORIGINAL_GAME_SHA1 = '6772928bce2a69c44fd6de2b5e23ada5537bfdde'
+    lunar.COSMETIC_MANAGER = ('com/moonsworth/lunar/client/IHCOHRRIIRROCRRRRRHCOCROIOCOII/'
+        'OIOIOCRCRHRHRHICCROORCRHCCRHHR/OOCHHCIRCOCHOOOCIOIIHCRIIHRRCH.class')
+    lunar.COSMETIC_PUSH_METHOD = 'HICRHHCCRCHIIRCIRHOORRIHHICIIO'
+    lunar.CLOTH_MENU = ('com/moonsworth/lunar/client/ICRCRHRCCRCHHIHOCIHIIHCOCCCCCH/'
+        'CORRIROORHRIRIHCRHROIOCRCCIOIH/CHHCRRRCCHCHOHCIHIHCIOHRORHCRC/'
+        'RRRRRIRCCIIORHHCCCHICOCRRCOOOH/HIIIRCIHHCOIRCOHOIIRRCRIHHRICI.class')
+    cloth_options = dict(check_name='HOCOHOCRORRRCRCHCOHCIRIOHCRRCI', methods={
+        ('RRRRRIRCCIIORHHCCCHICOCRRCOOOH', '(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'),
+        ('ICOHOCRCCHICCRROOHRRHIRHIICHCI', '(Lcom/moonsworth/lunar/client/HIHCRHIOIOIHORIHICOIOIHIIIOCOC/'
+         'CORRIROORHRIRIHCRHROIOCRCCIOIH/HHOICIOHOOOIIRHCIOOCCCCIHROIRH;)Ljava/lang/String;')})
 game = args.original_dir/'lunar.jar'
 genesis = args.original_dir/'genesis-0.1.0-SNAPSHOT-all.jar'
 exe_data = (args.original_dir/'Lunar Client.exe').read_bytes()
@@ -25,7 +42,8 @@ jar_hash = hashlib.sha256(game.read_bytes()).hexdigest()
 assert jar_hash == lunar.EXPECTED['lunar.jar']
 expected={
  '3.7.17-ow':('cc33e5054e13a68b980d1496116c74e7b89d38cbcd18b6ea27c3d392609065c4','b0493c048544f465de9867d5d8cbf2dd80da75a9b4635a567b397b80741d8acc'),
- '3.7.24-ow':('506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4','e21d5ad61a3caec8e25948a52f3a0157b9e875ef6cd9a47cd1ee874a7e58f5e6')
+ '3.7.24-ow':('506574f17a6b7aeb5a13fe5f53fc83329fa705141505dde30ec88e00aa03a9f4','e21d5ad61a3caec8e25948a52f3a0157b9e875ef6cd9a47cd1ee874a7e58f5e6'),
+ '3.7.25-ow':('40c417203aabaf1fe01ac4c0482beada823c86f3762aaa72e122aa5c339c20ae','c1d3f36dba310629aedec239b6c55a2f1cfe21e6930dff2ee0440c169718628e')
 }
 assert (lunar.sha(asar_data),lunar.sha(exe_data))==expected[args.version]
 exe_file = 'AppData/Local/Programs/Lunar Client/Lunar Client.exe'
@@ -85,7 +103,7 @@ with zipfile.ZipFile(game) as z:
     new = lunar.ClassFile(old).replace_methods({(lunar.COSMETIC_PUSH_METHOD,'()V'):(b'\xb1',0,1)})
     jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,lunar.COSMETIC_MANAGER))
     old = z.read(lunar.CLOTH_MENU)
-    new, edits = lunar.patch_cloth_menu(old)
+    new, edits = lunar.patch_cloth_menu(old, **cloth_options)
     class_edits[lunar.sha(old)] = [dict(offset=o,length=n,dataBase64=b64(v)) for o,n,v in edits]
     jar_ops.append(splice('jarEntrySplice',jar_file,old,new,jar_hash,lunar.CLOTH_MENU))
     for name in ['LocalCosmetics.class','LocalCosmetics$1.class']:
@@ -93,6 +111,39 @@ with zipfile.ZipFile(game) as z:
         jar_ops.append(dict(kind='jarEntryAdd',file=jar_file,sha256=jar_hash,entry='local/lunar/'+name,entrySha256=lunar.sha(data),dataBase64=b64(data)))
 
 _, members, base = lunar.asar_read(asar_data)
+if args.version == '3.7.25-ow':
+    name = 'dist-electron/electron/main.js'
+    member = members[name]; start = base + int(member['offset'])
+    main = asar_data[start:start + member['size']]
+    prefix = 'mS=async e=>{let t=await fS(e.location);'
+    guard = prefix + ('if((0,S.basename)(e.location)===`lunar.jar`){'
+        'if(e.expectedHash===`'+lunar.ORIGINAL_GAME_SHA1+'`&&t===`'+args.game_sha1+'`)return{reason:dS.Matched};'
+        'throw Error(`Local cosmetics patch: game file or version changed. Restore the patch before updating.`)}')
+    assert main.decode('utf-8').count(prefix) == 1
+    assert len(args.game_sha1) == 40 and all(c in '0123456789abcdef' for c in args.game_sha1)
+    jar_ops.append(dict(kind='asarTextReplace', file=asar_file, sha256=lunar.sha(asar_data),
+        entry=name, entrySha256=lunar.sha(main), find=prefix, replacement=guard, count=1))
+    # Keep every fuse enabled as shipped; update only the packaged archive's header digest.
+    header_hash = lunar.sha(asar_data[16:16 + struct.unpack_from('<I', asar_data, 12)[0]]).encode('ascii')
+    assert exe_data.count(header_hash) == 1
+    header_offset = exe_data.index(header_hash)
+    updated_header_hash = b'f30869f0018d7875136b76ab2355f87f9181889262cd1f1a074bef9862efdebb'
+    new_exe = exe_data[:header_offset] + updated_header_hash + exe_data[header_offset + 64:]
+    integrity = dict(kind='binarySplice', file=exe_file, sha256=lunar.sha(exe_data), resultSha256=lunar.sha(new_exe),
+        edits=[dict(offset=header_offset, length=64, dataBase64=b64(updated_header_hash))])
+    pack = dict(schemaVersion=1, id='lunar-local-3-7-25-ow', appId='lunar-client', appName='Lunar Client',
+        appVersion='3.7.25-ow / game 6772928', packVersion='0.1.7', minimumPatcherVersion='0.9.2',
+        versionFile=asar_file, versionSha256=lunar.sha(asar_data), author='MrCool-888',
+        source='https://github.com/MrCool-888/patchwork-patches', patches=[
+            dict(id='launcher-compatibility', name='Local cosmetics launcher support', category='Launcher',
+                version='0.1.0', status='ready', description='Updates the embedded ASAR header digest to match this exact modified launcher archive. All Electron security fuses, including archive integrity validation, stay as shipped. Editing the executable invalidates its publisher signature. Restore before updating Lunar.', operations=[integrity]),
+            dict(id='local-cosmetics', name='Local cosmetics', category='Game', version='0.1.3', status='ready',
+                dependencies=['launcher-compatibility'], description='Local Outfit storage, cosmetic equip/unequip and built-in cloth cloak settings for this exact game build. Login and assets still use Lunar servers. Saved online outfits remain separate; emotes/sprays and favorite persistence are outside scope. Multiplayer privacy is unverified. Restore before updating Lunar.', operations=jar_ops)])
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    out = args.output_dir/'LunarClient-3.7.25-ow.patchwork.json'
+    out.write_text(json.dumps(pack, indent=2)+'\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'file':str(out), 'size':out.stat().st_size, 'gameSHA1':args.game_sha1}))
+    raise SystemExit(0)
 entries = {}
 for name in ['dist-electron/electron/main.js','dist/assets/use-show-ad.js','dist/assets/main.js','dist/assets/topbar.js']:
     m=members[name]; start=base+int(m['offset']); entries[name]=asar_data[start:start+m['size']]
