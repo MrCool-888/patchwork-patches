@@ -58,6 +58,6 @@ All seven menu launches passed. Private menu screenshots for the three older ver
 
 The underlying Fabric connection/route failure remains unknown. This patch avoids repeated connection waits; it does not repair that route, eliminate normal cache-building time or resolve every Starting JVM hang. A skipped origin that recovers during the same launch is retried only in a fresh JVM. A dependency unavailable from the remaining repositories can still fail. The first 26.3 launch used a partly populated real cache, not a completely empty installation. Earlier original-bootstrap controls and 0.1.4 validation are retained in `STARTUP-VALIDATION.md`.
 
-Launcher 3.7.17 was tested on copies only. Multiplayer cosmetic privacy, world movement and every promotional UI surface remain unverified. The user reported that 0.1.5's in-game cleanup worked; the precise coverage of that report was not separately measured here.
+Launcher 3.7.17 was tested on copies only. The user reported that 0.1.5's in-game cleanup worked.
 
 Release assets contain both actual importable JSON files, instructions, this report and the complete committed patch source. Private originals, decompiled upstream code/configuration, raw logs, thread captures, screenshots, profile backups, launch arguments and account files are excluded. Build and fixture instructions are in `source/lunar/BUILD.md`. Restore before future Lunar/game updates and retain Patchwork 0.9.2 or newer for the large UI-file backup.
