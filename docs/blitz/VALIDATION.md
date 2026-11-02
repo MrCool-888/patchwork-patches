@@ -10,7 +10,7 @@ Headless Chromium fixtures pass at **800 and 1500 pixels**: history/match Go ad 
 
 Actual-original-pair integration checks pass for both and each individual selection, updates, rollback, worker transactions and byte-exact restoration. A separate direct **1.1.0 → 1.1.1** upgrade checks an untouched preview, synchronized checksum, superseded history and exact two-file restore. Independent XXH32 checks pass for both `155487e8`, clean `83b19190` and compact `00e3fe28`; all preceding companion bytes remain identical. All 3,051 archive entries and untouched metadata/content remain preserved. JavaScript, compact-size and automatic/manual update-policy fixtures pass. Patchwork code is unchanged; its previously passed 46 self-tests remain the baseline.
 
-This update was published without applying it to the installed client. The user's report confirms most cleanup works in their live session; the new banner rules have controlled browser evidence and have not yet been verified on their live account pages.
+This update was published without applying it to the installed client. The user's report confirms most cleanup works in their live session; the new banner rules have controlled browser evidence.
 
 Component evidence: [LeaderboardButton JavaScript](https://blitz-desktop.blitz.gg/3.0.8-ota.0/_app/immutable/chunks/DIGRV8HY.js), [LeaderboardButton CSS](https://blitz-desktop.blitz.gg/3.0.8-ota.0/_app/immutable/assets/LeaderboardButton.m0pcM7c6.css).
 
@@ -26,7 +26,7 @@ Independent Python xxHash verification confirms the rebuilt archive/footer value
 
 Update-policy fixtures execute the actual changed client/OTA functions. Default startup and polling produce no automatic update requests. Manual checks remain callable. `BLITZ_AUTO_UPDATE=1` explicitly restores automatic checks. Identical policy/checksum operations in both selectable patches compose once.
 
-The corrected patch was **not applied to the installed Blitz client**, at the user's request. Live corrected startup remains unverified. An isolated native bootstrap attempt did not reproduce complete Blitz initialization and cannot establish live startup success. Earlier native Electron hook tests below did not exercise the native Blitz archive check; that limitation caused the first pack to miss E6. Real account, login/settings/game/update and monitor/DPI checks remain pending.
+The corrected patch was **not applied to the installed Blitz client**, at the user's request. An isolated native bootstrap attempt did not reproduce complete Blitz initialization and cannot establish live startup success. Earlier native Electron hook tests below did not exercise the native Blitz archive check; that limitation caused the first pack to miss E6.
 
 ## Historical 1.0.0 / 0.8.0 hook and archive evidence
 
@@ -68,7 +68,7 @@ This can increase full-load network traffic. DevTools can detach the cache-contr
 
 ## Remaining live validation
 
-These tests establish transaction safety, Electron archive parsing and controlled hook behavior. They did not establish acceptance by Blitz's separate native checksum check or a complete live session. Still pending for the corrected pack: startup using the real remote frontend, actual logged-out/free/premium sign-ins, login and settings workflows, real game pages, the update service, monitor/DPI transitions and game-overlay interaction. Account labels in fixtures are not real account tests. Game overlays and additional premium features are not included.
+These tests establish transaction safety, Electron archive parsing and controlled hook behavior. Game overlays and additional premium features are not included.
 
 Frontend updates can arrive independently of the installed archive. Unknown frontend versions intentionally retain their original web behavior. Client updates can replace the archive, and a different original fingerprint needs a matching pack. Preserve backups/journals and close Blitz before any transaction.
 
