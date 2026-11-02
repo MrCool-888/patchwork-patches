@@ -36,7 +36,7 @@ The broader candidate checks passed: Java 17/21/25 matrix across original, minim
 
 On 2026-10-11, launcher **3.7.24-ow** with all four patches reached the Minecraft 1.17.1 main menu; baking completed at 09:02:32 CDT after Java started at 09:01:34 CDT, and the launcher received IPC at 09:02:55.448. Visual inspection and the user confirmed that run. The previously missing SLF4J archive was created at 09:01:37 and subsequently passed ZIP CRC validation. A repeat 1.17.1 launch reached the menu, with IPC at 09:15:05.122. Minecraft 1.8.9 reached its main menu on three launches, with IPC at 09:08:55.160, 09:10:25.432 and 09:11:33.129. Minecraft 1.21.11 reached the menu twice, with IPC at 09:17:11.803 and 09:19:36.050. Each game was closed normally.
 
-One repeated 1.21.11 launch was cancelled while the launcher displayed **Updating**: its card eventually returned to **Launch Game**, no Java game window remained, and a subsequent retry reached the main menu. Earlier cancel clicks raced into a completed launch and were not counted as cancellations. This checks the shared cancellation/retry lifecycle; an interrupted download under the earlier real network fault was not tested with the patch because the route had recovered.
+One repeated 1.21.11 launch was cancelled while the launcher displayed **Updating**: its card eventually returned to **Launch Game**, no Java game window remained, and a subsequent retry reached the main menu. Earlier cancel clicks raced into a completed launch and were not counted as cancellations. This checks the shared cancellation/retry lifecycle.
 
 | Version | Original game/bootstrap control | Patched compatibility |
 | --- | --- | --- |
