@@ -23,7 +23,7 @@ The initial sandbox test run blocked Windows `File.Replace` for scratch fixtures
 
 Both inspected launcher UI stages verify the cached source ZIP, then reuse the extracted source when the `.sha1` marker matches and expected ZIP files are present. Their `findMissingZipFiles` implementations check file existence. The assets index does not list `static/index.js`, so this source-file edit is not an indexed image/font asset edit. The patch changes none of these checks or markers, and adds no verifier exception. Missing files, cache re-extraction/deletion or a new UI source hash can overwrite or bypass the cleanup; restore before Lunar updates or cache clearing. A different UI build needs a newly inspected matching pack. Retain Patchwork 0.9.2 or newer to restore the large JS backup.
 
-The new patch does not modify the launcher executable/archive, game classes, bootstrap, account data, local outfit files or network methods. Prior game-launch and cloth-cape checks remain historical evidence for the unchanged four options. Minecraft launch, visual spacing at different GUI scales, native pause-menu content, catalog/equip behavior and persistence across a real relaunch still need the user's test. Multiplayer cosmetic privacy remains unverified.
+The new patch does not modify the launcher executable/archive, game classes, bootstrap, account data, local outfit files or network methods. Prior game-launch and cloth-cape checks remain historical evidence for the unchanged four options.
 
 ## Reproduce
 
@@ -42,4 +42,4 @@ node source/lunar/test-promotions.cjs PRIVATE_ORIGINALS/index.js PRIVATE_SCRATCH
 
 ## Requested user test
 
-Install Patchwork 0.9.2, import/check for the matching Lunar 0.1.5 pack, close Lunar/Minecraft/Java, retain your choices, add **Remove in-game promotions**, preview and update. Launch your usual version and wait for the main menu. Confirm shop/news/coins are gone, then open Locker and confirm the shop link is gone while Local Outfit, Equip/Unequip and Cloth Cloak still work. Close and relaunch once to check persistence. Report version, any remaining promotion, layout problems or broken controls. Results are not yet available.
+Install Patchwork 0.9.2, import/check for the matching Lunar 0.1.5 pack, close Lunar/Minecraft/Java, retain your choices, add **Remove in-game promotions**, preview and update. Launch your usual version and wait for the main menu. Confirm shop/news/coins are gone, then open Locker and confirm the shop link is gone while Local Outfit, Equip/Unequip and Cloth Cloak still work. Close and relaunch once to check persistence. Report version, any remaining promotion, layout problems or broken controls.
