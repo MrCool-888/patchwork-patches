@@ -30,6 +30,7 @@ public static class ValidatePack
             File.WriteAllText(Path.Combine(scratch, "artifacts", "before.txt"), preview.Files[0].BeforeText);
             File.WriteAllText(Path.Combine(scratch, "artifacts", "after.txt"), preview.Files[0].AfterText);
             var journal = engine.Apply(preview); byte[] applied = File.ReadAllBytes(destination);
+            byte[] appliedIcu = File.ReadAllBytes(icuTarget);
             File.WriteAllBytes(Path.Combine(scratch, "artifacts", "both.asar"), applied);
             File.Copy(icuTarget, Path.Combine(scratch, "artifacts", "both.icudtl.dat"));
             Assert(applied.Length > 8 * 1024 * 1024 && applied.Length < AsarPatches.MaximumSize, "Unexpected archive size.");
@@ -37,9 +38,10 @@ public static class ValidatePack
             var compactOnly = engine.Preview(bundle, target, new[] { "compact-window" });
             File.WriteAllBytes(Path.Combine(scratch, "artifacts", "compact.asar"), compactOnly.Files[0].AfterBytes);
             File.WriteAllBytes(Path.Combine(scratch, "artifacts", "compact.icudtl.dat"), compactOnly.Files.Single(x => x.RelativePath == "icudtl.dat").AfterBytes);
-            engine.BeforeWriteForTest = index => { throw new IOException("Injected update failure"); };
+            engine.BeforeWriteForTest = index => { if (index == 1) throw new IOException("Injected second-file update failure"); };
             Reject(() => engine.Apply(compactOnly), "previous patch version was restored");
             Assert(File.ReadAllBytes(destination).SequenceEqual(applied), "Rollback changed previous version.");
+            Assert(File.ReadAllBytes(icuTarget).SequenceEqual(appliedIcu), "Rollback changed previous companion.");
             engine.BeforeWriteForTest = null; var compactSession = engine.Apply(engine.Preview(bundle, target, new[] { "compact-window" }));
             var cleanSession = engine.Apply(engine.Preview(bundle, target, new[] { "clean-desktop" }));
             File.Copy(destination, Path.Combine(scratch, "artifacts", "clean.asar"));
@@ -54,6 +56,7 @@ public static class ValidatePack
             Assert(File.ReadAllBytes(icuTarget).SequenceEqual(originalIcu), "Worker companion restore mismatch.");
             var stale = engine.Preview(bundle, target, all); File.AppendAllText(destination, "x"); Reject(() => engine.Apply(stale), "after preview"); File.WriteAllBytes(destination, original);
             Assert(File.ReadAllBytes(originalPath).SequenceEqual(original), "Installed archive changed.");
+            Assert(File.ReadAllBytes(icuSource).SequenceEqual(originalIcu), "Installed companion changed.");
             Console.WriteLine("PASS real Blitz archive: preview, both selections, individual selections, direct updates, rollback, restore, worker transactions, stale preview and installed-original preservation.");
             return 0;
         }

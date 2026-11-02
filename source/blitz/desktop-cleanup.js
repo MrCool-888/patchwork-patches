@@ -10,7 +10,7 @@ function patchworkInstallDesktopCleanup(browserView, initialURL) {
     try {
       const parsed = new URL(value);
       return parsed.protocol === "https:" && knownHosts.has(parsed.hostname) &&
-        /^\/v3\.0\.8-ota\.0(?:\/|$)/.test(parsed.pathname) &&
+        /^\/v3\.0\.17(?:\/|$)/.test(parsed.pathname) &&
         !parsed.searchParams.has("overlay-route");
     } catch { return false; }
   }

@@ -16,13 +16,13 @@ for (const name of ['checkForUpdates', 'pollForUpdates', 'bootApp']) {
 }
 const otaContext = { module: { exports: {} }, process: environment,
   require(name) {
-    if (name === 'electron') return { app: { getVersion: () => '3.0.7' } };
+    if (name === 'electron') return { app: { getVersion: () => '3.0.17' } };
     if (name === 'npmlog') return { error() {} };
-    if (name === './db') return { get: async () => JSON.stringify({ ota: { '3.0.7': '3.0.8-ota.0' } }), write: async () => {} };
+    if (name === './db') return { get: async () => JSON.stringify({ ota: { '3.0.17': '3.0.17' } }), write: async () => {} };
     if (name === './windows') return { client: null };
     return {};
   },
-  fetch: async () => { frontendChecks++; return { ok: true, json: async () => ({ ota: { '3.0.7': '3.0.8-ota.0' } }) }; },
+  fetch: async () => { frontendChecks++; return { ok: true, json: async () => ({ ota: { '3.0.17': '3.0.17' } }) }; },
   setInterval: fn => timers.push(fn),
 };
 vm.runInNewContext(source, otaContext); const ota = otaContext.module.exports;
