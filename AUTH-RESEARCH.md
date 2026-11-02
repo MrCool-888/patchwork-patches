@@ -1,6 +1,6 @@
 # Guest session research
 
-Reviewed October 9, 2026. Experimental prerelease 1.5.0 integrates credentialless sessions with Windows authentication and certificate managers. The actual installed-client guest tunnel test remains pending. This is not yet ready for a stable release.
+Reviewed October 9, 2026. Experimental prerelease 1.5.0 integrates credentialless sessions with Windows authentication and certificate managers. This is not yet ready for a stable release.
 
 ## Official Android workflow
 
