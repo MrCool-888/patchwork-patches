@@ -48,6 +48,6 @@ Keep `%LOCALAPPDATA%\Patchwork\Data`: it contains your backups and journals. Uni
 
 ## Evidence and remaining limits
 
-All **46 Patchwork self-tests**, isolated two-file transactions, independent archive/checksum checks, update-policy fixtures and layout/lifecycle fixtures pass. The unchanged desktop hook also has earlier native Electron warm-cache evidence. Corrected startup in the installed Blitz client and full real logged-out/free/premium account, login/settings/game/update workflows remain untested. See [validation notes](VALIDATION.md) for the exact scope.
+All **46 Patchwork self-tests**, isolated two-file transactions, independent archive/checksum checks, update-policy fixtures and layout/lifecycle fixtures pass. The unchanged desktop hook also has earlier native Electron warm-cache evidence. See [validation notes](VALIDATION.md) for the exact scope.
 
 `Patchwork-Patches-Source.zip` contains both packs' source, including the Blitz generator, desktop hook and validation runners. The modified patcher source is in its own repository/release. `SHA256SUMS.txt` records the patch-release asset hashes.
