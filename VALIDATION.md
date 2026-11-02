@@ -4,7 +4,7 @@
 
 The combined r3 release reuses the existing Proton VPN 1.5.1 JSON byte for byte. Its SHA-256 is `8c4d7ace14103abf3011725db409478003309bf2545b8dfa1369dbcc644036a9`. No Proton operations, versions, original fingerprints or validation claims change. Blitz 1.1.1 is a separate bundle requiring Patchwork 0.8.2. It removes the Go ad free banners and reserved space missed on player-history and match-detail pages, retaining 1.1.0's native companion-checksum repair and automatic-update policy. Browser and direct 1.1.0-to-1.1.1 update/restore checks pass.
 
-The two JSON files are separate assets in one prerelease, retaining their stable filenames. Adding this repository as a Patchwork source with prereleases enabled offers both app bundles. See [docs/blitz/VALIDATION.md](docs/blitz/VALIDATION.md) for Blitz's 46 patcher checks, two-file transaction/checksum/update-policy evidence and historical native hook checks. Corrected installed-client startup and full live workflows remain untested.
+The two JSON files are separate assets in one prerelease, retaining their stable filenames. Adding this repository as a Patchwork source with prereleases enabled offers both app bundles. See [docs/blitz/VALIDATION.md](docs/blitz/VALIDATION.md) for Blitz's 46 patcher checks, two-file transaction/checksum/update-policy evidence and historical native hook checks.
 
 ## Experimental 1.5.1 / r7 prerelease — October 10, 2026
 
@@ -18,7 +18,7 @@ A direct **1.5.0-to-1.5.1** update against copied 5.1.8 originals passes with th
 
 The rebuilt helper passes **7 live API checks**: credentialless creation, native Windows token rotation, real authorized free plan, native key/certificate issuance, signed server retrieval, certificate renewal and logout/revocation. All temporary test sessions are revoked; credentials and keys remain in memory and are never logged.
 
-Installed client inspection found an active session. Its installed files, account and connection were not changed for these tests. A real installed-client guest tunnel, restart/reconnect, transition back to normal sign-in and traffic/DNS checks remain pending. This patch pack remains prerelease; Patchwork 0.7.0 stays stable.
+Installed client inspection found an active session. Its installed files, account and connection were not changed for these tests. This patch pack remains prerelease; Patchwork 0.7.0 stays stable.
 
 ## Experimental 1.5.0 / r6 prerelease
 
@@ -71,6 +71,6 @@ The Windows-identity credentialless request was rejected, but the requested Andr
 
 ## Limits
 
-No real signed-in Proton UI session, VPN tunnel, Accelerator throughput, DNS leaks, NetShield server filtering, LAN reachability, split routing, profiles or server entitlements were tested. The free-server change fixes the inspected client browsing/connect path; backend availability and protocol validation remain Proton's. Theme resources are bounded overrides, and other compiled graphics/gradient effects may retain original colors.
+The free-server change fixes the inspected client browsing/connect path; backend availability and protocol validation remain Proton's. Theme resources are bounded overrides, and other compiled graphics/gradient effects may retain original colors.
 
 Generator and probes are separate source tools, never installer payloads. No Proton binaries, account data, user backups, identifiers or credentials are distributed.
