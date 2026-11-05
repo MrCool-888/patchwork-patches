@@ -2,6 +2,7 @@
 *.ps1 text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+ProtonVPN-*.patchwork.json -text
 *.js text eol=lf
 *.cjs text eol=lf
 *.py text eol=lf

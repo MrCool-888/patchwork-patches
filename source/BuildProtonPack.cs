@@ -93,7 +93,13 @@ class BuildProtonPack
     {
         root = Path.GetFullPath(args[0]);
         string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(Path.Combine(root, "ProtonVPN.Client.exe")).FileVersion;
-        if (version != "5.1.8.0") throw new Exception("Pack generator supports the original Windows 5.1.8.0 release only.");
+        string appVersion, packVersion, sourceCommit;
+        switch (version)
+        {
+            case "5.1.8.0": appVersion = "5.1.8"; packVersion = "1.5.1"; sourceCommit = "d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9"; break;
+            case "5.1.9.0": appVersion = "5.1.9"; packVersion = "1.6.0"; sourceCommit = "bd8380fe92c2b07f07ee6e48858307f12780fcb9"; break;
+            default: throw new Exception("Pack generator supports original Windows 5.1.8.0 and 5.1.9.0 releases only.");
+        }
         const string client = "ProtonVPN.Client.dll", settings = "ProtonVPN.Client.Settings.dll", statistical = "ProtonVPN.StatisticalEvents.dll", logic = "ProtonVPN.Client.Logic.Connection.dll";
         const string advanced = "ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel";
         const string connSettings = "ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel";
@@ -222,14 +228,14 @@ class BuildProtonPack
         Add("switch-style", "Custom switch colors", "Choose enabled toggle-switch track and knob colors while keeping the native switch layout, disabled states and keyboard controls. Applies to Light and Dark themes.", "Appearance", Theme(switches.ToArray()));
         Options("track", "Switch track", "#36C9A0", "knob", "Switch knob", "#FFFFFF");
         var pack = new Dictionary<string, object> {
-            { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", "5.1.8" },
-            { "author", "Patchwork" }, { "source", "Windows source v5.1.8, d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9; experimental local client modifications" },
-            { "packVersion", "1.5.1" }, { "minimumPatcherVersion", "0.7.0" },
+            { "schemaVersion", 1 }, { "id", "proton-vpn-win-5-1-8-r1" }, { "appId", "proton-vpn" }, { "appName", "Proton VPN" }, { "appVersion", appVersion },
+            { "author", "Patchwork" }, { "source", "Windows source v" + appVersion + ", " + sourceCommit + "; experimental local client modifications" },
+            { "packVersion", packVersion }, { "minimumPatcherVersion", "0.7.0" },
             { "versionFile", "ProtonVPN.Client.exe" }, { "versionSha256", PatchEngine.Hash(File.ReadAllBytes(Path.Combine(root, "ProtonVPN.Client.exe"))) }, { "patches", patches }
         };
         string content = Json.Pretty(pack); PatchBundle.Parse(content);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[1]))); File.WriteAllText(args[1], content, new UTF8Encoding(false));
         foreach (var module in modules.Values) module.Dispose();
-        Console.WriteLine("Built prerelease pack v1.5.1: 15 available; installed guest tunnel validation is tracked separately."); return 0;
+        Console.WriteLine("Built pack v" + packVersion + " for Proton VPN " + appVersion + ": " + patches.Count + " available."); return 0;
     }
 }

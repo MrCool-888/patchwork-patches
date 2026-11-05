@@ -4,7 +4,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
 const { readArchive, hash } = require('./asar-reader.cjs');
-const known = 'https://blitzapp.gg/v3.0.8-ota.0/lol';
+const known = 'https://blitzapp.gg/v3.0.17/lol';
 const notices = [];
 const context = vm.createContext({ URL, Symbol, Set, Map, log: { warn: (...args) => notices.push(args) } });
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'desktop-cleanup.js'), 'utf8'), context);
@@ -47,7 +47,7 @@ function walk(node, prefix = '') {
 }
 function verifyArchives() {
   const installed = readArchive(process.argv[3] || path.join(process.env.LOCALAPPDATA, 'Programs/Blitz/resources/app.asar'));
-  assert.equal(hash(installed.bytes), '44132b54235250bc4db85c09c80a247ce20d4fac95476bb10244bb0ecf344193');
+  assert.equal(hash(installed.bytes), '41ae887fb6e213722ae66e764c09fb2b6bc590800a32c0c4d587f98a0de4d579');
   const originalEntries = walk(installed.header);
   for (const selection of ['both', 'clean', 'compact']) {
     const changed = readArchive(path.join(process.argv[2] || path.join(__dirname, '../blitz-integration/artifacts'), selection + '.asar'));
@@ -55,7 +55,8 @@ function verifyArchives() {
     assert.deepEqual([...entries.keys()].sort(), [...originalEntries.keys()].sort());
     for (const [entry, metadata] of originalEntries) {
       if (metadata.link || metadata.unpacked) assert.deepEqual(entries.get(entry), metadata);
-      else if (!['src/createWindow.js', 'src/autoUpdater/index.js', 'src/blitz-entry.js', 'src/ota.js'].includes(entry)) {
+      else if (!['src/createWindow.js', 'src/autoUpdater/index.js', 'src/blitz-entry.js', 'src/ota.js',
+        ...(selection === 'both' ? ['src/electronWindowHandlers.js', 'src/crashReporter.js', 'src/util/machineInfo.js', 'src/listeners/system.js', 'src/listeners/bapp.js'] : [])].includes(entry)) {
         assert.equal(hash(installed.member(entry)), hash(changed.member(entry)), 'Untouched entry changed: ' + entry);
         const { offset: beforeOffset, ...before } = metadata;
         const { offset: afterOffset, ...after } = entries.get(entry);
@@ -68,10 +69,16 @@ function verifyArchives() {
     assert.equal(integrity.blocks.length, Math.ceil(member.length / integrity.blockSize));
     for (let n = 0; n < integrity.blocks.length; n++) assert.equal(integrity.blocks[n], hash(member.subarray(n * integrity.blockSize, (n + 1) * integrity.blockSize)));
     const text = member.toString('utf8'); new vm.Script(text, { filename: selection + '-createWindow.js' });
+    for (const entry of ['src/autoUpdater/index.js', 'src/blitz-entry.js', 'src/ota.js', 'src/electronWindowHandlers.js', 'src/crashReporter.js', 'src/util/machineInfo.js', 'src/listeners/system.js', 'src/listeners/bapp.js']) {
+      const bytes = changed.member(entry), metadata = entries.get(entry);
+      assert.equal(metadata.integrity.hash, hash(bytes), entry);
+      metadata.integrity.blocks.forEach((block, index) => assert.equal(block, hash(bytes.subarray(index * metadata.integrity.blockSize, (index + 1) * metadata.integrity.blockSize)), entry));
+      new vm.Script(bytes.toString('utf8'), { filename: entry });
+    }
     assert.equal(text.includes('function patchworkInstallDesktopCleanup'), selection !== 'compact');
     assert.equal(text.includes('const DEFAULT_MIN_WIDTH = 940;'), selection !== 'clean');
   }
-  console.log('PASS actual archive: all 3051 entries preserved, metadata/integrity valid, three selections and JavaScript syntax verified');
+  console.log('PASS actual archive: all ' + originalEntries.size + ' entries preserved, metadata/integrity valid, selections and JavaScript syntax verified');
 }
 function verifyCompact() {
   const text = readArchive(path.join(process.argv[2], 'compact.asar')).member('src/createWindow.js').toString();
@@ -110,9 +117,12 @@ async function verifyHook() {
   wc.destroy(); assert.equal(request(wc, ad), false);
   const recreated = new Contents(); install({ webContents: recreated }, known); recreated.emit('did-finish-load'); await flush();
   assert.equal(session.registrations, 1); assert.equal(request(recreated, ad), true); assert.equal(recreated.styles.size, 1);
-  const foreign = new Contents('https://evil.example/v3.0.8-ota.0'); install({ webContents: foreign }, foreign.url); foreign.emit('did-finish-load'); await flush();
+  const foreign = new Contents('https://evil.example/v3.0.17'); install({ webContents: foreign }, foreign.url); foreign.emit('did-finish-load'); await flush();
   assert.equal(request(foreign, ad), false); assert.equal(foreign.styles.size, 0);
   const overlay = new Contents(known + '?overlay-route=lol'); install({ webContents: overlay }, overlay.url); assert.equal(request(overlay, ad), false);
+  for (const unsupported of ['https://blitzapp.gg/v3.0.170/lol', 'https://blitzapp.gg/v3.0.17-ota.1/lol', 'https://blitzapp.gg/v3.0.8-ota.0/lol', 'http://blitzapp.gg/v3.0.17/lol']) {
+    const view = new Contents(unsupported); install({ webContents: view }, unsupported); assert.equal(request(view, ad), false);
+  }
   recreated.emit('did-start-navigation', {}, 'https://blitzapp.gg/v3.0.9/lol', false, true); assert.equal(request(recreated, ad), false);
   console.log('PASS desktop hook: loader blocking, allowed APIs, unrelated views, unknown versions, reload, SPA navigation, recreation and one session listener');
   return css;
@@ -155,4 +165,7 @@ async function verifyLayout(css) {
     console.log('PASS Chromium layout fixtures: Go ad free banners and reserved space removed at 800/1500px; dynamic promotions collapsed, history/score/ranking controls retained, no hidden hit targets');
   } finally { await browser.close(); }
 }
-(async () => { verifyArchives(); verifyCompact(); await verifyLayout(await verifyHook()); })().catch(error => { console.error(error); process.exitCode = 1; });
+(async () => {
+  verifyArchives(); verifyCompact(); const css = await verifyHook();
+  if (!process.argv.includes('--node-only')) await verifyLayout(css);
+})().catch(error => { console.error(error); process.exitCode = 1; });

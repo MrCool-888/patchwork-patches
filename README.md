@@ -10,7 +10,7 @@ This repository includes packs for:
 
 - **Lunar Client** — launcher cleanup, local cosmetics, startup improvements, and promotion removal. See the [Lunar guide](docs/lunar/README.md) for supported builds and limitations.
 - **Blitz** — desktop cleanup and compact window options. See the [Blitz guide](docs/blitz/README.md) for supported versions and restore instructions.
-- **Proton VPN** — optional interface and client behavior patches. See [validation notes](VALIDATION.md) and [authentication research](AUTH-RESEARCH.md) for details and known limitations.
+- **Proton VPN** — optional interface and client behavior patches for Windows 5.1.8 and 5.1.9. See the [Proton guide](docs/proton/README.md), [5.1.9 validation](docs/proton/5.1.9-VALIDATION.md), and [authentication research](AUTH-RESEARCH.md) for details and known limitations.
 
 Compatibility depends on the exact app files supported by each pack. Check its documentation before applying. Packs do not grant access to paid services or features.
 

@@ -1,5 +1,7 @@
 # Blitz pack source and checks
 
+For the current **Blitz 3.0.17 / pack 1.2.0**, use [3.0.17-BUILD.md](3.0.17-BUILD.md). The instructions below record the earlier 3.0.7 build and its historical checks.
+
 The generator, hook and fixtures are in this folder. Patchwork 0.8.2 source and its build instructions are in [the patcher repository](https://github.com/MrCool-888/patchwork). Build its test executable with `source/build.ps1 -Console -Tests`; all 46 scenarios should pass. The installer contains neither app's patch pack.
 
 ## Generate the pack

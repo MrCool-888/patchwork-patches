@@ -1,0 +1,1104 @@
+{
+  "schemaVersion": 1,
+  "id": "proton-vpn-win-5-1-8-r1",
+  "appId": "proton-vpn",
+  "appName": "Proton VPN",
+  "appVersion": "5.1.9",
+  "author": "Patchwork",
+  "source": "Windows source v5.1.9, bd8380fe92c2b07f07ee6e48858307f12780fcb9; experimental local client modifications",
+  "packVersion": "1.6.0",
+  "minimumPatcherVersion": "0.7.0",
+  "versionFile": "ProtonVPN.Client.exe",
+  "versionSha256": "9f2896029452d392b74941e42f439641d32a7d40c77b71e64498ae3db8a804b0",
+  "patches": [
+    {
+      "id": "disable-telemetry",
+      "name": "Disable usage telemetry",
+      "description": "Stops both authenticated and pre-login statistical event senders. Diagnostic reports submitted by the user are separate.",
+      "category": "Privacy",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "d574fbac4556be09d89b805402b549c0a75a32fc318d466b70e4135bb8cadb31",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.AuthenticatedStatisticalEventSender::get_CanSendTelemetryEvents()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "d574fbac4556be09d89b805402b549c0a75a32fc318d466b70e4135bb8cadb31",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.AuthenticatedStatisticalEventSender::get_IsShareStatisticsEnabled()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "d574fbac4556be09d89b805402b549c0a75a32fc318d466b70e4135bb8cadb31",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.UnauthenticatedStatisticalEventSender::get_CanSendTelemetryEvents()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.StatisticalEvents.dll",
+          "sha256": "d574fbac4556be09d89b805402b549c0a75a32fc318d466b70e4135bb8cadb31",
+          "method": "System.Boolean ProtonVPN.StatisticalEvents.Events.Senders.UnauthenticatedStatisticalEventSender::get_IsShareStatisticsEnabled()",
+          "returnType": "boolean",
+          "value": false
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "hide-promotions",
+      "name": "Hide upgrade promotions",
+      "description": "Hides shared upgrade banners/feature cards, subscription badges, four explicit Upgrade buttons (including change-server and network notices), promotional announcement offers/popups, and restricted server-row upgrade actions. Available rows keep Connect and maintenance checks. NPS surveys and normal service notices remain available; actual account plan and backend eligibility are unchanged.",
+      "category": "Interface",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Components.Banners.BannerComponent::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.ViewModels.CountriesComponentViewModelBase::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Profiles.ProfilesPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Dialogs.Tray.Pages.TrayMainPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Home.Upsell.ConnectionCardUpsellBannerViewModel::get_IsBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "a8a8dc85b617a6eca0c6cedb05832000e7dc7544f64ce7a35266127a99927a73",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Custom.UpsellBanner::.ctor()"
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "a8a8dc85b617a6eca0c6cedb05832000e7dc7544f64ce7a35266127a99927a73",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.UpsellBannerControl::.ctor()"
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "a8a8dc85b617a6eca0c6cedb05832000e7dc7544f64ce7a35266127a99927a73",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Custom.UpsellFeatureContentControl::.ctor()"
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "a8a8dc85b617a6eca0c6cedb05832000e7dc7544f64ce7a35266127a99927a73",
+          "method": "System.Boolean ProtonVPN.Client.Common.UI.Controls.Custom.GridSettingsCard::get_IsSubscriptionBadgeVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Overlays.WhatsNew.WhatsNewOverlayViewModel::get_IsSubscriptionBadgeVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedEnumFilter",
+          "file": "ProtonVPN.Client.Logic.Announcements.dll",
+          "sha256": "4408278f73c8d2751d2906ffe8841f9b9894ca3db136f950298761eea22b26e8",
+          "method": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement\u003e ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider::GetAllActive()",
+          "elementGetter": "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.AnnouncementType ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement::get_Type()",
+          "value": 4
+        },
+        {
+          "kind": "managedEnumGuardNull",
+          "file": "ProtonVPN.Client.Logic.Announcements.dll",
+          "sha256": "4408278f73c8d2751d2906ffe8841f9b9894ca3db136f950298761eea22b26e8",
+          "method": "ProtonVPN.Client.Logic.Announcements.Contracts.Entities.Announcement ProtonVPN.Client.Logic.Announcements.AnnouncementsProvider::GetActiveAndUnseenByType(ProtonVPN.Client.Logic.Announcements.Contracts.Entities.AnnouncementType)",
+          "values": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.Common.UI.dll",
+          "sha256": "a8a8dc85b617a6eca0c6cedb05832000e7dc7544f64ce7a35266127a99927a73",
+          "method": "System.Void ProtonVPN.Client.Common.UI.Controls.Bases.ConnectionRowButtonBase::set_IsRestricted(System.Boolean)",
+          "field": "",
+          "fromParameter": true
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.UI.Main.Home.Upsell.ChangeServerComponentView/ChangeServerComponentView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Main.Home.Upsell.ChangeServerComponentView/ChangeServerComponentView_obj1_Bindings::obj7",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.P2PDetectionShellView/P2PDetectionShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.P2PDetectionShellView/P2PDetectionShellView_obj1_Bindings::obj2",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.StreamingDetectionShellView/StreamingDetectionShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.StreamingDetectionShellView/StreamingDetectionShellView_obj1_Bindings::obj2",
+          "fromParameter": false
+        },
+        {
+          "kind": "managedUiVisibility",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.UI.Dialogs.Upsell.UpsellCarouselShellView/UpsellCarouselShellView_obj1_Bindings::Invoke_ViewModel_Localizer_M_Get_1992939572(System.Int32)",
+          "field": "Microsoft.UI.Xaml.Controls.Button ProtonVPN.Client.UI.Dialogs.Upsell.UpsellCarouselShellView/UpsellCarouselShellView_obj1_Bindings::obj3",
+          "fromParameter": false
+        }
+      ],
+      "version": "1.2.0"
+    },
+    {
+      "id": "vpn-accelerator",
+      "name": "Keep VPN Accelerator enabled",
+      "description": "Keeps VPN Accelerator on, opens its settings without an upgrade prompt, and shows its enabled state. This overrides the saved off toggle; restore this patch to return toggle control. Live speed improvements are not verified.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsVpnAcceleratorEnabled()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.VpnAcceleratorSettingsPageViewModel::get_IsVpnAcceleratorEnabled()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToVpnAcceleratorPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.String ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_VpnAcceleratorSettingsState()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "server-delay",
+      "name": "Remove local server change delay",
+      "description": "Makes the desktop cooldown check accept a server change and report zero remaining time. Server limits can still apply.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "41769d2b0b1cd9c9d5d3626e689532119dd47ec06497b81dc6d82932341e587a",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.ChangeServerModerator::CanChangeServer()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "41769d2b0b1cd9c9d5d3626e689532119dd47ec06497b81dc6d82932341e587a",
+          "method": "System.TimeSpan ProtonVPN.Client.Logic.Connection.ChangeServerModerator::GetRemainingDelayUntilNextAttempt()",
+          "returnType": "timeSpanZero"
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "lan-connections",
+      "name": "LAN connections controls",
+      "description": "Exposes the shared advanced-settings screen and uses the saved LAN access toggle. The same screen also displays custom DNS and NAT controls; their effective settings have separate checks.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsLocalAreaNetworkAccessEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedSuppressCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Void ProtonVPN.Client.Settings.SettingsCorrector::Correct()",
+          "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsLocalAreaNetworkAccessEnabled(System.Boolean)",
+          "count": 1
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "custom-dns",
+      "name": "Custom DNS controls",
+      "description": "Exposes the shared advanced-settings screen and uses the saved custom DNS toggle and resolver list. Test DNS behavior on your network before relying on it.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsCustomDnsServersEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "netshield",
+      "name": "NetShield client controls",
+      "description": "Opens the NetShield widget and settings and uses the saved toggle. This changes client checks; Proton\u0027s servers still decide whether DNS filtering is available for the account.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Features.Bases.FeatureWidgetViewModelBase::get_IsRestricted()",
+          "type": "ProtonVPN.Client.UI.Main.Features.NetShield.NetShieldWidgetViewModel",
+          "value": false
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToNetShieldPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsNetShieldEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedSuppressCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Void ProtonVPN.Client.Settings.SettingsCorrector::Correct()",
+          "calledMethod": "System.Void ProtonVPN.Client.Settings.Contracts.IUserSettings::set_IsNetShieldEnabled(System.Boolean)",
+          "count": 1
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "split-tunneling",
+      "name": "Split tunneling client controls",
+      "description": "Opens the split-tunneling widget and settings and uses the saved routing toggle. VPN routing and kill-switch interaction still need a live network test.",
+      "category": "Networking",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Features.Bases.FeatureWidgetViewModelBase::get_IsRestricted()",
+          "type": "ProtonVPN.Client.UI.Main.Features.SplitTunneling.SplitTunnelingWidgetViewModel",
+          "value": false
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Threading.Tasks.Task ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::NavigateToSplitTunnelingPageAsync()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.Connection.ConnectionSettingsViewModel::get_IsPaidUser()",
+          "count": 1,
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "System.Boolean ProtonVPN.Client.Settings.UserSettings::get_IsSplitTunnelingEnabled()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "connection-preferences",
+      "name": "Connection preference controls",
+      "description": "Shows the default-connection and excluded-location controls and reads the saved default connection. Account-eligible servers and normal connection validation still apply.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Settings.Pages.ConnectionPreferences.ConnectionPreferencesSettingsPageViewModel::get_IsPaidUser()",
+          "returnType": "boolean",
+          "value": true
+        },
+        {
+          "kind": "managedBooleanCall",
+          "file": "ProtonVPN.Client.Settings.dll",
+          "sha256": "2f05d85fc476fd76c639fc4024b7552ca11eb6844e1a26ed316dbeeb6396afe3",
+          "method": "ProtonVPN.Client.Settings.Contracts.Models.DefaultConnection ProtonVPN.Client.Settings.UserSettings::get_DefaultConnection()",
+          "calledMethod": "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()",
+          "count": 1,
+          "value": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "profiles",
+      "name": "Connection profile controls",
+      "description": "Shows profile creation/editing and clears the profile row\u0027s local restriction. Connections still pass through Proton\u0027s account and location validation.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Boolean ProtonVPN.Client.UI.Main.Sidebar.Connections.Profiles.ProfilesPageViewModel::get_IsUpsellBannerVisible()",
+          "returnType": "boolean",
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBooleanArgument",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Profiles.ProfileConnectionItem",
+          "value": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "free-locations",
+      "name": "Free country and individual server selection",
+      "description": "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires a signed-in or guest VPN session.",
+      "category": "Connections",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedConditionalProjection",
+          "file": "ProtonVPN.Client.Logic.Servers.dll",
+          "sha256": "49f06fad4d8eb81568943796f1d9bb2c25a826f4bc24176fe67b52c32c4dde03",
+          "method": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Country\u003e ProtonVPN.Client.Logic.Servers.Cache.ServersCache::get_Countries()",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Servers.Cache.ServersCache::_settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "sourceMethod": "System.Collections.Generic.IReadOnlyList`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry\u003e ProtonVPN.Client.Logic.Servers.Cache.ServersCache::get_FreeCountries()",
+          "mappings": [
+            {
+              "getter": "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.FreeCountry::get_Code()",
+              "setter": "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.Country::set_Code(System.String)"
+            },
+            {
+              "getter": "System.Boolean ProtonVPN.Client.Logic.Servers.Contracts.Models.StandardLocationBase::get_IsLocationUnderMaintenance()",
+              "setter": "System.Void modreq(System.Runtime.CompilerServices.IsExternalInit) ProtonVPN.Client.Logic.Servers.Contracts.Models.FeatureLocationBase::set_IsStandardUnderMaintenance(System.Boolean)"
+            }
+          ]
+        },
+        {
+          "kind": "managedConditionalCall",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "41769d2b0b1cd9c9d5d3626e689532119dd47ec06497b81dc6d82932341e587a",
+          "method": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Connection.ServerListGenerators.ServerListGeneratorBase::GetAvailableServers(ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent,System.Boolean)",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Connection.ServerListGenerators.ServerListGeneratorBase::Settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "calledMethod": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetServers()",
+          "replacementMethod": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()",
+          "count": 1
+        },
+        {
+          "kind": "managedOverrideBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.Logic.Connection.Contracts.dll",
+          "sha256": "331420c98922c1ac470b9f1351a9060f6a0827a61960ccb00aaac796dc2a4320",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.CountryLocationIntentBase::get_IsForPaidUsersOnly()",
+          "type": "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Countries.SingleCountryLocationIntent",
+          "value": false
+        },
+        {
+          "kind": "managedConditionalBooleanCall",
+          "file": "ProtonVPN.Client.Logic.Connection.dll",
+          "sha256": "41769d2b0b1cd9c9d5d3626e689532119dd47ec06497b81dc6d82932341e587a",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.RequestCreators.ConnectionRequestCreatorBase::IsToBypassSmartServerListGenerator(ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent)",
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.Logic.Connection.RequestCreators.RequestCreatorBase::Settings",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ],
+          "calledMethod": "System.Boolean ProtonVPN.Client.Settings.Contracts.IUserSettings::get_IsSmartReconnectEnabled()",
+          "value": false,
+          "count": 1
+        },
+        {
+          "kind": "managedOverrideConditionalBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "condition": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.ServerLocationItemBase::get_IsFree()"
+          ],
+          "value": false
+        },
+        {
+          "kind": "managedOverrideBoolean",
+          "file": "ProtonVPN.Client.Logic.Connection.Contracts.dll",
+          "sha256": "331420c98922c1ac470b9f1351a9060f6a0827a61960ccb00aaac796dc2a4320",
+          "method": "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.ServerLocationIntentBase::get_IsForPaidUsersOnly()",
+          "type": "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.Servers.SingleServerLocationIntent",
+          "value": false
+        },
+        {
+          "kind": "managedEnumerableFactory",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Models.Connections.ConnectionItemBase\u003e ProtonVPN.Client.Models.Connections.Countries.CountryLocationItem::GetSubItems()",
+          "condition": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.HostLocationItemBase`1::_lastKnownIsPaidUser"
+          ],
+          "source": [
+            "ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader ProtonVPN.Client.Models.Connections.ConnectionItemBase::ServersLoader",
+            "System.Collections.Generic.IEnumerable`1\u003cProtonVPN.Client.Logic.Servers.Contracts.Models.Server\u003e ProtonVPN.Client.Logic.Servers.Contracts.IServersLoader::GetFreeServers()"
+          ],
+          "filter": [
+            "System.String ProtonVPN.Client.Models.Connections.CountryLocationItemBase::get_ExitCountryCode()"
+          ],
+          "factory": [
+            "ProtonVPN.Client.Factories.ILocationItemFactory ProtonVPN.Client.Models.Connections.HostLocationItemBase`1::LocationItemFactory"
+          ],
+          "argument": [
+            "System.Boolean ProtonVPN.Client.Models.Connections.ConnectionItemBase::get_IsSearchItem()"
+          ],
+          "elementGetter": "System.String ProtonVPN.Client.Logic.Servers.Contracts.Models.Server::get_ExitCountry()",
+          "factoryMethod": "ProtonVPN.Client.Models.Connections.Countries.ServerLocationItem ProtonVPN.Client.Factories.ILocationItemFactory::GetServer(ProtonVPN.Client.Logic.Servers.Contracts.Models.Server,System.Boolean)"
+        },
+        {
+          "kind": "managedOverrideConditionalBooleanSetter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::InvalidateIsRestricted(System.Boolean)",
+          "type": "ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem",
+          "setterMethod": "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)",
+          "value": false,
+          "conditionExpected": false,
+          "condition": [
+            "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_RecentConnection()",
+            "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection::get_ConnectionIntent()",
+            "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.ILocationIntent ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent::get_Location()",
+            "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IIntent::get_IsForPaidUsersOnly()"
+          ],
+          "exclusions": [
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsSecureCore()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsP2P()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsTor()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsB2B()"
+            ],
+            [
+              "System.Boolean ProtonVPN.Client.Models.Connections.Recents.RecentConnectionItem::get_IsProfileIntent()"
+            ]
+          ]
+        }
+      ],
+      "version": "1.3.0"
+    },
+    {
+      "id": "hide-paid-modes",
+      "name": "Hide paid country modes",
+      "description": "Hides Secure Core, P2P and Tor country tabs on free accounts, keeping All countries and free server selection. Paid accounts retain their mode tabs. This changes navigation only; it does not grant access to paid servers. Restart Proton after an account-plan change.",
+      "category": "Interface",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedEnumFilter",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Collections.Generic.List`1\u003cProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent\u003e ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel::get_CountriesComponents()",
+          "elementGetter": "ProtonVPN.Client.Core.Enums.CountriesConnectionType ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent::get_ConnectionType()",
+          "value": 0,
+          "condition": [
+            "ProtonVPN.Client.Settings.Contracts.ISettings ProtonVPN.Client.UI.Main.Sidebar.Bases.ConnectionListViewModelBase`1::get_Settings()",
+            "ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan ProtonVPN.Client.Settings.Contracts.IUserSettings::get_VpnPlan()",
+            "System.Boolean ProtonVPN.Client.Logic.Users.Contracts.Messages.VpnPlan::get_IsPaid()"
+          ]
+        }
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "id": "no-sign-in",
+      "name": "Guest VPN session",
+      "description": "Adds Continue as guest with native loading-page cancellation, bounded requests, encrypted session storage and native VPN authorization, certificate renewal, refresh, restart and logout. Fixes sign-in cancelling itself when the page unloads. Contains executable managed client code; source: source/GuestClient.cs. Normal sign-in remains available. Guest accounts retain backend free-server limits.",
+      "category": "Guest client code",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedEmbeddedHook",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.UI.Login.Pages.SignInPageView::.ctor()",
+          "moduleBase64": "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AElFbnVtZXJhdG9yYDEAQXBpUmVzcG9uc2VSZXN1bHRgMQBSZWFkT25seU1lbW9yeWAxADw+N19fd3JhcDEAPFJlcXVpcmVDZXJ0aWZpY2F0ZUFzeW5jPmRfXzEyAEdldEludDMyADxkZWFkbGluZT41X18yADxwcm90b2NvbD41X18yADx0b2tlbj41X18yADxib290c3RyYXA+NV9fMgA8c2V0dGluZ3M+NV9fMgA8dGltZW91dD41X18yADxBZGRCdXR0b25Db3JlPmJfXzIAPD51X18yAERpY3Rpb25hcnlgMgA8RW5kRmFpbGVkU2Vzc2lvbkFzeW5jPmRfXzEzADxyZXF1ZXN0VG9rZW4+NV9fMwA8dG9rZW4+NV9fMwA8cmVzdWx0PjVfXzMAPGd1ZXN0PjVfXzMAPEFkZEJ1dHRvbkNvcmU+Yl9fMwA8PnVfXzMAPFJlc3VtZUFzeW5jPmRfXzE0ADxhY2NlcHRlZD41X180ADxzZXNzaW9uPjVfXzQAPHJlcXVlc3Q+NV9fNAA8PjdfX3dyYXA0ADxMb2dpbkFzeW5jPmRfXzE1ADxhY2NlcHRlZD41X181ADxyZXNwb25zZT41X181ADw+N19fd3JhcDUAPHN0b3JlZD41X182ADxpbnB1dD41X182ADw+N19fd3JhcDYAPGJ1ZmZlcj41X183ADxSZXF1ZXN0QXN5bmM+ZF9fNwA8PjdfX3dyYXA3AGdldF9VVEY4ADxibG9jaz41X184ADw+N19fd3JhcDgAPD45ADxwMD4APHAxPgA8TW9kdWxlPgBNaWNyb3NvZnQuV2luVUkAU3lzdGVtLklPAFN5c3RlbS5Qcml2YXRlLkNvcmVMaWIAPD5jAFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljAFJlYWRBc3luYwBTZW5kQXN5bmMAUmV2b2tlQXN5bmMAUmVzdW1lQXN5bmMAUmVxdWlyZUNlcnRpZmljYXRlQXN5bmMAQ3JlYXRlQXN5bmMAUmVhZEFzU3RyZWFtQXN5bmMATG9naW5Bc3luYwBFbmRGYWlsZWRTZXNzaW9uQXN5bmMAUmVxdWlyZVZwbkFzeW5jAFJlcXVlc3RBc3luYwBnZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwBzZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwA8PEFkZEJ1dHRvbkNvcmU+Yl9fMD5kAHNldF9VbmlxdWVTZXNzaW9uSWQAU2V0QXV0b21hdGlvbklkAGdldF9Vc2VySWQAc2V0X1VzZXJJZABnZXRfUGF5bG9hZABwYXlsb2FkAEFkZABhZGRfTG9hZGVkAGFkZF9VbmxvYWRlZABhZGRfUHJvcGVydHlDaGFuZ2VkAHJlbW92ZV9Qcm9wZXJ0eUNoYW5nZWQASU5vdGlmeVByb3BlcnR5Q2hhbmdlZABjaGFuZ2VkAHNldF9Jc0VuYWJsZWQAdXNlclJlcXVpcmVkAEF3YWl0VW5zYWZlT25Db21wbGV0ZWQAZ2V0X0lzQ29tcGxldGVkAFRocm93SWZDYW5jZWxsYXRpb25SZXF1ZXN0ZWQAZ2V0X0lzQ2FuY2VsbGF0aW9uUmVxdWVzdGVkAFVpZAA8UGF5bG9hZD5pX19GaWVsZABHZXRGaWVsZABnZXRfQ2hpbGQAU2VuZABnZXRfVmFsdWVLaW5kAEpzb25WYWx1ZUtpbmQASHR0cE1ldGhvZABHZXRNZXRob2QAbWV0aG9kAEluc3RhbmNlAENyZWF0ZUxpbmtlZFRva2VuU291cmNlAENhbmNlbGxhdGlvblRva2VuU291cmNlAHNldF9Db2RlAEdldEhhc2hDb2RlAEh0dHBTdGF0dXNDb2RlAGdldF9Jc1N1Y2Nlc3NTdGF0dXNDb2RlAFBhZ2UAcGFnZQBnZXRfTWVzc2FnZQBMb2dpblN0YXRlQ2hhbmdlZE1lc3NhZ2UASHR0cFJlc3BvbnNlTWVzc2FnZQBIdHRwUmVxdWVzdE1lc3NhZ2UAbWVzc2FnZQBJbnZva2UASURpc3Bvc2FibGUAZ2V0X05hbWUAc2V0X05hbWUAc2V0X0Rpc3BsYXlOYW1lAHNldF9Vc2VyRGlzcGxheU5hbWUAZ2V0X1Byb3BlcnR5TmFtZQBzZXRfVXNlcm5hbWUAc2V0X0NyZWF0ZVRpbWUAUmVzdW1lAElBc3luY1N0YXRlTWFjaGluZQBTZXRTdGF0ZU1hY2hpbmUAc3RhdGVNYWNoaW5lAGdldF9CYXNlVHlwZQBWYWx1ZVR5cGUAR2V0VHlwZQBQcm90b25WUE4uQ2xpZW50LkNvcmUAQWRkQnV0dG9uQ29yZQBHdWVzdEZhaWx1cmUAQ2FwdHVyZQBNZXRob2RCYXNlAEJ1dHRvbkJhc2UAQmFzZVJlc3BvbnNlAEdldFZwbkluZm9SZXNwb25zZQBWcG5JbmZvV3JhcHBlclJlc3BvbnNlAFVzZXJSZXNwb25zZQBVc2Vyc1Jlc3BvbnNlAEdldExvZ291dFJlc3BvbnNlAERpc3Bvc2UAUGFyc2UAZ2V0X0V4cGlyYXRpb25VdGNEYXRlAGdldF9Db25uZWN0aW9uQ2VydGlmaWNhdGUAQ3JlYXRlAERlYnVnZ2VyQnJvd3NhYmxlU3RhdGUATG9naW5TdGF0ZQA8PjFfX3N0YXRlAGdldF9EZWxldGUAV3JpdGUAQ29tcGlsZXJHZW5lcmF0ZWRBdHRyaWJ1dGUARGVidWdnYWJsZUF0dHJpYnV0ZQBOdWxsYWJsZUF0dHJpYnV0ZQBEZWJ1Z2dlckJyb3dzYWJsZUF0dHJpYnV0ZQBBc3luY1N0YXRlTWFjaGluZUF0dHJpYnV0ZQBEZWJ1Z2dlckhpZGRlbkF0dHJpYnV0ZQBSZWZTYWZldHlSdWxlc0F0dHJpYnV0ZQBDb21waWxhdGlvblJlbGF4YXRpb25zQXR0cmlidXRlAFBhcmFtQXJyYXlBdHRyaWJ1dGUAUnVudGltZUNvbXBhdGliaWxpdHlBdHRyaWJ1dGUAQnl0ZQBnZXRfVmFsdWUAQXV0aGVudGljYXRpb25IZWFkZXJWYWx1ZQBnZXRfSGFzVmFsdWUAR2V0VmFsdWUAU2V0VmFsdWUAdmFsdWUAU2VyaWFsaXplAFN5c3RlbS5UaHJlYWRpbmcARW5jb2RpbmcAbGlzdGVuaW5nAHNldF9UZXh0V3JhcHBpbmcAVG9TdHJpbmcAR2V0U3RyaW5nAGdldF9MZW5ndGgAZ2V0X0NvbnRlbnRMZW5ndGgAU3RhcnRzV2l0aABkZXB0aABQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5BdXRoAGF1dGgAT2sAYWRkX0NsaWNrAFRleHRCbG9jawBnZXRfVGFzawBvcF9MZXNzVGhhbk9yRXF1YWwAU3lzdGVtLk9iamVjdE1vZGVsAFN5c3RlbS5Db21wb25lbnRNb2RlbABGaW5kUGFuZWwAU3RhY2tQYW5lbABGYWlsAHNldF9FbWFpbABzZXRfVXNlckVtYWlsAENhbGwAUGF0Y2h3b3JrLlByb3Rvbkd1ZXN0LmRsbABNaWNyb3NvZnQuVUkuWGFtbABjcmVhdGVQcm90b2NvbABHdWVzdFByb3RvY29sAHByb3RvY29sAFVzZXJDb250cm9sAENvbnRlbnRDb250cm9sAEJhc2VVcmwATWVtb3J5U3RyZWFtAGdldF9QZW0AU3lzdGVtAHZtAEJvb2xlYW4Ab3BfR3JlYXRlclRoYW4ASW5maW5pdGVUaW1lU3BhbgBnZXRfVG9rZW4Ac2V0X1JlZnJlc2hUb2tlbgBDYW5jZWxsYXRpb25Ub2tlbgBzZXRfQWNjZXNzVG9rZW4AdG9rZW4AZ2V0X0NoaWxkcmVuAFZhbGlkYXRlU2Vzc2lvbgBHdWVzdFNlc3Npb24Ac2Vzc2lvbgBNaWNyb3NvZnQuVUkuWGFtbC5BdXRvbWF0aW9uAHNldF9BdXRob3JpemF0aW9uAFN5c3RlbS5SZWZsZWN0aW9uAFVJRWxlbWVudENvbGxlY3Rpb24ASHR0cENvbXBsZXRpb25PcHRpb24AT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24AQXJndW1lbnRPdXRPZlJhbmdlRXhjZXB0aW9uAEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24AU2V0RXhjZXB0aW9uAFByb3RvblZQTi5BcGkuQ29udHJhY3RzLkNvbW1vbgBTeXN0ZW0uVGV4dC5Kc29uAExvZ291dFJlYXNvbgBTdHJpbmdDb21wYXJpc29uAEFkZEJ1dHRvbgBidXR0b24AZ2V0X1ZwbgBGaWVsZEluZm8ATWV0aG9kSW5mbwBFeGNlcHRpb25EaXNwYXRjaEluZm8AUHJvcGVydHlJbmZvAFplcm8AU3lzdGVtLk5ldC5IdHRwAHN0YXJ0dXAAPFBheWxvYWQ+al9fVFBhcgBJRm9ybWF0UHJvdmlkZXIAQXN5bmNWb2lkTWV0aG9kQnVpbGRlcgBBc3luY1Rhc2tNZXRob2RCdWlsZGVyADw+dF9fYnVpbGRlcgBJRXZlbnRNZXNzYWdlU2VuZGVyAHNlbmRlcgBCb3JkZXIASHR0cE1lc3NhZ2VJbnZva2VyAEh0dHBNZXNzYWdlSGFuZGxlcgBIdHRwQ2xpZW50SGFuZGxlcgBQcm9wZXJ0eUNoYW5nZWRFdmVudEhhbmRsZXIAUm91dGVkRXZlbnRIYW5kbGVyAHNldF9Vc2VyAEd1ZXN0VXNlcgBDYW5jZWxBZnRlcgBDb25maWd1cmVkVGFza0F3YWl0ZXIAR2V0QXdhaXRlcgBKc29uU2VyaWFsaXplcgBnZXRfRXJyb3IAQXV0aEVycm9yAElFbnVtZXJhdG9yAEdldEVudW1lcmF0b3IALmN0b3IALmNjdG9yAFN5c3RlbS5EaWFnbm9zdGljcwBUb1VuaXhUaW1lU2Vjb25kcwBGcm9tU2Vjb25kcwBTeXN0ZW0uUnVudGltZS5FeGNlcHRpb25TZXJ2aWNlcwBTeXN0ZW0uUnVudGltZS5Db21waWxlclNlcnZpY2VzAERlYnVnZ2luZ01vZGVzAFByb3RvblZQTi5DbGllbnQuQ29yZS5NZXNzYWdlcwBjaGFuZ2VzAEF1dG9tYXRpb25Qcm9wZXJ0aWVzAE1pY3Jvc29mdC5VSS5YYW1sLkNvbnRyb2xzLlByaW1pdGl2ZXMAU3lzdGVtLk5ldC5QcmltaXRpdmVzAEJpbmRpbmdGbGFncwBJU2V0dGluZ3MASUdsb2JhbFNldHRpbmdzAElVc2VyU2V0dGluZ3MAc2V0dGluZ3MAUHJvcGVydHlDaGFuZ2VkRXZlbnRBcmdzAFJvdXRlZEV2ZW50QXJncwBhcmdzADw+NF9fdGhpcwBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzAEVxdWFscwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzLk1vZGVscwBNaWNyb3NvZnQuVUkuWGFtbC5Db250cm9scwBQcm90b25WUE4uQ2xpZW50LkNvcmUuRW51bXMAUHJvdG9uVlBOLkNsaWVudC5Mb2dpYy5BdXRoLkNvbnRyYWN0cy5FbnVtcwBTeXN0ZW0uQ29sbGVjdGlvbnMASnNvblNlcmlhbGl6ZXJPcHRpb25zAEpzb25Eb2N1bWVudE9wdGlvbnMAU3lzdGVtLk5ldC5IdHRwLkhlYWRlcnMAZ2V0X0hlYWRlcnMASHR0cEhlYWRlcnMASHR0cENvbnRlbnRIZWFkZXJzAEh0dHBSZXF1ZXN0SGVhZGVycwBQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5Vc2VycwBnZXRfU3VjY2VzcwBQcm90b25WUE4uQ2xpZW50LkV2ZW50TWVzc2FnaW5nLkNvbnRyYWN0cwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzAFByb3RvblZQTi5BcGkuQ29udHJhY3RzAFByb3RvblZQTi5DbGllbnQuU2V0dGluZ3MuQ29udHJhY3RzAGdldF9TdGF0dXMAQXV0aGVudGljYXRpb25TdGF0dXMAc3RhdHVzAENvbmNhdABGb3JtYXQAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kuQWJzdHJhY3QARGVwZW5kZW5jeU9iamVjdABnZXRfTWF4Q29ubmVjdABzZXRfQWxsb3dBdXRvUmVkaXJlY3QAR2V0AFN5c3RlbS5OZXQAU2V0AHRhcmdldABEYXRlVGltZU9mZnNldABDb25maWd1cmVBd2FpdABvcF9JbXBsaWNpdABnZXRfRGVmYXVsdABHZXRWYWx1ZU9yRGVmYXVsdABBdXRoUmVzdWx0AEZyb21SZXN1bHQAR2V0UmVzdWx0AFNldFJlc3VsdABJQXBpQ2xpZW50AEh0dHBDbGllbnQAR3Vlc3RDbGllbnQAY2xpZW50AFVJRWxlbWVudABGcmFtZXdvcmtFbGVtZW50AEpzb25FbGVtZW50AGdldF9Sb290RWxlbWVudABzZXRfSG9yaXpvbnRhbEFsaWdubWVudABzZXRfSG9yaXpvbnRhbENvbnRlbnRBbGlnbm1lbnQASnNvbkRvY3VtZW50AGdldF9QYXJlbnQAZ2V0X0N1cnJlbnQAZ2V0X0NvbnRlbnQAc2V0X0NvbnRlbnQAU3RyaW5nQ29udGVudABIdHRwQ29udGVudABlbmRwb2ludAByb290AFN0YXJ0AFBhdGNod29yay5Qcm90b25HdWVzdABJc0d1ZXN0AGdldF9Qb3N0AHNldF9UaW1lb3V0AHJlcXVlc3RUaW1lb3V0AE1vdmVOZXh0AFN5c3RlbS5UZXh0AHNldF9UZXh0AGdldF9VdGNOb3cAVGhyb3cAUHJlZml4AFRvQXJyYXkAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kAYm9keQBidXN5AG9wX0VxdWFsaXR5AG9wX0luZXF1YWxpdHkAc2V0X1Zpc2liaWxpdHkASXNOdWxsT3JFbXB0eQBUcnlHZXRQcm9wZXJ0eQAAJ3sAewAgAFAAYQB5AGwAbwBhAGQAIAA9ACAAewAwAH0AIAB9AH0AADlHAHUAZQBzAHQAIABjAGwAaQBlAG4AdAAgAGYAaQBlAGwAZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAA7RwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAIABtAGUAdABoAG8AZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAAncABhAHQAYwBoAHcAbwByAGsALQBnAHUAZQBzAHQAOgB2ADEAOgABL1MAZQB0AEEAdQB0AGgAZQBuAHQAaQBjAGEAdABpAG8AbgBTAHQAYQB0AHUAcwAACV8AYwB0AHMAABNfAHMAZQB0AHQAaQBuAGcAcwAAC0cAdQBlAHMAdAAAGVMAaQBnAG4ASQBuAEIAdQB0AHQAbwBuAAA7RwB1AGUAcwB0ACAAYgB1AHQAdABvAG4AIABwAGEAcgBlAG4AdAAgAG0AaQBzAG0AYQB0AGMAaAAuAAApUABhAHQAYwBoAHcAbwByAGsARwB1AGUAcwB0AEIAdQB0AHQAbwBuAAATVgBpAGUAdwBNAG8AZABlAGwAACVfAHUAcwBlAHIAQQB1AHQAaABlAG4AdABpAGMAYQB0AG8AcgAAI0MAbwBuAHQAaQBuAHUAZQAgAGEAcwAgAGcAdQBlAHMAdAAAF0kAcwBTAGkAZwBuAGkAbgBnAEkAbgAAHXIAZQBxAHUAZQBzAHQAVABpAG0AZQBvAHUAdAAAB1UASQBEAAANVQBzAGUAcgBJAEQAABdBAGMAYwBlAHMAcwBUAG8AawBlAG4AABlSAGUAZgByAGUAcwBoAFQAbwBrAGUAbgAAZUcAdQBlAHMAdAAgAHMAZQByAHYAaQBjAGUAIAByAGUAdAB1AHIAbgBlAGQAIABpAG4AYwBvAG0AcABsAGUAdABlACAAcwBlAHMAcwBpAG8AbgAgAGQAZQB0AGEAaQBsAHMALgAAF0wAbwBnAG8AdQB0AEEAcwB5AG4AYwAAFV8AYQBwAGkAQwBsAGkAZQBuAHQAADtfAGMAbwBuAG4AZQBjAHQAaQBvAG4AQwBlAHIAdABpAGYAaQBjAGEAdABlAE0AYQBuAGEAZwBlAHIAADdEAGUAbABlAHQAZQBLAGUAeQBQAGEAaQByAEEAbgBkAEMAZQByAHQAaQBmAGkAYwBhAHQAZQAAL0MAbABlAGEAcgBBAHUAdABoAFMAZQBzAHMAaQBvAG4ARABlAHQAYQBpAGwAcwAAN0gAYQBzAEEAdQB0AGgAZQBuAHQAaQBjAGEAdABlAGQAUwBlAHMAcwBpAG8AbgBEAGEAdABhAAB3UwBpAGcAbgAgAG8AdQB0ACAAbwBmACAAdABoAGUAIABjAHUAcgByAGUAbgB0ACAAcwBlAHMAcwBpAG8AbgAgAGIAZQBmAG8AcgBlACAAYwBvAG4AdABpAG4AdQBpAG4AZwAgAGEAcwAgAGcAdQBlAHMAdAAuAABDUgBlAHMAZQB0AEMAYQBuAGMAZQBsAGwAYQB0AGkAbwBuAFQAbwBrAGUAbgBJAGYAQwBhAG4AYwBlAGwAbABlAGQAACVDAG8AbQBwAGwAZQB0AGUATABvAGcAaQBuAEEAcwB5AG4AYwAAMUcAdQBlAHMAdAAgAHMAaQBnAG4ALQBpAG4AIABjAGEAbgBjAGUAbABsAGUAZAAuAAF7RwB1AGUAcwB0ACAAcwBpAGcAbgAtAGkAbgAgAHQAaQBtAGUAZAAgAG8AdQB0AC4AIABDAGgAZQBjAGsAIAB5AG8AdQByACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGEAbgBkACAAdAByAHkAIABhAGcAYQBpAG4ALgABgJ9HAHUAZQBzAHQAIABzAGkAZwBuAC0AaQBuACAAZgBhAGkAbABlAGQALgAgAEMAaABlAGMAawAgAHkAbwB1AHIAIABjAG8AbgBuAGUAYwB0AGkAbwBuACAAYQBuAGQAIAB0AHIAeQAgAGEAZwBhAGkAbgAsACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAAE1UgBlAHEAdQBlAHMAdABOAGUAdwBDAGUAcgB0AGkAZgBpAGMAYQB0AGUAQQBzAHkAbgBjAACAk1QAaABlACAAZwB1AGUAcwB0ACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGMAZQByAHQAaQBmAGkAYwBhAHQAZQAgAGMAbwB1AGwAZAAgAG4AbwB0ACAAYgBlACAAbwBiAHQAYQBpAG4AZQBkAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuAC4AAIC5VABoAGUAIABnAHUAZQBzAHQAIABzAGUAcwBzAGkAbwBuACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIABhAHUAdABoAG8AcgBpAHoAZQBkACAAZgBvAHIAIABWAFAATgAgAHUAcwBlAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAACApUcAdQBlAHMAdAAgAHMAZQBzAHMAaQBvAG4AIABlAHgAcABpAHIAZQBkACAAbwByACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIAByAGUAcwB1AG0AZQBkAC4AIABDAG8AbgB0AGkAbgB1AGUAIABhAHMAIABnAHUAZQBzAHQAIABhAGcAYQBpAG4AIABvAHIAIABzAGkAZwBuACAAaQBuAC4AACMvAGEAdQB0AGgALwB2ADQALwBzAGUAcwBzAGkAbwBuAHMAAC8vAGEAdQB0AGgALwB2ADQALwBjAHIAZQBkAGUAbgB0AGkAYQBsAGwAZQBzAHMAADNoAHQAdABwAHMAOgAvAC8AdgBwAG4ALQBhAHAAaQAuAHAAcgBvAHQAbwBuAC4AbQBlAAEfeAAtAHAAbQAtAGEAcABwAHYAZQByAHMAaQBvAG4AASthAG4AZAByAG8AaQBkAC0AdgBwAG4AQAA1AC4AMgAwAC4ANQA3AC4AMAABH3gALQBwAG0ALQBhAHAAaQB2AGUAcgBzAGkAbwBuAAEDMwAADUEAYwBjAGUAcAB0AAAhYQBwAHAAbABpAGMAYQB0AGkAbwBuAC8AagBzAG8AbgAAFVUAcwBlAHIALQBBAGcAZQBuAHQAATtQAGEAdABjAGgAdwBvAHIAawAgAFAAcgBvAHQAbwBuACAAZwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAAA1CAGUAYQByAGUAcgAAEXgALQBwAG0ALQB1AGkAZAABRVUAbgBlAHgAcABlAGMAdABlAGQAIABnAHUAZQBzAHQAIABzAGUAcgB2AGkAYwBlACAAcgBlAHMAcABvAG4AcwBlAC4AAAlDAG8AZABlAACAoVAAcgBvAHQAbwBuACAAZABpAGQAIABuAG8AdAAgAGEAdQB0AGgAbwByAGkAegBlACAAZwB1AGUAcwB0ACAAbQBvAGQAZQAuACAAUABsAGUAYQBzAGUAIAB0AHIAeQAgAGEAZwBh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",
+          "moduleSha256": "f3e619c7f89432d37a7f0b7716756c82e78212ae74ea8d5ac5a251d40e84026e",
+          "entryType": "Patchwork.ProtonGuest.GuestClient",
+          "entryMethod": "AddButton",
+          "mode": "after"
+        },
+        {
+          "kind": "managedEmbeddedHook",
+          "file": "ProtonVPN.Client.Logic.Auth.dll",
+          "sha256": "2ad0e260931e370bcf6a77c409b9d861634adabceeaac484248130599b6b59b9",
+          "method": "System.Threading.Tasks.Task`1\u003cProtonVPN.Api.Contracts.ApiResponseResult`1\u003cProtonVPN.Api.Contracts.Users.UsersResponse\u003e\u003e ProtonVPN.Client.Logic.Auth.UserAuthenticator::GetUserAsync()",
+          "moduleBase64": "TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1vZGUuDQ0KJAAAAAAAAABQRQAAZIYCANDx7GoAAAAAAAAAAPAAIiALAjAAAHAAAAAEAAAAAAAAAAAAAAAgAAAAAACAAQAAAAAgAAAAAgAABAAAAAAAAAAEAAAAAAAAAADAAAAAAgAAAAAAAAMAQIUAAEAAAAAAAABAAAAAAAAAAAAQAAAAAAAAIAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAACgAADYAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAABIAAAAAAAAAAAAAAAudGV4dAAAAGBvAAAAIAAAAHAAAAACAAAAAAAAAAAAAAAAAAAgAABgLnJzcmMAAADYAgAAAKAAAAAEAAAAcgAAAAAAAAAAAAAAAAAAQAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAgAFALRJAACsRQAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAnsOAAAKKjoCKA8AAAoCA30OAAAKKgATMAMAKQAAAAEAABEDdQEAABsKAgYuHAYsFygQAAAKAnsOAAAKBnsOAAAKbxEAAAoqFioXKnYgFEBW4yApVVWlWigQAAAKAnsOAAAKbxIAAApYKgATMAcAOgAAAAIAABEUcgEAAHAXjQcAAAElFgJ7DgAACgoSACVxAwAAG4wDAAAbLQQmFCsL/hYDAAAbbxMAAAqiKBQAAAoqAAATMAQARAAAAAMAABECbxUAAAoKKycGA34DAAAEGGBvFgAACgsHFCgXAAAKLAgHAm8YAAAKKgZvGQAACgoGFCgaAAAKLdByKQAAcHMbAAAKehMwBABFAAAABAAAEQJvFQAACgorKAYDfgMAAAQYYG8cAAAKCwcUKB0AAAosCQcCBG8eAAAKKgZvGQAACgoGFCgaAAAKLc9yYwAAcHMbAAAKemICbxUAAAoDfgMAAARvHwAACgJvIAAACipmAm8VAAAKA34DAAAEbx8AAAoCBG8hAAAKKnICbyIAAAosEgJvIgAACnKfAABwGm8jAAAKKhYqcgJyxwAAcBiNBwAAASUWA4wSAAABoigHAAAGJipaAnL3AABwKAYAAAZ0QgAAAW8kAAAKKgAAABMwBADPAAAABQAAEQJyAQEAcCgGAAAGdBEAAAEKBigKAAAGLQIUKgZyFQEAcG8lAAAKBnIVAQBwbyYAAAoGFG8nAAAKBm8oAAAKDBICKCkAAAotEAYoKgAACnMrAAAKbywAAApzLQAACiUGbyIAAApvLgAACiVyFQEAcG8vAAAKJXIVAQBwbzAAAAolFG8xAAAKJQZvKAAACgwSAigyAAAKDRIDKDMAAApvNAAACgsgyAAAAHM1AAAKczYAAAolIOgDAABvNwAACiUHbzgAAAooOQAACigBAAArKqICcgEBAHAoBgAABnQRAAABKAoAAAYtAhQqAgMWmqVQAAABKBIAAAYqEzACAD8AAAAGAAAREgAoOwAACn00AAAEEgACfTUAAAQSAAN9NgAABBIAFX0zAAAEEgB8NAAABBIAKAIAACsSAHw0AAAEKD0AAAoqABMwAgA/AAAABwAAERIAKDsAAAp9LwAABBIAAn0wAAAEEgADfTEAAAQSABV9LgAABBIAfC8AAAQSACgDAAArEgB8LwAABCg9AAAKKgATMAIANwAAAAgAABESACg7AAAKfRcAAAQSAAJ9GAAABBIAFX0WAAAEEgB8FwAABBIAKAQAACsSAHwXAAAEKD0AAAoqABMwAgA/AAAACQAAERIAKD4AAAp9OQAABBIAAn06AAAEEgADfTsAAAQSABV9OAAABBIAfDkAAAQSACgFAAArEgB8OQAABChAAAAKKgATMAIAPwAAAAoAABESACg+AAAKfR0AAAQSAAJ9HgAABBIAA30fAAAEEgAVfRwAAAQSAHwdAAAEEgAoBgAAKxIAfB0AAAQoQAAACiqaAn4MAAAEJS0XJn4LAAAE/gYmAAAGc0EAAAolgAwAAAQoFQAABioAABswBQDtAQAACwAAEXMnAAAGCgYDfREAAAQCciEBAHAoBgAABnQcAAABCwdvQgAACnUdAAABJS0OJgJ0HwAAAQcWKBYAAAYMCBQoQwAACiwLcjsBAHBzGwAACnoIb0QAAApvRQAACg0rMQlvRgAAChMEEQR1UQAAASwgEQR0UQAAAW9HAAAKcncBAHAoSAAACiwIFBMF3VwBAAAJb0kAAAotx94KCSwGCW9KAAAK3AYCcqEBAHAoCAAABn0OAAAEBgZ7DgAABHK1AQBwKAYAAAZ9EgAABAYWfQ0AAAQGc0sAAAolcncBAHBvTAAACiVy2wEAcG9NAAAKJQZ7DgAABHL/AQBwKAgAAAalUAAAARb+AW9OAAAKJRlvTwAACiUXb1AAAAp9DwAABAZzUQAACiUYb1IAAAolF29TAAAKfRAAAAQGew8AAARydwEAcChUAAAKBnsPAAAEBv4GKAAABnNVAAAKb1YAAAoGBnsOAAAEdCYAAAF9FAAABAYXfRMAAAQGBv4GKQAABnNXAAAKfRUAAAQGexQAAAQGexUAAARvWAAACgJ0UQAAAQb+BioAAAZzVQAACm9ZAAAKAnRRAAABBv4GKwAABnNVAAAKb1oAAAoIb0QAAAoGew8AAARvWwAACghvRAAACgZ7EAAABG9bAAAKFCoRBSoAAAABEAAAAgBbAD2YAAoAAAAAGzAEAA4BAAAMAAARAhQoXAAACi0FBB8gMQIUKgJ1IAAAAQoGFChdAAAKLGEGb0QAAApvRQAAChMFKzsRBW9GAAAKEwYRBgMzDQZ1HQAAARMI3cEAAAARBgMEF1goFgAABhMHEQcUKF4AAAosCREHEwjdoQAAABEFb0kAAAotvN4MEQUsBxEFb0oAAArcAnUhAAABCwcUKF8AAAosEAdvYAAACgMEF1goFgAABioCdSIAAAEMCBQoYQAACiwQCG9gAAAKAwQXWCgWAAAGKgJ1IwAAAQ0JFChiAAAKLBUJb2MAAAp1HwAAAQMEF1goFgAABioCdSQAAAETBBEEFChkAAAKLBERBG9lAAAKAwQXWCgWAAAGKhQqEQgqAAABEAAAAgAtAEh1AAwAAAAAIh80gAMAAAQqIgIDKGYAAAoqHgIoDwAACipiAnNnAAAKJRZvaAAACnNpAAAKKBsAAAYqWgIDIwAAAAAAAD5AKGoAAAooHAAABioAABMwAgBOAAAAAAAAAAIoDwAACgR+awAACihsAAAKLRYEIwAAAAAAAD5AKGoAAAoobQAACiwLchcCAHBzbgAACnoCA30JAAAEAgR9CgAABAN+bwAACm9wAAAKKgAAEzADACAAAAANAAARDwADEgAocQAACiwKEgAocgAAChkuAhQqEgAocwAACioTMAIAYQAAAA4AABESACh0AAAKfU0AAAQSAAJ9TwAABBIAA31RAAAEEgAEfVAAAAQSAAV9UgAABBIADgR9UwAABBIADgV9TgAABBIAFX1MAAAEEgB8TQAABBIAKAcAACsSAHxNAAAEKHYAAAoqAAAAEzAEAEoAAAAAAAAAcxkAAAYlAnI1AgBwKB0AAAZ9BAAABCUCcj0CAHAoHQAABn0FAAAEJQJySwIAcCgdAAAGfQYAAAQlAnJjAgBwKB0AAAZ9BwAABCoAABMwAQBDAAAAAAAAAAJ7BAAABCh3AAAKLSoCewYAAAQodwAACi0dAnsHAAAEKHcAAAotEAMsGAJ7BQAABCh3AAAKLAtyfQIAcHMYAAAGeioAEzACAD8AAAAPAAAREgAoeAAACn1BAAAEEgACfUIAAAQSAAN9QwAABBIAFX1AAAAEEgB8QQAABBIAKAgAACsSAHxBAAAEKHoAAAoqABMwAgA/AAAAEAAAERIAKDsAAAp9XwAABBIAAn1gAAAEEgADfWEAAAQSABV9XgAABBIAfF8AAAQSACgJAAArEgB8XwAABCg9AAAKKjICewkAAARvewAACioucyUAAAaACwAABCoacxoAAAYqABMwAgArAAAAEQAAERIAKHwAAAp9ZQAABBIAAn1mAAAEEgAVfWQAAAQSAHxlAAAEEgAoCgAAKyoAEzADAEEAAAAAAAAABG9+AAAKcv8BAHAoSAAACiwuAnsPAAAEAnsNAAAELRoCew4AAARy/wEAcCgIAAAGpVAAAAEW/gErARZvTgAACioAAAATMAMATwAAAAAAAAACexMAAAQtGAJ7FAAABAJ7FQAABG9YAAAKAhd9EwAABAJ7DwAABAJ7DQAABC0aAnsOAAAEcv8BAHAoCAAABqVQAAABFv4BKwEWb04AAAoqhgJ7EwAABCwYAnsUAAAEAnsVAAAEb38AAAoCFn0TAAAEKgAAABswBgCqAQAAEgAAEQJ7FgAABAoGFyYmAAYsDgYXO5sAAAACFn0ZAAAEAAYsVgJ7GAAABHLjAgBwF40HAAABJRYXjGIAAAGiKAcAAAZ0GAAAAW+AAAAKCxIBKIEAAAotPwIWJQp9FgAABAIHfRoAAAQCfBcAAAQSAQIoCwAAK90yAQAAAnsaAAAECwJ8GgAABP4VLwAAAQIVJQp9FgAABBIBKIMAAAreCiYCF30ZAAAE3gACexkAAAQMCBczegAGFy5MAnsYAAAEcvsCAHAoBgAABnRjAAABb4QAAApvhQAACg0SAyiGAAAKLT8CFyUKfRYAAAQCCX0bAAAEAnwXAAAEEgMCKAwAACvdpwAAAAJ7GwAABA0CfBsAAAT+FQwAABsCFSUKfRYAAAQSAyiHAAAKJt4DJt4A3k4GFi9JAnsYAAAEchEDAHAoBgAABnJNAwBwKA0AACsoBwAABibeJwYWLyICexgAAARyhQMAcCgNAAArKAcAAAYmAnsYAAAEFigLAAAG3NzeGRMEAh/+fRYAAAQCfBcAAAQRBCiJAAAK3hMCH/59FgAABAJ8FwAABCiKAAAKKgAAQXwAAAAAAAAeAAAAfgAAAJwAAAAKAAAALQAAAQAAAACyAAAAdgAAACgBAAADAAAALQAAAQIAAAAxAQAAIgAAAFMBAAAnAAAAAAAAAAIAAAAMAAAAIQEAAC0BAABOAAAAAAAAAAAAAAAHAAAAdgEAAH0BAAAZAAAALQAAATYCfBcAAAQDKIsAAAoqAAAbMAYAEAYAABMAABECexwAAAQKBkUGAAAAkwAAAJMAAACTAAAAkwAAAOkDAADYBAAAAgJ7HgAABHIBAQBwKAYAAAZ0EQAAAX0gAAAEAnseAAAEcrUDAHAoDQAAKygHAAAGpVAAAAEsEh8Pcu0DAHAojAAACgvdcwUAAAJ7HgAABHJlBABwKA0AACsoBwAABiYCAnseAAAEKAwAAAZ9IQAABAIUfSIAAAQCFn0jAAAEAhZ9JAAABAIUfSUAAAQCFn0mAAAEAAYZJiYABkUEAAAATwAAADMBAAC4AQAASQIAAAJ7HgAABBkoCwAABgJ7HwAABAJ7IQAABG8hAAAGb40AAAoNEgMojgAACi0/AhYlCn0cAAAEAgl9KQAABAJ8HQAABBIDAigOAAAr3ewEAAACeykAAAQNAnwpAAAE/hUOAAAbAhUlCn0cAAAEEgMokAAACgwCCH0iAAAEAnwhAAAEKJEAAAoCeyAAAARynwAAcAJ7IgAABHsFAAAEKJIAAApvkwAACgJ7IAAABAJ7IgAABHsGAAAEb5QAAAoCeyAAAAQCeyIAAAR7BwAABG+VAAAKAnsgAAAEAnsiAAAEewQAAARvlgAACgIXfSQAAAQCex4AAAQCeyEAAAQoDwAABm+AAAAKEwQSBCiBAAAKLUECFyUKfRwAAAQCEQR9KgAABAJ8HQAABBIEAigPAAAr3QgEAAACeyoAAAQTBAJ8KgAABP4VLwAAAQIVJQp9HAAABBIEKIMAAAoCex4AAARyqQQAcBiNBwAAASUWFoxQAAABoiUXFoxQAAABoigHAAAGdA8AABtvlwAAChMGEgYomAAACi1BAhglCn0cAAAEAhEGfSsAAAQCfB0AAAQSBgIoEAAAK92DAwAAAnsrAAAEEwYCfCsAAAT+FRAAABsCFSUKfRwAAAQSBiiZAAAKEwUCEQV9KAAABAJ7KAAABG+aAAAKLRECAnsoAAAEfScAAATdCAEAAAJ7HgAABAJ7IQAABCgQAAAGb4AAAAoTBBIEKIEAAAotQQIZJQp9HAAABAIRBH0qAAAEAnwdAAAEEgQCKA8AACvd8gIAAAJ7KgAABBMEAnwqAAAE/hUvAAABAhUlCn0cAAAEEgQogwAACgJ8IQAABCiRAAAKAnseAAAEFygLAAAGAhd9IwAABAICeygAAAR9JwAABN5zdTMAAAElLQQmFisPJgJ8IQAABCibAAAKFv4D/hEmAhZyzwQAcCiMAAAKfScAAATeQiYCHw9yAQUAcCiMAAAKfScAAATeLRMHAh8PEQdvnAAACiiMAAAKfScAAATeFSYCHw9yfQUAcCiMAAAKfScAAATeAAIXfSYAAATeDBMIAhEIfSUAAATeAAJ7IwAABDpLAQAAAhR9LAAABAIWfS0AAAQABhouRwJ7JAAABCxlAnseAAAEKBEAAAZvgAAAChMEEgQogQAACi1BAholCn0cAAAEAhEEfSoAAAQCfB0AAAQSBAIoDwAAK921AQAAAnsqAAAEEwQCfCoAAAT+FS8AAAECFSUKfRwAAAQSBCiDAAAKKyICex4AAARyhQMAcCgNAAArKAcAAAYmAnseAAAEFigLAAAG3gwTCAIRCH0sAAAE3gACeyIAAAQsaQJ7HwAABAJ7IgAABG8iAAAGb4AAAAoTBBIEKIEAAAotQQIbJQp9HAAABAIRBH0qAAAEAnwdAAAEEgQCKA8AACvdEgEAAAJ7KgAABBMEAnwqAAAE/hUvAAABAhUlCn0cAAAEEgQogwAACgJ7LAAABBMIEQgsFxEIdS0AAAElLQMRCHoonQAACm+eAAAKAhR9LAAABAJ7JQAABBMIEQgsFxEIdS0AAAElLQMRCHoonQAACm+eAAAKAnsmAAAEEwkRCRczCQJ7JwAABAveXQIUfSUAAAQCFH0nAAAEAhR9IAAABAJ8IQAABP4VEwAAAQIUfSIAAATeMxMKAh/+fRwAAAQCFH0gAAAEAnwhAAAE/hUTAAABAhR9IgAABAJ8HQAABBEKKJ8AAAreLgIf/n0cAAAEAhR9IAAABAJ8IQAABP4VEwAAAQIUfSIAAAQCfB0AAAQHKKAAAAoqQawAAAEAAAC+AAAArwIAAIoDAAAUAAAAbQMAAAAAAAC+AAAArwIAAJ4DAAAVAAAAMwAAAQAAAAC+AAAArwIAALMDAAAYAAAABAAAAgAAAAC+AAAArwIAAMsDAAAVAAAALQAAAQAAAAC5AAAAMAMAAOkDAAAMAAAABwAAAQAAAAAPBAAAlQAAAKQEAAAMAAAABwAAAQAAAAAHAAAApwUAAK4FAAAzAAAALQAAATYCfB0AAAQDKKEAAAoqAAAbMAYAMwEAABQAABECey4AAAQKBixlAnswAAAEchEDAHAoBgAABnIeBgBwGI0HAAABJRYCezEAAASMEwAAAaIoBwAABnQYAAABb4AAAAoMEgIogQAACi0/AhYlCn0uAAAEAgh9MgAABAJ8LwAABBICAigRAAAr3cMAAAACezIAAAQMAnwyAAAE/hUvAAABAhUlCn0uAAAEEgIogwAACgJ7MAAABHIBAQBwKAYAAAZ0EQAAAQsHb6IAAAoNEgMoowAACixBB2+iAAAKDRIDKKQAAAoTBBIEKKUAAAoodwAACi0jB2+iAAAKDRIDKKQAAAoTBBIEKKYAAAooKgAACiinAAAKLAtyVAYAcHMYAAAGet4ZEwUCH/59LgAABAJ8LwAABBEFKIkAAAreEwIf/n0uAAAEAnwvAAAEKIoAAAoqAAEQAAAAAAcA/wYBGS0AAAE2AnwvAAAEAyiLAAAKKgAAGzADAPsAAAAVAAARAnszAAAECgYsUgJ7NQAABHL7AgBwKAYAAAZ0YwAAAQJ7NgAABG+oAAAKb6kAAAoMEgIoqgAACi0/AhYlCn0zAAAEAgh9NwAABAJ8NAAABBICAigSAAAr3Z4AAAACezcAAAQMAnw3AAAE/hUTAAAbAhUlCn0zAAAEEgIoqwAACgsHb5oAAAosOwdvrAAACiwzB2+sAAAKb60AAAosJgdvrAAACm+tAAAKb64AAAoXMxMHb6wAAApvrQAACm+vAAAKFy8LcukGAHBzGAAABnreFw0CH/59MwAABAJ8NAAABAkoiQAACt4TAh/+fTMAAAQCfDQAAAQoigAACioAARAAAAAABwDJ0AAXLQAAATYCfDQAAAQDKIsAAAoqAAAbMAYAfAMAABYAABECezgAAAQKBhlDjwAAAAYaO+ECAAACezoAAARyAQEAcCgGAAAGdBEAAAEmAns6AAAEcrUDAHAoDQAAKygHAAAGpVAAAAEtIQJ7OgAABHKFAwBwKA0AACsoBwAABiYosAAACgvd8wIAAAJ7OgAABHJlBABwKA0AACsoBwAABiYCAns6AAAEKAwAAAZ9PAAABAJ7OgAABBkoCwAABhYMAAZFBAAAAEMAAADMAAAARAEAALYBAAACezoAAAQCezwAAAQoDwAABm+AAAAKDRIDKIEAAAotPwIWJQp9OAAABAIJfT4AAAQCfDkAAAQSAwIoEwAAK92EAgAAAns+AAAEDQJ8PgAABP4VLwAAAQIVJQp9OAAABBIDKIMAAAoCezoAAARyqQQAcBiNBwAAASUWAns7AAAEjFAAAAGiJRcWjFAAAAGiKAcAAAZ0DwAAG2+XAAAKEwUSBSiYAAAKLUECFyUKfTgAAAQCEQV9PwAABAJ8OQAABBIFAigUAAAr3fsBAAACez8AAAQTBQJ8PwAABP4VEAAAGwIVJQp9OAAABBIFKJkAAAoTBAIRBH09AAAEAns9AAAEb5oAAAotbAJ7OgAABCgRAAAGb4AAAAoNEgMogQAACi0/AhglCn04AAAEAgl9PgAABAJ8OQAABBIDAigTAAAr3YMBAAACez4AAAQNAnw+AAAE/hUvAAABAhUlCn04AAAEEgMogwAACgJ7PQAABAvdNAEAAAJ7OgAABAJ7PAAABCgQAAAGb4AAAAoNEgMogQAACi0/AhklCn04AAAEAgl9PgAABAJ8OQAABBIDAigTAAAr3REBAAACez4AAAQNAnw+AAAE/hUvAAABAhUlCn04AAAEEgMogwAACgJ8PAAABCiRAAAKAns6AAAEFygLAAAGAns9AAAEC92rAAAAJhcM3gAIFzNvAns6AAAEKBEAAAZvgAAACg0SAyiBAAAKLT8CGiUKfTgAAAQCCX0+AAAEAnw5AAAEEgMCKBMAACvdhQAAAAJ7PgAABA0CfD4AAAT+FS8AAAECFSUKfTgAAAQSAyiDAAAKHwtypAcAcCiMAAAKC94zAnw8AAAE/hUTAAAB3iUTBgIf/n04AAAEAnw8AAAE/hUTAAABAnw5AAAEEQYonwAACt4gAh/+fTgAAAQCfDwAAAT+FRMAAAECfDkAAAQHKKAAAAoqQTQAAAAAAACeAAAAEgIAALACAAAFAAAALQAAAQAAAAAHAAAALwMAADYDAAAlAAAALQAAATYCfDkAAAQDKKEAAAoqAAAbMAYA2AMAABcAABECe0AAAAQKAntCAAAECwZFBAAAACMAAAAjAAAAKQIAAO8CAAACFH1EAAAEAhR9RQAABAIWfUYAAAQCFH1HAAAEAhZ9SAAABAAGLFMGFzv4AAAAB3JLCABwKLEAAAoUFAJ7QwAABCgeAAAGb7IAAAoTBBIEKLMAAAotQQIWJQp9QAAABAIRBH1KAAAEAnxBAAAEEgQCKBUAACvdOQMAAAJ7SgAABBMEAnxKAAAE/hUWAAAbAhUlCn1AAAAEEgQotQAACg0CCW+2AAAKKB8AAAZ9RAAABN4OBhYvCQksBglvSgAACtwCe0QAAAQWKCAAAAYHcm8IAHAosQAACgJ7RAAABHO3AAAKc7gAAAoCe0MAAAQoHgAABm+yAAAKEwQSBCizAAAKLUECFyUKfUAAAAQCEQR9SgAABAJ8QQAABBIEAigVAAAr3Y0CAAACe0oAAAQTBAJ8SgAABP4VFgAAGwIVJQp9QAAABBIEKLUAAAoTBQIRBW+2AAAKKB8AAAZ9RQAABN4QBhYvCxEFLAcRBW9KAAAK3AJ7RQAABBcoIAAABgJ8QwAABCiRAAAKAhd9RgAABAICe0UAAAR9SQAABAIXfUgAAATeDBMGAhEGfUcAAATeAAJ7RgAABDqTAAAAAntFAAAEOYgAAAACe0UAAAR7BAAABCh3AAAKLXYCe0UAAAR7BgAABCh3AAAKLWQHAntFAAAEKCIAAAZvgAAAChMHEgcogQAACi1BAhglCn1AAAAEAhEHfUsAAAQCfEEAAAQSBwIoFgAAK92KAQAAAntLAAAEEwcCfEsAAAT+FS8AAAECFSUKfUAAAAQSByiDAAAKAntEAAAEObsAAAACe0QAAAR7BAAABCh3AAAKOqYAAAACe0QAAAR7BgAABCh3AAAKOpEAAAACe0YAAAQsJQJ7RQAABCwdAntFAAAEewQAAAQCe0QAAAR7BAAABCi5AAAKLGQHAntEAAAEKCIAAAZvgAAAChMHEgcogQAACi1BAhklCn1AAAAEAhEHfUsAAAQCfEEAAAQSBwIoFgAAK93EAAAAAntLAAAEEwcCfEsAAAT+FS8AAAECFSUKfUAAAAQSByiDAAAKAntHAAAEEwYRBiwXEQZ1LQAAASUtAxEGeiidAAAKb54AAAoCe0gAAAQTCBEIFzMJAntJAAAEDN5FAhR9RwAABAIUfUkAAAQCFH1EAAAEAhR9RQAABN4nEwkCH/59QAAABAIUfUQAAAQCFH1FAAAEAnxBAAAEEQkougAACt4iAh/+fUAAAAQCFH1EAAAEAhR9RQAABAJ8QQAABAgouwAACipBZAAAAgAAAMMAAAATAAAA1gAAAA4AAAAAAAAAAgAAAHABAAAUAAAAhAEAABAAAAAAAAAAAAAAAEgAAAB/AQAAxwEAAAwAAAAHAAABAAAAAA4AAACAAwAAjgMAACcAAAAtAAABNgJ8QQAABAMovAAACioAABswBQAwBQAAGAAAEQJ7TAAABAoCe08AAAQLBhg2EQICe04AAAQovQAACn1UAAAEAAYYNiICe1QAAAQHewoAAARvvgAACgICe1QAAARvJAAACn1VAAAEAAYYNiECAntQAAAEcp8IAHACe1EAAAQokgAACnO/AAAKfVYAAAQABjlCAQAABhdZF0NlAQAAAntWAAAEb8AAAApy0wgAcHLzCABwb8EAAAoCe1YAAARvwAAACnIfCQBwcj8JAHBvwQAACgJ7VgAABG/AAAAKckMJAHByUQkAcG/BAAAKAntWAAAEb8AAAApycwkAcHKJCQBwb8EAAAoCe1IAAAQsRQJ7VgAABG/AAAAKcsUJAHACe1IAAAR7BgAABHPCAAAKb8MAAAoCe1YAAARvwAAACnLTCQBwAntSAAAEewQAAARvwQAACgJ7UwAABCwmAntWAAAEAntTAAAEFCgXAAArKMUAAApyUQkAcHPGAAAKb8cAAAoHewkAAAQCe1YAAAQXAntVAAAEb8gAAAoWb8kAAAoTBRIFKMoAAAoTBBIEKMsAAAotQQIWJQp9TAAABAIRBH1YAAAEAnxNAAAEEgQCKBgAACvddgMAAAJ7WAAABBMEAnxYAAAE/hUbAAAbAhUlCn1MAAAEEgQozQAACg0CCX1XAAAEAAYXO5oAAAAGGDvBAAAAAntXAAAEb84AAApvzwAACm/QAAAKEwkgAAAEAGoTChIJKNEAAAoRCv4CEgko0gAACl8sC3LlCQBwcxgAAAZ6AntXAAAEb84AAAoCe1UAAARv0wAAChZv1AAAChMNEg0o1QAAChMMEgwo1gAACi1BAhclCn1MAAAEAhEMfVoAAAQCfE0AAAQSDAIoGQAAK92oAgAAAntaAAAEEwwCfFoAAAT+FR8AABsCFSUKfUwAAAQSDCjXAAAKEwsCEQt9WQAABAAGGC4LAnPYAAAKfVsAAAQABhg7pgAAAAIgABAAAI11AAABfVwAAAQrNgJ7WwAABG/ZAAAKEQ5qWCAAAAQAajELcuUJAHBzGAAABnoCe1sAAAQCe1wAAAQWEQ5v2gAACgJ7WQAABAJ7XAAABBYCe1wAAASOaQJ7VQAABG/bAAAKFm/cAAAKExASECjdAAAKEw8SDyjeAAAKLUECGCUKfUwAAAQCEQ99XQAABAJ8TQAABBIPAigaAAAr3bwBAAACe10AAAQTDwJ8XQAABP4VIgAAGwIVJQp9TAAABBIPKN8AAAolEw46QP///wJ7WwAABG/gAAAKEwYCFH1cAAAE3hgGFi8TAntbAAAELAsCe1sAAARvSgAACtwCFH1bAAAE3hgGFi8TAntZAAAELAsCe1kAAARvSgAACtwCFH1ZAAAEEQYo4QAAChIR/hVBAAABEREo4gAAChMHAntXAAAEb+MAAAosJxEHb7YAAAoTEhIScisKAHASCChxAAAKLA4SCCjkAAAKIOgDAAAuRREHb7YAAAoTEhIScisKAHASCChxAAAKLBASCCjkAAAKICkjAAD+ASsBFhEHb+UAAAotB3I1CgBwKwVy2AoAcHMYAAAGehEHDN2NAAAABhYvEwJ7VwAABCwLAntXAAAEb0oAAArcBhYvEwJ7VgAABCwLAntWAAAEb0oAAArcdTMAAAElLQQmFisSJgJ8TgAABCibAAAKFv4BFv4D/hEmcqMLAHBzGAAABnoGFi8TAntUAAAELAsCe1QAAARvSgAACtwTEwIf/n1MAAAEAnxNAAAEERMo5gAACt4UAh/+fUwAAAQCfE0AAAQIKOcAAAoqQawAAAIAAADGAgAA7wAAALUDAAAYAAAAAAAAAAIAAAC2AgAAIAEAANYDAAAYAAAAAAAAAAIAAADmAQAAqAIAAI4EAAAYAAAAAAAAAAIAAABxAAAANQQAAKYEAAAYAAAAAAAAAAEAAABLAAAAcwQAAN4EAAAMAAAAvgQAAAIAAAAkAAAAxgQAAOoEAAAYAAAAAAAAAAAAAAAOAAAA9AQAAAIFAAAZAAAALQAAATYCfE0AAAQDKOgAAAoqAAAbMAYADgEAABkAABECe14AAAQKAntgAAAECwYmAAYsGQIjAAAAAAAAJEAoagAACnPpAAAKfWIAAAQABixUB3IwDABwKOoAAAoCe2EAAAQUAntiAAAEbyQAAAooHgAABm+yAAAKDRIDKLMAAAotPwIWJQp9XgAABAIJfWMAAAQCfF8AAAQSAwIoGwAAK92IAAAAAntjAAAEDQJ8YwAABP4VFgAAGwIVJQp9XgAABBIDKLUAAAoM3g4GFi8JCCwGCG9KAAAK3N4YBhYvEwJ7YgAABCwLAntiAAAEb0oAAArcAhR9YgAABN4DJt4A3hkTBAIf/n1eAAAEAnxfAAAEEQQoiQAACt4TAh/+fV4AAAQCfF8AAAQoigAACioAAAE0AAACAKkAAqsADgAAAAACAC4AjbsAGAAAAAAAABEAy9wAAwcAAAEAAA4A0+EAGS0AAAE2AnxfAAAEAyiLAAAKKgAAGzAGAGwCAAAaAAARAntkAAAECgJ7ZgAABAsGLGkHew0AAAQtFwd7DgAABHL/AQBwKAgAAAalUAAAASwF3SMCAAAHF30NAAAEB3sOAAAEcv8BAHAXjFAAAAEoCQAABgd7DwAABHI8DABwb00AAAoHew8AAAQWb04AAAoHexAAAAQXb1MAAAoABiw3B3sOAAAEcmwMAHAoBgAABnR3AAABFxZylAwAcHPrAAAKbxwAACsCB3sRAAAEb+0AAAp9ZwAABAAGLEMHexIAAAQCe2cAAAQoEwAABm+XAAAKDRIDKJgAAAotPwIWJQp9ZAAABAIJfWgAAAQCfGUAAAQSAwIoHQAAK91vAQAAAntoAAAEDQJ8aAAABP4VEAAAGwIVJQp9ZAAABBIDKJkAAAoMCG+aAAAKLBgHew4AAARylgwAcCgNAAArKAcAAAYmKzgHew4AAARysgwAcBeNBwAAASUWCKIoBwAABiYHexAAAAQIb+8AAApv8AAACgd7EAAABBZvUwAACt4YBhYvEwJ7ZwAABCwLAntnAAAEb0oAAArcAhR9ZwAABN5LJh8PcsoMAHAojAAAChMEB3sOAAAEcrIMAHAXjQcAAAElFhEEoigHAAAGJgd7EAAABBEEb+8AAApv8AAACgd7EAAABBZvUwAACt4A3lUGFi9QBxZ9DQAABAd7DgAABHL/AQBwFoxQAAABKAkAAAYHew8AAARy2wEAcG9NAAAKB3sPAAAEB3sOAAAEcv8BAHAoCAAABqVQAAABFv4Bb04AAArc3hkTBQIf/n1kAAAEAnxlAAAEEQUo8QAACt4TAh/+fWQAAAQCfGUAAAQo8gAACipBZAAAAgAAALYAAADEAAAAegEAABgAAAAAAAAAAAAAAHsAAAAgAQAAmwEAAEsAAAAtAAABAgAAAHsAAABtAQAA6AEAAFUAAAAAAAAAAAAAAA4AAAAxAgAAPwIAABkAAAAtAAABNgJ8ZQAABAMo8wAACioAAEJTSkIBAAEAAAAAAAwAAAB2NC4wLjMwMzE5AAAAAAUAbAAAAGQVAAAjfgAA0BUAAFAWAAAjU3RyaW5ncwAAAAAgLAAAUA0AACNVUwBwOQAAEAAAACNHVUlEAAAAgDkAACwMAAAjQmxvYgAAAAAAAAACAAABVx+iCwkOAAAA+gEzABYAAAEAAAB5AAAAEQAAAGgAAAA9AAAARgAAAAoAAADzAAAAAgAAADMAAAAaAAAAAQAAAAEAAAABAAAAEgAAACMAAAABAAAADAAAAAsAAAABAAAAHQAAAAAAxQsBAAAAAAAGAPAJOxAGACQKOxAGAGQJ6Q8PAFsQAAAGANgJOxAGAEkJOxAGAK8TTwwGAAsJ6Q8GAIoJ6Q8GAMAJ6Q8GAHgJOxAGAOIQJQ0GAA4ITwwGACUOJQ0GABAKTwwGAC8OJQ0KAO8QKxMOAFoT2hEGAJwMmgoSAJkImRIGAOMATwwGAPUTTwwGAKUJOxAGAE0LWBEGAAgBWBEOAD0UdhEGANwATwwWAA8OoxEWAJgLoxEGAEkB3QMWAJAU3wsWAJ0LoxEWAOkGoxEWABcMoxEWACMMoxEWAPEOoxEWAD8LoxEaAHQFeAsaADAPeAsWADkR3wsaACAReAsGAAEITwwGAMQHOxAGADsBOxAGALQNTwwGAJsOOxAGAIgPOxASAFcBExMSAGIIvg0GALIOOxAGAGANTwwGAA8BOxAOAO4IdhESAIIIEAsGAE4HTwweAHIUYg4GAHgMTwwiAKsU3Q0iAP4U3Q0eAFgGYg4eABgHYg4GAO4AOxD7AH4PAAAGAEAMuAMiAC8S3Q0GAJUGmgoeACwHYg4GADoMuAMGACgB3QMGANsKTwwGAIsOTwwGAJcNTwwGAEwIJQ0GAFAOJQ0KAPkQKxMGAPsNTwwKAAkRKxMmAMIG3xMSAKYImRIGAFkMTwwWAJoU3wsWAKUT3wsWADcNoxEGAMIPBhIWACoMoxEWAMsU3wsWAMIK3wsWACgW3wsWAJEQ9gwWAEwP3wsWAFcIphAeAB4PYg4eAAsPYg4GAHsNTwwGAKIVmgoiAEoG3Q0eAPgOYg4OAO4N2hESAGcUExMGAOIVTwwOALgP2hEqAGAUhBMGADoOGhAqAGIBhBMSAHIIEAsGACEC3QMeAIYSQxIeAGcSQxIeAFEKQxIiAJ8P3Q0iABkS3Q0GAKsKsxUeADoVYg4eAEgVYg4eAEsNYg4eAHMSQxIGAEIKTwwGAGsBTwwuANYOwxIyAP8GahAyACIJvhEAAAAAnwMAAAAAAQABAAABEADGAAAAHQABAAEAgQEQAH0UaBUdAAIABgAAARAANwhoFbUABAAYAAABEADhDGgVHQAEABkAAAEQAAAMaBUdAAgAGgADIRAA2QMAAB0ACwAkAAMBEABLAAAAHQANACcAAwEQAC4CAACpABYALAADARAA5wIAAKkAHAAuAAMBEACHAQAAqQAuADAAAwEQAIgAAACpADMAMgADARAAngIAAKkAOAA0AAMBEAAPAAAAqQBAADYAAwEQAFMDAACpAEwAOAADARAAdQAAAKkAXgA6AAMBEADIBAAAqQBkADwAIQASBjUAU4DZFccHMQB0BsoHBgAOBscHBgASBccHBgCyDMcHBgCPDMcHU4AyDMcHIQCJFM4HIQCbFbUCNgCRA9MHFgAuANcHBgAFFt8HBgBWDOIHBgAWDuUHBgA/B+kHBgDxC9cHBgAtC+IHBgC0Ct8HBgCJEO4HBgCLBfMHBgAtCfgHBgDJDvsHBgAtC+IHAQB8AfgHAQC/AAAIAQAaAgUIBgAtCfgHBgDJDhQIBgAtC+IHBgAODB0IAQDpASEIAQBeAiUIAQDAAikIAQD5At8HAQAiA98HAQA7A+IHAQBmA/gHAQCGAy0IAQABAC0IAQC/ADEIAQAaAgAIAQCXAjoIAQAiAOIHAQCfAPgHBgAtCfgHBgDJDvsHBgAtC+IHBgC+DCUIAQC/AAAIBgAtCfgHBgDJDvsHBgAtC+IHBgC+DCUIAQC/AEMIBgAtCfgHBgDJDhQIBgAtC+IHBgByDt8HAQDNASUIAQBqAi0IAQC/AAAIAQAaAjoIBgAtCfgHBgDJDlIIBgBOER0IBgC+DCUIAQDZASkIAQB3AikIAQCxAt8HAQDcAuIHAQAXA/gHAQA7AykIAQC/AFsIAQAaAgAIBgAtCfgHBgDJDmUIBgC+DCUIBgBOER0IBgBtBm8IBgBUFccHBgDuDCkIBgAlBeIHAQCvAXQIAQBLAiUIAQDOAnkIAQAIA34IAQC/AIMIAQAvA40IAQAaApIIAQBGA5wIAQB6A6EIAQCXAqUIBgAtCfgHBgDJDvsHBgBOER0IBgDuDCkIAQD4AXQIAQC/AFsIBgAtCfgHBgDJDq0IBgBOEbIIAQC+AR0IAQC/ADoISCAAAAAAhggZBRgBAQBQIAAAAACGGNwPCAEBAGAgAAAAAMYAbxG2CAIAlSAAAAAAxgC2BssEAwC0IAAAAADGAM8KagADAPwgAAAAAJMAJwa7CAQATCEAAAAAkwDAC8EIBgCdIQAAAACRANsTuwgJALYhAAAAAJEA6hPJCAsA0CEAAAAAkwB+FdAIDgDtIQAAAACRAGgT1ggPAAoiAAAAAJEAuAzdCBEAJCIAAAAAlgBoD+MIEgD/IgAAAACWAL0H4wgUACgjAAAAAJEAewTqCBYAdCMAAAAAkQAkBOoIGADAIwAAAACRAGUE8ggaAAQkAAAAAJEAGAT4CBsAUCQAAAAAkwBaBAMJHQCbJAAAAACWAAwO4wgfAMQkAAAAAJMAKQgPCSEA0CYAAAAAkQCOCxoJIwD8JwAAAACRGOIPJAkmAAUoAAAAAIYY3A+hACYADigAAAAAhhjcDwYAJwAWKAAAAACDGNwPBgAnAC8oAAAAAIMY3A8oCScASCgAAAAAgxjcDy8JKACkKAAAAACRAMMVOQkqANAoAAAAAIEAiwRBCSwAQCkAAAAAkQDmDFQJMQCYKQAAAACRANEMXAkyAOgpAAAAAIMAPARjCTQANCoAAAAAgwAMBG4JNQB/KgAAAADmAcYIBgA2AIwqAAAAAJEY4g8kCTYADigAAAAAhhjcDwYANgCYKgAAAACDADgAdQk2AA4oAAAAAIYY3A8GADYAoCoAAAAAgwBhAHoJNgDYKgAAAACDAKsAggk4ACgrAAAAAIMABgJ6CToAgysAAAAAgwCDAnoJPACoKwAAAADhAaoVBgA+ANwtAAAAAOEB1wchAD4A7C0AAAAA4QGqFQYAPwC0NAAAAADhAdcHIQA/AMQ0AAAAAOEBqhUGAEAAFDYAAAAA4QHXByEAQAAkNgAAAADhAaoVBgBBADw3AAAAAOEB1wchAEEATDcAAAAA4QGqFQYAQgAIOwAAAADhAdcHIQBCABg7AAAAAOEBqhUGAEMAYD8AAAAA4QHXByEAQwBwPwAAAADhAaoVBgBEAFhFAAAAAOEB1wchAEQAaEUAAAAA4QGqFQYARQC4RgAAAADhAdcHIQBFAMhGAAAAAOEBqhUGAEYApEkAAAAA4QHXByEARgAAAAEAHQUAAAEAigoAAAAAAAAAAAEA7hMAAAIAqQcAAAEA7hMAAAIAqQcAAAMASREAAAEA7hMAAAIAqQcAAAEA7hMAAAIAqQcAAAMAigoAAAEAFxEAAAEALQsAAAIAbxMAAAEALQsAAAEALQsAAAIASREAAAEALQsAAAIASREAAAEALQsAAAIAvgwAAAEALQsAAAIAvgwAAAEALQsAAAEALQsAAAIAcg4AAAEALQsAAAIADgwAAAEA7gYAAAIASREAAAEA7gYAAAIA8QsAAAEAXRUAAAIAFg4AAAMACgsAAAEAPwcAAAEAiRQAAAEAiRQAAAIAmxUAAAEAABYAAAIAqQcAAAEAVBUAAAIAbQYAAAMA7gwAAAQAJQUAAAUAvgwAAAEAABYAAAEA7gwAAAIAoQUAAAEAvgwAAAEA7gwAAAEAlQMAAAIAmgMAAAEA6g4AAAIAmAoAAAEAlQMAAAIAmgMAAAEAlQMAAAIAmgMAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcGAN0ACQCtAAoArQALAK0ADACtAA0ArQAOAK0ADwCtABAArQARAK0ACQDcDwEAEQDcDwYAGQDcDwoAKQDcDwEAMQDcDwYASQDcDxAAUQDcDwYAWQDcDxYAeQDcDwYAuQDcDxsAWQGqFQYAWQHXByEAWQDcDygADAASBjUAOQDcDwYAFAAfFEoAFABvEVQAFAC2BlwAOQDPCmoAMQJ9E24AOQALCH8AaQAkBoQAcQAWFowAcQB4CpQAaQD0B38AaQAWFpkAQQLcD6EAaQBjBq0AgQAWFrUASQJHB70AaQBEFsQAUQJ4CpQAUQKBCs0AWQIDBWoAMQL/CtMAEQKBDNsAaQKhB6EAaQJ8B6EAaQKyC6EAaQKYBO8AJABrCv8AsQDIFQMBJADcDwgBaQKwBA4BoQDcDwYAoQAOBaEAoQBjB6EAoQBsB6EAoQCoC6EAJABHChgBsQD8Dx0BoQCuByEB6QHcDyYBeQLcDwYAiQGtBgEAeQJfDy0BLAAyCzwBwQBIFEsBkQEECWcBkQFiFW0BkQFJC3oBNAAECaABNABiFW0BNABJC68BPADcD8kBiQILFeEB6QAKFucBAQHEDO8BmQLOD/UBRAAWFRgBiQJaB2oAMQIKFgUCoQKqFf8AuQHGCAYA4QDcDwYAiQJjB6EAGQEuFQsCqQKTBRACiQLHFBUCqQLfFBUCKQHcDwYAKQG+ChwC+QAkFiMCyQLzBCoC0QLcD8kB2QI1CzICOQHcD8kBMQFJBTkCiQIxBTICiQI8BTICmQItBUAC+QAKFmQCAQEWFmwC6QAWFucBCQEWFnYCEQEiFYACEQEWFoUCGQEWFo8CGQEiFZkCIQEWFp0CIQEtBoACaQHcD6EA4QLcDwYA4QLFExACwQHcD6cCyQEOEK4CyQFdDrUCyQFSC7oCyQFhDLoC8QLcD6EA+QJwDLUCwQGPFcQC0QFBFtEC0QE8BtoC0QHYCmoATAAECaABTABiFW0BTABJC68BMQIzFvMCVAAECaABVABiFW0BVABJC68BCQPGCAYAcQEECRkDcQFiFW0BSQGQB2oAMQFdBTkCwQCUDzwDeQHFBf8AkQGuBUIDeQFTFAYAGQO0CFUDXACUD3EDZADFBf8AZABTFBgBIQM7FpsDkQGxDaYDkQFdFAYAkQHXByEA0QCjC88DbACUD3EDdADFBf8ANACuBUIDdABTFBgBmQDVBQYAMQJ2E/MDWQIOBaEAWQKuDKEAWQKLDKEAWQLfBKEAfACUD3EDhADFBf8AhABTFBgBMQO3Ev8AmQDyBf8AaQHzBmoAOQNECBwEOQPTFQYANACxDaYDNABdFAgBNADXByEAaQLqCEMEjABrCv8AjABHChgBqQFHDGoAqQHUCFUEsQBSC1oEGQNvCH4ElACUD3EDnADFBf8AnABTFBgBpABHChgBsQEdDsUESQNPE8sESQO2E8sE0QAyC+UE4QGGFRwFrACUD3EDtADFBf8AVACuBUIDtABTFBgB2QG3FEAFvADcDwYAxADcDwgBMQIWFgUCVACxDaYDVABdFAgBVADXByEAEQJ9BrUFEQJyD8QCGQLcD70FGQJbEsUFYQMtBcsFaQPcD8sFWQMTDdEFcQOQCtgFgQNxA+IFiQPcD+gFGQIuFfEFwQECBPgFzAAEFBIG1ACUDyYG3ADFBf8ATACuBUID3ABTFBgB6QEiFUYGkQNbEkwGoQPtClIG5AArFBgB5ABrCv8AkQNIBGAG7AAEFBIG9ACUDyYG/ADFBf8A/ABTFBgBIQLcDwYAAQLiCh0BAQJDCZMGAQL4A5sGBAEEFBIGDAGUDyYGFAHFBf8AFAFTFBgBIQLgFcgGHAETFNQG2QHOCOEG6QHRBv8A0QGmAcsE2QHGCAYATACxDaYDTABdFAgBTADXByEAEQLcD8QC4QE4CRwFwQPcDyUHuQM3BjAHPABHBxgBcQGuBUIDMQOuD2oAKQG/FaEAcQGxDaYDcQFdFAYAcQHXByEADgAIAG0HDgAgAJQHIQAzAAgMJwAjACIMLgALAI8JLgATAJgJLgAbALcJQAA7AMAJQwArAMAJYAA7AMAJZABDABwMgAA7AMAJoAA7AMAJ4wArAMAJAwErAMAJBAFLAMAJIwErAMAJQwErAMAJYwErAMAJgwErAMAJowErAMAJwwErAMAJ4AFTAMUJ4wErAMAJAAJTAAMKAwIrAMAJIAJTAEkKQAJTAI0KYAJTAMcKwANTAAALIARTADwLQARTAHgLAAVTALQLoAU7AMAJ4AU7AMAJIAY7AMAJYAY7AMAJoAY7AMAJ4AY7AMAJIAc7AMAJYAc7AMAJoAc7AMAJxAdDABwM5AdDABwMBAhDABwMJAhDABwMRAhDABwMZAhDABwMhAhDABwMpAhDABwMxAhDABwMAQtrABEMQQtrABEMOQBiAHgApgDgAGIBfwGJAZMBuAHPAUYCywLgAvgCCgMUAyQDrQMlBGIEzwT+BGIF8AYRBwIAAQAAAB0FigkCAAEAAwAJAFgAFwAJAFoAGQAKAFwAFwAKAF4AGQALAGAAFwALAGIAGQAMAGQAFwAMAGYAGQANAGgAFwANAGoAGQAOAGwAFwAOAG4AGQAPAHAAFwAPAHIAGQAQAHQAFwAQAHYAGQARAHgAFwARAHoAGQAuAEIAZwD4ADMBmAHCAf4B5QL9AmQDewPYA98DAQQIBE0EjwScBLwEIgUqBUYFTgUKBh0GMAZaBmwGdAZ9BqkGrwa2Bs0GBIAAAAAAAAAAAAAAAAAAAAAAaBUAAAgAAAAAAAAAAAAAAEkHwgMAAAAABQABAAkAAAAAAAAAAAArEwAAAAAAAAAAAAAAAAAAAAAAAO0SAAAAAAUAAQAJAAAAAAAAAAAAExMAAAAAAwAAAAAAAAAAAAAAUgeoAwAAAAAIAAAAAAAAAAAAAABbB2ULAAAAAAgAAAAAAAAAAAAAAFsHYg4AAAAACAAAAAAAAAAAAAAAZAfdDQAAAAAIAAAAAAAAAAAAAABbB8wQAAAAAAUAAQAJAAAAAAAAAAAA6BUAAAAABQABAAkAAAAAAAAAAADDEgAAAAAFAAEACQAAAAAAAAAAABMIAAAAAAcAAwAIAAMACQADAAoAAwALAAMADAADAA0AAwAOAAYADwAGABAABgARAAgAAAAAAAQAeg51AFcBeQB1AXkAhAF5AI4BfwCqAX8AvQHrAO4C8wAFA3kADwP7AB8DBQFNAwUBiQMRAaIDHwHnAx8B+QMfARAEBQE7BAUBqgQfAeoEHwHyBGkBMwVpAVoFiQGiA5kBOQaZAYYGmQG9BgUBBAfZATcH3QE9BwAAAAAAPHJlc3VsdD41X18xMAA8Q3JlYXRlQXN5bmM+ZF9fMTAAPD43X193cmFwMTAAPD45X18xNl8wADxBZGRCdXR0b24+Yl9fMTZfMAA8PmNfX0Rpc3BsYXlDbGFzczE3XzAAPEFkZEJ1dHRvbkNvcmU+Yl9fMAA8UmV2b2tlQXN5bmM+ZF9fMTEAPFJlcXVpcmVWcG5Bc3luYz5kX18xMQA8PjdfX3dyYXAxMQA8QWRkQnV0dG9uQ29yZT5iX18xADw+dV9fMQA8PmZfX0Fub255bW91c1R5cGUwYDEARnVuY2AxAE51bGxhYmxlYDEAQ29uZmlndXJlZFRhc2tBd2FpdGFibGVgMQBUYXNrYDEAQXN5bmNUYXNrTWV0aG9kQnVpbGRlcmAxAEVxdWFsaXR5Q29tcGFyZXJgMQBUYXNrQXdhaXRlcmAxAElFbnVtZXJhdG9yYDEAQXBpUmVzcG9uc2VSZXN1bHRgMQBSZWFkT25seU1lbW9yeWAxADw+N19fd3JhcDEAPFJlcXVpcmVDZXJ0aWZpY2F0ZUFzeW5jPmRfXzEyAEdldEludDMyADxkZWFkbGluZT41X18yADxwcm90b2NvbD41X18yADx0b2tlbj41X18yADxib290c3RyYXA+NV9fMgA8c2V0dGluZ3M+NV9fMgA8dGltZW91dD41X18yADxBZGRCdXR0b25Db3JlPmJfXzIAPD51X18yAERpY3Rpb25hcnlgMgA8RW5kRmFpbGVkU2Vzc2lvbkFzeW5jPmRfXzEzADxyZXF1ZXN0VG9rZW4+NV9fMwA8dG9rZW4+NV9fMwA8cmVzdWx0PjVfXzMAPGd1ZXN0PjVfXzMAPEFkZEJ1dHRvbkNvcmU+Yl9fMwA8PnVfXzMAPFJlc3VtZUFzeW5jPmRfXzE0ADxhY2NlcHRlZD41X180ADxzZXNzaW9uPjVfXzQAPHJlcXVlc3Q+NV9fNAA8PjdfX3dyYXA0ADxMb2dpbkFzeW5jPmRfXzE1ADxhY2NlcHRlZD41X181ADxyZXNwb25zZT41X181ADw+N19fd3JhcDUAPHN0b3JlZD41X182ADxpbnB1dD41X182ADw+N19fd3JhcDYAPGJ1ZmZlcj41X183ADxSZXF1ZXN0QXN5bmM+ZF9fNwA8PjdfX3dyYXA3AGdldF9VVEY4ADxibG9jaz41X184ADw+N19fd3JhcDgAPD45ADxwMD4APHAxPgA8TW9kdWxlPgBNaWNyb3NvZnQuV2luVUkAU3lzdGVtLklPAFN5c3RlbS5Qcml2YXRlLkNvcmVMaWIAPD5jAFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljAFJlYWRBc3luYwBTZW5kQXN5bmMAUmV2b2tlQXN5bmMAUmVzdW1lQXN5bmMAUmVxdWlyZUNlcnRpZmljYXRlQXN5bmMAQ3JlYXRlQXN5bmMAUmVhZEFzU3RyZWFtQXN5bmMATG9naW5Bc3luYwBFbmRGYWlsZWRTZXNzaW9uQXN5bmMAUmVxdWlyZVZwbkFzeW5jAFJlcXVlc3RBc3luYwBnZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwBzZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwA8PEFkZEJ1dHRvbkNvcmU+Yl9fMD5kAHNldF9VbmlxdWVTZXNzaW9uSWQAU2V0QXV0b21hdGlvbklkAGdldF9Vc2VySWQAc2V0X1VzZXJJZABnZXRfUGF5bG9hZABwYXlsb2FkAEFkZABhZGRfTG9hZGVkAGFkZF9VbmxvYWRlZABhZGRfUHJvcGVydHlDaGFuZ2VkAHJlbW92ZV9Qcm9wZXJ0eUNoYW5nZWQASU5vdGlmeVByb3BlcnR5Q2hhbmdlZABjaGFuZ2VkAHNldF9Jc0VuYWJsZWQAdXNlclJlcXVpcmVkAEF3YWl0VW5zYWZlT25Db21wbGV0ZWQAZ2V0X0lzQ29tcGxldGVkAFRocm93SWZDYW5jZWxsYXRpb25SZXF1ZXN0ZWQAZ2V0X0lzQ2FuY2VsbGF0aW9uUmVxdWVzdGVkAFVpZAA8UGF5bG9hZD5pX19GaWVsZABHZXRGaWVsZABnZXRfQ2hpbGQAU2VuZABnZXRfVmFsdWVLaW5kAEpzb25WYWx1ZUtpbmQASHR0cE1ldGhvZABHZXRNZXRob2QAbWV0aG9kAEluc3RhbmNlAENyZWF0ZUxpbmtlZFRva2VuU291cmNlAENhbmNlbGxhdGlvblRva2VuU291cmNlAHNldF9Db2RlAEdldEhhc2hDb2RlAEh0dHBTdGF0dXNDb2RlAGdldF9Jc1N1Y2Nlc3NTdGF0dXNDb2RlAFBhZ2UAcGFnZQBnZXRfTWVzc2FnZQBMb2dpblN0YXRlQ2hhbmdlZE1lc3NhZ2UASHR0cFJlc3BvbnNlTWVzc2FnZQBIdHRwUmVxdWVzdE1lc3NhZ2UAbWVzc2FnZQBJbnZva2UASURpc3Bvc2FibGUAZ2V0X05hbWUAc2V0X05hbWUAc2V0X0Rpc3BsYXlOYW1lAHNldF9Vc2VyRGlzcGxheU5hbWUAZ2V0X1Byb3BlcnR5TmFtZQBzZXRfVXNlcm5hbWUAc2V0X0NyZWF0ZVRpbWUAUmVzdW1lAElBc3luY1N0YXRlTWFjaGluZQBTZXRTdGF0ZU1hY2hpbmUAc3RhdGVNYWNoaW5lAGdldF9CYXNlVHlwZQBWYWx1ZVR5cGUAR2V0VHlwZQBQcm90b25WUE4uQ2xpZW50LkNvcmUAQWRkQnV0dG9uQ29yZQBHdWVzdEZhaWx1cmUAQ2FwdHVyZQBNZXRob2RCYXNlAEJ1dHRvbkJhc2UAQmFzZVJlc3BvbnNlAEdldFZwbkluZm9SZXNwb25zZQBWcG5JbmZvV3JhcHBlclJlc3BvbnNlAFVzZXJSZXNwb25zZQBVc2Vyc1Jlc3BvbnNlAEdldExvZ291dFJlc3BvbnNlAERpc3Bvc2UAUGFyc2UAZ2V0X0V4cGlyYXRpb25VdGNEYXRlAGdldF9Db25uZWN0aW9uQ2VydGlmaWNhdGUAQ3JlYXRlAERlYnVnZ2VyQnJvd3NhYmxlU3RhdGUATG9naW5TdGF0ZQA8PjFfX3N0YXRlAGdldF9EZWxldGUAV3JpdGUAQ29tcGlsZXJHZW5lcmF0ZWRBdHRyaWJ1dGUARGVidWdnYWJsZUF0dHJpYnV0ZQBOdWxsYWJsZUF0dHJpYnV0ZQBEZWJ1Z2dlckJyb3dzYWJsZUF0dHJpYnV0ZQBBc3luY1N0YXRlTWFjaGluZUF0dHJpYnV0ZQBEZWJ1Z2dlckhpZGRlbkF0dHJpYnV0ZQBSZWZTYWZldHlSdWxlc0F0dHJpYnV0ZQBDb21waWxhdGlvblJlbGF4YXRpb25zQXR0cmlidXRlAFBhcmFtQXJyYXlBdHRyaWJ1dGUAUnVudGltZUNvbXBhdGliaWxpdHlBdHRyaWJ1dGUAQnl0ZQBnZXRfVmFsdWUAQXV0aGVudGljYXRpb25IZWFkZXJWYWx1ZQBnZXRfSGFzVmFsdWUAR2V0VmFsdWUAU2V0VmFsdWUAdmFsdWUAU2VyaWFsaXplAFN5c3RlbS5UaHJlYWRpbmcARW5jb2RpbmcAbGlzdGVuaW5nAHNldF9UZXh0V3JhcHBpbmcAVG9TdHJpbmcAR2V0U3RyaW5nAGdldF9MZW5ndGgAZ2V0X0NvbnRlbnRMZW5ndGgAU3RhcnRzV2l0aABkZXB0aABQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5BdXRoAGF1dGgAT2sAYWRkX0NsaWNrAFRleHRCbG9jawBnZXRfVGFzawBvcF9MZXNzVGhhbk9yRXF1YWwAU3lzdGVtLk9iamVjdE1vZGVsAFN5c3RlbS5Db21wb25lbnRNb2RlbABGaW5kUGFuZWwAU3RhY2tQYW5lbABGYWlsAHNldF9FbWFpbABzZXRfVXNlckVtYWlsAENhbGwAUGF0Y2h3b3JrLlByb3Rvbkd1ZXN0LmRsbABNaWNyb3NvZnQuVUkuWGFtbABjcmVhdGVQcm90b2NvbABHdWVzdFByb3RvY29sAHByb3RvY29sAFVzZXJDb250cm9sAENvbnRlbnRDb250cm9sAEJhc2VVcmwATWVtb3J5U3RyZWFtAGdldF9QZW0AU3lzdGVtAHZtAEJvb2xlYW4Ab3BfR3JlYXRlclRoYW4ASW5maW5pdGVUaW1lU3BhbgBnZXRfVG9rZW4Ac2V0X1JlZnJlc2hUb2tlbgBDYW5jZWxsYXRpb25Ub2tlbgBzZXRfQWNjZXNzVG9rZW4AdG9rZW4AZ2V0X0NoaWxkcmVuAFZhbGlkYXRlU2Vzc2lvbgBHdWVzdFNlc3Npb24Ac2Vzc2lvbgBNaWNyb3NvZnQuVUkuWGFtbC5BdXRvbWF0aW9uAHNldF9BdXRob3JpemF0aW9uAFN5c3RlbS5SZWZsZWN0aW9uAFVJRWxlbWVudENvbGxlY3Rpb24ASHR0cENvbXBsZXRpb25PcHRpb24AT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24AQXJndW1lbnRPdXRPZlJhbmdlRXhjZXB0aW9uAEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24AU2V0RXhjZXB0aW9uAFByb3RvblZQTi5BcGkuQ29udHJhY3RzLkNvbW1vbgBTeXN0ZW0uVGV4dC5Kc29uAExvZ291dFJlYXNvbgBTdHJpbmdDb21wYXJpc29uAEFkZEJ1dHRvbgBidXR0b24AZ2V0X1ZwbgBGaWVsZEluZm8ATWV0aG9kSW5mbwBFeGNlcHRpb25EaXNwYXRjaEluZm8AUHJvcGVydHlJbmZvAFplcm8AU3lzdGVtLk5ldC5IdHRwAHN0YXJ0dXAAPFBheWxvYWQ+al9fVFBhcgBJRm9ybWF0UHJvdmlkZXIAQXN5bmNWb2lkTWV0aG9kQnVpbGRlcgBBc3luY1Rhc2tNZXRob2RCdWlsZGVyADw+dF9fYnVpbGRlcgBJRXZlbnRNZXNzYWdlU2VuZGVyAHNlbmRlcgBCb3JkZXIASHR0cE1lc3NhZ2VJbnZva2VyAEh0dHBNZXNzYWdlSGFuZGxlcgBIdHRwQ2xpZW50SGFuZGxlcgBQcm9wZXJ0eUNoYW5nZWRFdmVudEhhbmRsZXIAUm91dGVkRXZlbnRIYW5kbGVyAHNldF9Vc2VyAEd1ZXN0VXNlcgBDYW5jZWxBZnRlcgBDb25maWd1cmVkVGFza0F3YWl0ZXIAR2V0QXdhaXRlcgBKc29uU2VyaWFsaXplcgBnZXRfRXJyb3IAQXV0aEVycm9yAElFbnVtZXJhdG9yAEdldEVudW1lcmF0b3IALmN0b3IALmNjdG9yAFN5c3RlbS5EaWFnbm9zdGljcwBUb1VuaXhUaW1lU2Vjb25kcwBGcm9tU2Vjb25kcwBTeXN0ZW0uUnVudGltZS5FeGNlcHRpb25TZXJ2aWNlcwBTeXN0ZW0uUnVudGltZS5Db21waWxlclNlcnZpY2VzAERlYnVnZ2luZ01vZGVzAFByb3RvblZQTi5DbGllbnQuQ29yZS5NZXNzYWdlcwBjaGFuZ2VzAEF1dG9tYXRpb25Qcm9wZXJ0aWVzAE1pY3Jvc29mdC5VSS5YYW1sLkNvbnRyb2xzLlByaW1pdGl2ZXMAU3lzdGVtLk5ldC5QcmltaXRpdmVzAEJpbmRpbmdGbGFncwBJU2V0dGluZ3MASUdsb2JhbFNldHRpbmdzAElVc2VyU2V0dGluZ3MAc2V0dGluZ3MAUHJvcGVydHlDaGFuZ2VkRXZlbnRBcmdzAFJvdXRlZEV2ZW50QXJncwBhcmdzADw+NF9fdGhpcwBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzAEVxdWFscwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzLk1vZGVscwBNaWNyb3NvZnQuVUkuWGFtbC5Db250cm9scwBQcm90b25WUE4uQ2xpZW50LkNvcmUuRW51bXMAUHJvdG9uVlBOLkNsaWVudC5Mb2dpYy5BdXRoLkNvbnRyYWN0cy5FbnVtcwBTeXN0ZW0uQ29sbGVjdGlvbnMASnNvblNlcmlhbGl6ZXJPcHRpb25zAEpzb25Eb2N1bWVudE9wdGlvbnMAU3lzdGVtLk5ldC5IdHRwLkhlYWRlcnMAZ2V0X0hlYWRlcnMASHR0cEhlYWRlcnMASHR0cENvbnRlbnRIZWFkZXJzAEh0dHBSZXF1ZXN0SGVhZGVycwBQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5Vc2VycwBnZXRfU3VjY2VzcwBQcm90b25WUE4uQ2xpZW50LkV2ZW50TWVzc2FnaW5nLkNvbnRyYWN0cwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzAFByb3RvblZQTi5BcGkuQ29udHJhY3RzAFByb3RvblZQTi5DbGllbnQuU2V0dGluZ3MuQ29udHJhY3RzAGdldF9TdGF0dXMAQXV0aGVudGljYXRpb25TdGF0dXMAc3RhdHVzAENvbmNhdABGb3JtYXQAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kuQWJzdHJhY3QARGVwZW5kZW5jeU9iamVjdABnZXRfTWF4Q29ubmVjdABzZXRfQWxsb3dBdXRvUmVkaXJlY3QAR2V0AFN5c3RlbS5OZXQAU2V0AHRhcmdldABEYXRlVGltZU9mZnNldABDb25maWd1cmVBd2FpdABvcF9JbXBsaWNpdABnZXRfRGVmYXVsdABHZXRWYWx1ZU9yRGVmYXVsdABBdXRoUmVzdWx0AEZyb21SZXN1bHQAR2V0UmVzdWx0AFNldFJlc3VsdABJQXBpQ2xpZW50AEh0dHBDbGllbnQAR3Vlc3RDbGllbnQAY2xpZW50AFVJRWxlbWVudABGcmFtZXdvcmtFbGVtZW50AEpzb25FbGVtZW50AGdldF9Sb290RWxlbWVudABzZXRfSG9yaXpvbnRhbEFsaWdubWVudABzZXRfSG9yaXpvbnRhbENvbnRlbnRBbGlnbm1lbnQASnNvbkRvY3VtZW50AGdldF9QYXJlbnQAZ2V0X0N1cnJlbnQAZ2V0X0NvbnRlbnQAc2V0X0NvbnRlbnQAU3RyaW5nQ29udGVudABIdHRwQ29udGVudABlbmRwb2ludAByb290AFN0YXJ0AFBhdGNod29yay5Qcm90b25HdWVzdABJc0d1ZXN0AGdldF9Qb3N0AHNldF9UaW1lb3V0AHJlcXVlc3RUaW1lb3V0AE1vdmVOZXh0AFN5c3RlbS5UZXh0AHNldF9UZXh0AGdldF9VdGNOb3cAVGhyb3cAUHJlZml4AFRvQXJyYXkAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kAYm9keQBidXN5AG9wX0VxdWFsaXR5AG9wX0luZXF1YWxpdHkAc2V0X1Zpc2liaWxpdHkASXNOdWxsT3JFbXB0eQBUcnlHZXRQcm9wZXJ0eQAAJ3sAewAgAFAAYQB5AGwAbwBhAGQAIAA9ACAAewAwAH0AIAB9AH0AADlHAHUAZQBzAHQAIABjAGwAaQBlAG4AdAAgAGYAaQBlAGwAZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAA7RwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAIABtAGUAdABoAG8AZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAAncABhAHQAYwBoAHcAbwByAGsALQBnAHUAZQBzAHQAOgB2ADEAOgABL1MAZQB0AEEAdQB0AGgAZQBuAHQAaQBjAGEAdABpAG8AbgBTAHQAYQB0AHUAcwAACV8AYwB0AHMAABNfAHMAZQB0AHQAaQBuAGcAcwAAC0cAdQBlAHMAdAAAGVMAaQBnAG4ASQBuAEIAdQB0AHQAbwBuAAA7RwB1AGUAcwB0ACAAYgB1AHQAdABvAG4AIABwAGEAcgBlAG4AdAAgAG0AaQBzAG0AYQB0AGMAaAAuAAApUABhAHQAYwBoAHcAbwByAGsARwB1AGUAcwB0AEIAdQB0AHQAbwBuAAATVgBpAGUAdwBNAG8AZABlAGwAACVfAHUAcwBlAHIAQQB1AHQAaABlAG4AdABpAGMAYQB0AG8AcgAAI0MAbwBuAHQAaQBuAHUAZQAgAGEAcwAgAGcAdQBlAHMAdAAAF0kAcwBTAGkAZwBuAGkAbgBnAEkAbgAAHXIAZQBxAHUAZQBzAHQAVABpAG0AZQBvAHUAdAAAB1UASQBEAAANVQBzAGUAcgBJAEQAABdBAGMAYwBlAHMAcwBUAG8AawBlAG4AABlSAGUAZgByAGUAcwBoAFQAbwBrAGUAbgAAZUcAdQBlAHMAdAAgAHMAZQByAHYAaQBjAGUAIAByAGUAdAB1AHIAbgBlAGQAIABpAG4AYwBvAG0AcABsAGUAdABlACAAcwBlAHMAcwBpAG8AbgAgAGQAZQB0AGEAaQBsAHMALgAAF0wAbwBnAG8AdQB0AEEAcwB5AG4AYwAAFV8AYQBwAGkAQwBsAGkAZQBuAHQAADtfAGMAbwBuAG4AZQBjAHQAaQBvAG4AQwBlAHIAdABpAGYAaQBjAGEAdABlAE0AYQBuAGEAZwBlAHIAADdEAGUAbABlAHQAZQBLAGUAeQBQAGEAaQByAEEAbgBkAEMAZQByAHQAaQBmAGkAYwBhAHQAZQAAL0MAbABlAGEAcgBBAHUAdABoAFMAZQBzAHMAaQBvAG4ARABlAHQAYQBpAGwAcwAAN0gAYQBzAEEAdQB0AGgAZQBuAHQAaQBjAGEAdABlAGQAUwBlAHMAcwBpAG8AbgBEAGEAdABhAAB3UwBpAGcAbgAgAG8AdQB0ACAAbwBmACAAdABoAGUAIABjAHUAcgByAGUAbgB0ACAAcwBlAHMAcwBpAG8AbgAgAGIAZQBmAG8AcgBlACAAYwBvAG4AdABpAG4AdQBpAG4AZwAgAGEAcwAgAGcAdQBlAHMAdAAuAABDUgBlAHMAZQB0AEMAYQBuAGMAZQBsAGwAYQB0AGkAbwBuAFQAbwBrAGUAbgBJAGYAQwBhAG4AYwBlAGwAbABlAGQAACVDAG8AbQBwAGwAZQB0AGUATABvAGcAaQBuAEEAcwB5AG4AYwAAMUcAdQBlAHMAdAAgAHMAaQBnAG4ALQBpAG4AIABjAGEAbgBjAGUAbABsAGUAZAAuAAF7RwB1AGUAcwB0ACAAcwBpAGcAbgAtAGkAbgAgAHQAaQBtAGUAZAAgAG8AdQB0AC4AIABDAGgAZQBjAGsAIAB5AG8AdQByACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGEAbgBkACAAdAByAHkAIABhAGcAYQBpAG4ALgABgJ9HAHUAZQBzAHQAIABzAGkAZwBuAC0AaQBuACAAZgBhAGkAbABlAGQALgAgAEMAaABlAGMAawAgAHkAbwB1AHIAIABjAG8AbgBuAGUAYwB0AGkAbwBuACAAYQBuAGQAIAB0AHIAeQAgAGEAZwBhAGkAbgAsACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAAE1UgBlAHEAdQBlAHMAdABOAGUAdwBDAGUAcgB0AGkAZgBpAGMAYQB0AGUAQQBzAHkAbgBjAACAk1QAaABlACAAZwB1AGUAcwB0ACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGMAZQByAHQAaQBmAGkAYwBhAHQAZQAgAGMAbwB1AGwAZAAgAG4AbwB0ACAAYgBlACAAbwBiAHQAYQBpAG4AZQBkAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuAC4AAIC5VABoAGUAIABnAHUAZQBzAHQAIABzAGUAcwBzAGkAbwBuACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIABhAHUAdABoAG8AcgBpAHoAZQBkACAAZgBvAHIAIABWAFAATgAgAHUAcwBlAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAACApUcAdQBlAHMAdAAgAHMAZQBzAHMAaQBvAG4AIABlAHgAcABpAHIAZQBkACAAbwByACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIAByAGUAcwB1AG0AZQBkAC4AIABDAG8AbgB0AGkAbgB1AGUAIABhAHMAIABnAHUAZQBzAHQAIABhAGcAYQBpAG4AIABvAHIAIABzAGkAZwBuACAAaQBuAC4AACMvAGEAdQB0AGgALwB2ADQALwBzAGUAcwBzAGkAbwBuAHMAAC8vAGEAdQB0AGgALwB2ADQALwBjAHIAZQBkAGUAbgB0AGkAYQBsAGwAZQBzAHMAADNoAHQAdABwAHMAOgAvAC8AdgBwAG4ALQBhAHAAaQAuAHAAcgBvAHQAbwBuAC4AbQBlAAEfeAAtAHAAbQAtAGEAcABwAHYAZQByAHMAaQBvAG4AASthAG4AZAByAG8AaQBkAC0AdgBwAG4AQAA1AC4AMgAwAC4ANQA3AC4AMAABH3gALQBwAG0ALQBhAHAAaQB2AGUAcgBzAGkAbwBuAAEDMwAADUEAYwBjAGUAcAB0AAAhYQBwAHAAbABpAGMAYQB0AGkAbwBuAC8AagBzAG8AbgAAFVUAcwBlAHIALQBBAGcAZQBuAHQAATtQAGEAdABjAGgAdwBvAHIAawAgAFAAcgBvAHQAbwBuACAAZwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAAA1CAGUAYQByAGUAcgAAEXgALQBwAG0ALQB1AGkAZAABRVUAbgBlAHgAcABlAGMAdABlAGQAIABnAHUAZQBzAHQAIABzAGUAcgB2AGkAYwBlACAAcgBlAHMAcABvAG4AcwBlAC4AAAlDAG8AZABlAACAoVAAcgBvAHQAbwBuACAAZABpAGQAIABuAG8AdAAgAGEAdQB0AGgAbwByAGkAegBlACAAZwB1AGUAcwB0ACAAbQBvAGQAZQAuACAAUABsAGUAYQBzAGUAIAB0AHIAeQAgAGEAZwBh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",
+          "moduleSha256": "f3e619c7f89432d37a7f0b7716756c82e78212ae74ea8d5ac5a251d40e84026e",
+          "entryType": "Patchwork.ProtonGuest.GuestClient",
+          "entryMethod": "GuestUser",
+          "mode": "fallback"
+        },
+        {
+          "kind": "managedEmbeddedHook",
+          "file": "ProtonVPN.Client.Logic.Auth.dll",
+          "sha256": "2ad0e260931e370bcf6a77c409b9d861634adabceeaac484248130599b6b59b9",
+          "method": "System.Threading.Tasks.Task`1\u003cProtonVPN.Client.Logic.Auth.Contracts.Models.AuthResult\u003e ProtonVPN.Client.Logic.Auth.UserAuthenticator::AutoLoginUserAsync(System.Boolean)",
+          "moduleBase64": "TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1vZGUuDQ0KJAAAAAAAAABQRQAAZIYCANDx7GoAAAAAAAAAAPAAIiALAjAAAHAAAAAEAAAAAAAAAAAAAAAgAAAAAACAAQAAAAAgAAAAAgAABAAAAAAAAAAEAAAAAAAAAADAAAAAAgAAAAAAAAMAQIUAAEAAAAAAAABAAAAAAAAAAAAQAAAAAAAAIAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAACgAADYAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAABIAAAAAAAAAAAAAAAudGV4dAAAAGBvAAAAIAAAAHAAAAACAAAAAAAAAAAAAAAAAAAgAABgLnJzcmMAAADYAgAAAKAAAAAEAAAAcgAAAAAAAAAAAAAAAAAAQAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAgAFALRJAACsRQAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAnsOAAAKKjoCKA8AAAoCA30OAAAKKgATMAMAKQAAAAEAABEDdQEAABsKAgYuHAYsFygQAAAKAnsOAAAKBnsOAAAKbxEAAAoqFioXKnYgFEBW4yApVVWlWigQAAAKAnsOAAAKbxIAAApYKgATMAcAOgAAAAIAABEUcgEAAHAXjQcAAAElFgJ7DgAACgoSACVxAwAAG4wDAAAbLQQmFCsL/hYDAAAbbxMAAAqiKBQAAAoqAAATMAQARAAAAAMAABECbxUAAAoKKycGA34DAAAEGGBvFgAACgsHFCgXAAAKLAgHAm8YAAAKKgZvGQAACgoGFCgaAAAKLdByKQAAcHMbAAAKehMwBABFAAAABAAAEQJvFQAACgorKAYDfgMAAAQYYG8cAAAKCwcUKB0AAAosCQcCBG8eAAAKKgZvGQAACgoGFCgaAAAKLc9yYwAAcHMbAAAKemICbxUAAAoDfgMAAARvHwAACgJvIAAACipmAm8VAAAKA34DAAAEbx8AAAoCBG8hAAAKKnICbyIAAAosEgJvIgAACnKfAABwGm8jAAAKKhYqcgJyxwAAcBiNBwAAASUWA4wSAAABoigHAAAGJipaAnL3AABwKAYAAAZ0QgAAAW8kAAAKKgAAABMwBADPAAAABQAAEQJyAQEAcCgGAAAGdBEAAAEKBigKAAAGLQIUKgZyFQEAcG8lAAAKBnIVAQBwbyYAAAoGFG8nAAAKBm8oAAAKDBICKCkAAAotEAYoKgAACnMrAAAKbywAAApzLQAACiUGbyIAAApvLgAACiVyFQEAcG8vAAAKJXIVAQBwbzAAAAolFG8xAAAKJQZvKAAACgwSAigyAAAKDRIDKDMAAApvNAAACgsgyAAAAHM1AAAKczYAAAolIOgDAABvNwAACiUHbzgAAAooOQAACigBAAArKqICcgEBAHAoBgAABnQRAAABKAoAAAYtAhQqAgMWmqVQAAABKBIAAAYqEzACAD8AAAAGAAAREgAoOwAACn00AAAEEgACfTUAAAQSAAN9NgAABBIAFX0zAAAEEgB8NAAABBIAKAIAACsSAHw0AAAEKD0AAAoqABMwAgA/AAAABwAAERIAKDsAAAp9LwAABBIAAn0wAAAEEgADfTEAAAQSABV9LgAABBIAfC8AAAQSACgDAAArEgB8LwAABCg9AAAKKgATMAIANwAAAAgAABESACg7AAAKfRcAAAQSAAJ9GAAABBIAFX0WAAAEEgB8FwAABBIAKAQAACsSAHwXAAAEKD0AAAoqABMwAgA/AAAACQAAERIAKD4AAAp9OQAABBIAAn06AAAEEgADfTsAAAQSABV9OAAABBIAfDkAAAQSACgFAAArEgB8OQAABChAAAAKKgATMAIAPwAAAAoAABESACg+AAAKfR0AAAQSAAJ9HgAABBIAA30fAAAEEgAVfRwAAAQSAHwdAAAEEgAoBgAAKxIAfB0AAAQoQAAACiqaAn4MAAAEJS0XJn4LAAAE/gYmAAAGc0EAAAolgAwAAAQoFQAABioAABswBQDtAQAACwAAEXMnAAAGCgYDfREAAAQCciEBAHAoBgAABnQcAAABCwdvQgAACnUdAAABJS0OJgJ0HwAAAQcWKBYAAAYMCBQoQwAACiwLcjsBAHBzGwAACnoIb0QAAApvRQAACg0rMQlvRgAAChMEEQR1UQAAASwgEQR0UQAAAW9HAAAKcncBAHAoSAAACiwIFBMF3VwBAAAJb0kAAAotx94KCSwGCW9KAAAK3AYCcqEBAHAoCAAABn0OAAAEBgZ7DgAABHK1AQBwKAYAAAZ9EgAABAYWfQ0AAAQGc0sAAAolcncBAHBvTAAACiVy2wEAcG9NAAAKJQZ7DgAABHL/AQBwKAgAAAalUAAAARb+AW9OAAAKJRlvTwAACiUXb1AAAAp9DwAABAZzUQAACiUYb1IAAAolF29TAAAKfRAAAAQGew8AAARydwEAcChUAAAKBnsPAAAEBv4GKAAABnNVAAAKb1YAAAoGBnsOAAAEdCYAAAF9FAAABAYXfRMAAAQGBv4GKQAABnNXAAAKfRUAAAQGexQAAAQGexUAAARvWAAACgJ0UQAAAQb+BioAAAZzVQAACm9ZAAAKAnRRAAABBv4GKwAABnNVAAAKb1oAAAoIb0QAAAoGew8AAARvWwAACghvRAAACgZ7EAAABG9bAAAKFCoRBSoAAAABEAAAAgBbAD2YAAoAAAAAGzAEAA4BAAAMAAARAhQoXAAACi0FBB8gMQIUKgJ1IAAAAQoGFChdAAAKLGEGb0QAAApvRQAAChMFKzsRBW9GAAAKEwYRBgMzDQZ1HQAAARMI3cEAAAARBgMEF1goFgAABhMHEQcUKF4AAAosCREHEwjdoQAAABEFb0kAAAotvN4MEQUsBxEFb0oAAArcAnUhAAABCwcUKF8AAAosEAdvYAAACgMEF1goFgAABioCdSIAAAEMCBQoYQAACiwQCG9gAAAKAwQXWCgWAAAGKgJ1IwAAAQ0JFChiAAAKLBUJb2MAAAp1HwAAAQMEF1goFgAABioCdSQAAAETBBEEFChkAAAKLBERBG9lAAAKAwQXWCgWAAAGKhQqEQgqAAABEAAAAgAtAEh1AAwAAAAAIh80gAMAAAQqIgIDKGYAAAoqHgIoDwAACipiAnNnAAAKJRZvaAAACnNpAAAKKBsAAAYqWgIDIwAAAAAAAD5AKGoAAAooHAAABioAABMwAgBOAAAAAAAAAAIoDwAACgR+awAACihsAAAKLRYEIwAAAAAAAD5AKGoAAAoobQAACiwLchcCAHBzbgAACnoCA30JAAAEAgR9CgAABAN+bwAACm9wAAAKKgAAEzADACAAAAANAAARDwADEgAocQAACiwKEgAocgAAChkuAhQqEgAocwAACioTMAIAYQAAAA4AABESACh0AAAKfU0AAAQSAAJ9TwAABBIAA31RAAAEEgAEfVAAAAQSAAV9UgAABBIADgR9UwAABBIADgV9TgAABBIAFX1MAAAEEgB8TQAABBIAKAcAACsSAHxNAAAEKHYAAAoqAAAAEzAEAEoAAAAAAAAAcxkAAAYlAnI1AgBwKB0AAAZ9BAAABCUCcj0CAHAoHQAABn0FAAAEJQJySwIAcCgdAAAGfQYAAAQlAnJjAgBwKB0AAAZ9BwAABCoAABMwAQBDAAAAAAAAAAJ7BAAABCh3AAAKLSoCewYAAAQodwAACi0dAnsHAAAEKHcAAAotEAMsGAJ7BQAABCh3AAAKLAtyfQIAcHMYAAAGeioAEzACAD8AAAAPAAAREgAoeAAACn1BAAAEEgACfUIAAAQSAAN9QwAABBIAFX1AAAAEEgB8QQAABBIAKAgAACsSAHxBAAAEKHoAAAoqABMwAgA/AAAAEAAAERIAKDsAAAp9XwAABBIAAn1gAAAEEgADfWEAAAQSABV9XgAABBIAfF8AAAQSACgJAAArEgB8XwAABCg9AAAKKjICewkAAARvewAACioucyUAAAaACwAABCoacxoAAAYqABMwAgArAAAAEQAAERIAKHwAAAp9ZQAABBIAAn1mAAAEEgAVfWQAAAQSAHxlAAAEEgAoCgAAKyoAEzADAEEAAAAAAAAABG9+AAAKcv8BAHAoSAAACiwuAnsPAAAEAnsNAAAELRoCew4AAARy/wEAcCgIAAAGpVAAAAEW/gErARZvTgAACioAAAATMAMATwAAAAAAAAACexMAAAQtGAJ7FAAABAJ7FQAABG9YAAAKAhd9EwAABAJ7DwAABAJ7DQAABC0aAnsOAAAEcv8BAHAoCAAABqVQAAABFv4BKwEWb04AAAoqhgJ7EwAABCwYAnsUAAAEAnsVAAAEb38AAAoCFn0TAAAEKgAAABswBgCqAQAAEgAAEQJ7FgAABAoGFyYmAAYsDgYXO5sAAAACFn0ZAAAEAAYsVgJ7GAAABHLjAgBwF40HAAABJRYXjGIAAAGiKAcAAAZ0GAAAAW+AAAAKCxIBKIEAAAotPwIWJQp9FgAABAIHfRoAAAQCfBcAAAQSAQIoCwAAK90yAQAAAnsaAAAECwJ8GgAABP4VLwAAAQIVJQp9FgAABBIBKIMAAAreCiYCF30ZAAAE3gACexkAAAQMCBczegAGFy5MAnsYAAAEcvsCAHAoBgAABnRjAAABb4QAAApvhQAACg0SAyiGAAAKLT8CFyUKfRYAAAQCCX0bAAAEAnwXAAAEEgMCKAwAACvdpwAAAAJ7GwAABA0CfBsAAAT+FQwAABsCFSUKfRYAAAQSAyiHAAAKJt4DJt4A3k4GFi9JAnsYAAAEchEDAHAoBgAABnJNAwBwKA0AACsoBwAABibeJwYWLyICexgAAARyhQMAcCgNAAArKAcAAAYmAnsYAAAEFigLAAAG3NzeGRMEAh/+fRYAAAQCfBcAAAQRBCiJAAAK3hMCH/59FgAABAJ8FwAABCiKAAAKKgAAQXwAAAAAAAAeAAAAfgAAAJwAAAAKAAAALQAAAQAAAACyAAAAdgAAACgBAAADAAAALQAAAQIAAAAxAQAAIgAAAFMBAAAnAAAAAAAAAAIAAAAMAAAAIQEAAC0BAABOAAAAAAAAAAAAAAAHAAAAdgEAAH0BAAAZAAAALQAAATYCfBcAAAQDKIsAAAoqAAAbMAYAEAYAABMAABECexwAAAQKBkUGAAAAkwAAAJMAAACTAAAAkwAAAOkDAADYBAAAAgJ7HgAABHIBAQBwKAYAAAZ0EQAAAX0gAAAEAnseAAAEcrUDAHAoDQAAKygHAAAGpVAAAAEsEh8Pcu0DAHAojAAACgvdcwUAAAJ7HgAABHJlBABwKA0AACsoBwAABiYCAnseAAAEKAwAAAZ9IQAABAIUfSIAAAQCFn0jAAAEAhZ9JAAABAIUfSUAAAQCFn0mAAAEAAYZJiYABkUEAAAATwAAADMBAAC4AQAASQIAAAJ7HgAABBkoCwAABgJ7HwAABAJ7IQAABG8hAAAGb40AAAoNEgMojgAACi0/AhYlCn0cAAAEAgl9KQAABAJ8HQAABBIDAigOAAAr3ewEAAACeykAAAQNAnwpAAAE/hUOAAAbAhUlCn0cAAAEEgMokAAACgwCCH0iAAAEAnwhAAAEKJEAAAoCeyAAAARynwAAcAJ7IgAABHsFAAAEKJIAAApvkwAACgJ7IAAABAJ7IgAABHsGAAAEb5QAAAoCeyAAAAQCeyIAAAR7BwAABG+VAAAKAnsgAAAEAnsiAAAEewQAAARvlgAACgIXfSQAAAQCex4AAAQCeyEAAAQoDwAABm+AAAAKEwQSBCiBAAAKLUECFyUKfRwAAAQCEQR9KgAABAJ8HQAABBIEAigPAAAr3QgEAAACeyoAAAQTBAJ8KgAABP4VLwAAAQIVJQp9HAAABBIEKIMAAAoCex4AAARyqQQAcBiNBwAAASUWFoxQAAABoiUXFoxQAAABoigHAAAGdA8AABtvlwAAChMGEgYomAAACi1BAhglCn0cAAAEAhEGfSsAAAQCfB0AAAQSBgIoEAAAK92DAwAAAnsrAAAEEwYCfCsAAAT+FRAAABsCFSUKfRwAAAQSBiiZAAAKEwUCEQV9KAAABAJ7KAAABG+aAAAKLRECAnsoAAAEfScAAATdCAEAAAJ7HgAABAJ7IQAABCgQAAAGb4AAAAoTBBIEKIEAAAotQQIZJQp9HAAABAIRBH0qAAAEAnwdAAAEEgQCKA8AACvd8gIAAAJ7KgAABBMEAnwqAAAE/hUvAAABAhUlCn0cAAAEEgQogwAACgJ8IQAABCiRAAAKAnseAAAEFygLAAAGAhd9IwAABAICeygAAAR9JwAABN5zdTMAAAElLQQmFisPJgJ8IQAABCibAAAKFv4D/hEmAhZyzwQAcCiMAAAKfScAAATeQiYCHw9yAQUAcCiMAAAKfScAAATeLRMHAh8PEQdvnAAACiiMAAAKfScAAATeFSYCHw9yfQUAcCiMAAAKfScAAATeAAIXfSYAAATeDBMIAhEIfSUAAATeAAJ7IwAABDpLAQAAAhR9LAAABAIWfS0AAAQABhouRwJ7JAAABCxlAnseAAAEKBEAAAZvgAAAChMEEgQogQAACi1BAholCn0cAAAEAhEEfSoAAAQCfB0AAAQSBAIoDwAAK921AQAAAnsqAAAEEwQCfCoAAAT+FS8AAAECFSUKfRwAAAQSBCiDAAAKKyICex4AAARyhQMAcCgNAAArKAcAAAYmAnseAAAEFigLAAAG3gwTCAIRCH0sAAAE3gACeyIAAAQsaQJ7HwAABAJ7IgAABG8iAAAGb4AAAAoTBBIEKIEAAAotQQIbJQp9HAAABAIRBH0qAAAEAnwdAAAEEgQCKA8AACvdEgEAAAJ7KgAABBMEAnwqAAAE/hUvAAABAhUlCn0cAAAEEgQogwAACgJ7LAAABBMIEQgsFxEIdS0AAAElLQMRCHoonQAACm+eAAAKAhR9LAAABAJ7JQAABBMIEQgsFxEIdS0AAAElLQMRCHoonQAACm+eAAAKAnsmAAAEEwkRCRczCQJ7JwAABAveXQIUfSUAAAQCFH0nAAAEAhR9IAAABAJ8IQAABP4VEwAAAQIUfSIAAATeMxMKAh/+fRwAAAQCFH0gAAAEAnwhAAAE/hUTAAABAhR9IgAABAJ8HQAABBEKKJ8AAAreLgIf/n0cAAAEAhR9IAAABAJ8IQAABP4VEwAAAQIUfSIAAAQCfB0AAAQHKKAAAAoqQawAAAEAAAC+AAAArwIAAIoDAAAUAAAAbQMAAAAAAAC+AAAArwIAAJ4DAAAVAAAAMwAAAQAAAAC+AAAArwIAALMDAAAYAAAABAAAAgAAAAC+AAAArwIAAMsDAAAVAAAALQAAAQAAAAC5AAAAMAMAAOkDAAAMAAAABwAAAQAAAAAPBAAAlQAAAKQEAAAMAAAABwAAAQAAAAAHAAAApwUAAK4FAAAzAAAALQAAATYCfB0AAAQDKKEAAAoqAAAbMAYAMwEAABQAABECey4AAAQKBixlAnswAAAEchEDAHAoBgAABnIeBgBwGI0HAAABJRYCezEAAASMEwAAAaIoBwAABnQYAAABb4AAAAoMEgIogQAACi0/AhYlCn0uAAAEAgh9MgAABAJ8LwAABBICAigRAAAr3cMAAAACezIAAAQMAnwyAAAE/hUvAAABAhUlCn0uAAAEEgIogwAACgJ7MAAABHIBAQBwKAYAAAZ0EQAAAQsHb6IAAAoNEgMoowAACixBB2+iAAAKDRIDKKQAAAoTBBIEKKUAAAoodwAACi0jB2+iAAAKDRIDKKQAAAoTBBIEKKYAAAooKgAACiinAAAKLAtyVAYAcHMYAAAGet4ZEwUCH/59LgAABAJ8LwAABBEFKIkAAAreEwIf/n0uAAAEAnwvAAAEKIoAAAoqAAEQAAAAAAcA/wYBGS0AAAE2AnwvAAAEAyiLAAAKKgAAGzADAPsAAAAVAAARAnszAAAECgYsUgJ7NQAABHL7AgBwKAYAAAZ0YwAAAQJ7NgAABG+oAAAKb6kAAAoMEgIoqgAACi0/AhYlCn0zAAAEAgh9NwAABAJ8NAAABBICAigSAAAr3Z4AAAACezcAAAQMAnw3AAAE/hUTAAAbAhUlCn0zAAAEEgIoqwAACgsHb5oAAAosOwdvrAAACiwzB2+sAAAKb60AAAosJgdvrAAACm+tAAAKb64AAAoXMxMHb6wAAApvrQAACm+vAAAKFy8LcukGAHBzGAAABnreFw0CH/59MwAABAJ8NAAABAkoiQAACt4TAh/+fTMAAAQCfDQAAAQoigAACioAARAAAAAABwDJ0AAXLQAAATYCfDQAAAQDKIsAAAoqAAAbMAYAfAMAABYAABECezgAAAQKBhlDjwAAAAYaO+ECAAACezoAAARyAQEAcCgGAAAGdBEAAAEmAns6AAAEcrUDAHAoDQAAKygHAAAGpVAAAAEtIQJ7OgAABHKFAwBwKA0AACsoBwAABiYosAAACgvd8wIAAAJ7OgAABHJlBABwKA0AACsoBwAABiYCAns6AAAEKAwAAAZ9PAAABAJ7OgAABBkoCwAABhYMAAZFBAAAAEMAAADMAAAARAEAALYBAAACezoAAAQCezwAAAQoDwAABm+AAAAKDRIDKIEAAAotPwIWJQp9OAAABAIJfT4AAAQCfDkAAAQSAwIoEwAAK92EAgAAAns+AAAEDQJ8PgAABP4VLwAAAQIVJQp9OAAABBIDKIMAAAoCezoAAARyqQQAcBiNBwAAASUWAns7AAAEjFAAAAGiJRcWjFAAAAGiKAcAAAZ0DwAAG2+XAAAKEwUSBSiYAAAKLUECFyUKfTgAAAQCEQV9PwAABAJ8OQAABBIFAigUAAAr3fsBAAACez8AAAQTBQJ8PwAABP4VEAAAGwIVJQp9OAAABBIFKJkAAAoTBAIRBH09AAAEAns9AAAEb5oAAAotbAJ7OgAABCgRAAAGb4AAAAoNEgMogQAACi0/AhglCn04AAAEAgl9PgAABAJ8OQAABBIDAigTAAAr3YMBAAACez4AAAQNAnw+AAAE/hUvAAABAhUlCn04AAAEEgMogwAACgJ7PQAABAvdNAEAAAJ7OgAABAJ7PAAABCgQAAAGb4AAAAoNEgMogQAACi0/AhklCn04AAAEAgl9PgAABAJ8OQAABBIDAigTAAAr3REBAAACez4AAAQNAnw+AAAE/hUvAAABAhUlCn04AAAEEgMogwAACgJ8PAAABCiRAAAKAns6AAAEFygLAAAGAns9AAAEC92rAAAAJhcM3gAIFzNvAns6AAAEKBEAAAZvgAAACg0SAyiBAAAKLT8CGiUKfTgAAAQCCX0+AAAEAnw5AAAEEgMCKBMAACvdhQAAAAJ7PgAABA0CfD4AAAT+FS8AAAECFSUKfTgAAAQSAyiDAAAKHwtypAcAcCiMAAAKC94zAnw8AAAE/hUTAAAB3iUTBgIf/n04AAAEAnw8AAAE/hUTAAABAnw5AAAEEQYonwAACt4gAh/+fTgAAAQCfDwAAAT+FRMAAAECfDkAAAQHKKAAAAoqQTQAAAAAAACeAAAAEgIAALACAAAFAAAALQAAAQAAAAAHAAAALwMAADYDAAAlAAAALQAAATYCfDkAAAQDKKEAAAoqAAAbMAYA2AMAABcAABECe0AAAAQKAntCAAAECwZFBAAAACMAAAAjAAAAKQIAAO8CAAACFH1EAAAEAhR9RQAABAIWfUYAAAQCFH1HAAAEAhZ9SAAABAAGLFMGFzv4AAAAB3JLCABwKLEAAAoUFAJ7QwAABCgeAAAGb7IAAAoTBBIEKLMAAAotQQIWJQp9QAAABAIRBH1KAAAEAnxBAAAEEgQCKBUAACvdOQMAAAJ7SgAABBMEAnxKAAAE/hUWAAAbAhUlCn1AAAAEEgQotQAACg0CCW+2AAAKKB8AAAZ9RAAABN4OBhYvCQksBglvSgAACtwCe0QAAAQWKCAAAAYHcm8IAHAosQAACgJ7RAAABHO3AAAKc7gAAAoCe0MAAAQoHgAABm+yAAAKEwQSBCizAAAKLUECFyUKfUAAAAQCEQR9SgAABAJ8QQAABBIEAigVAAAr3Y0CAAACe0oAAAQTBAJ8SgAABP4VFgAAGwIVJQp9QAAABBIEKLUAAAoTBQIRBW+2AAAKKB8AAAZ9RQAABN4QBhYvCxEFLAcRBW9KAAAK3AJ7RQAABBcoIAAABgJ8QwAABCiRAAAKAhd9RgAABAICe0UAAAR9SQAABAIXfUgAAATeDBMGAhEGfUcAAATeAAJ7RgAABDqTAAAAAntFAAAEOYgAAAACe0UAAAR7BAAABCh3AAAKLXYCe0UAAAR7BgAABCh3AAAKLWQHAntFAAAEKCIAAAZvgAAAChMHEgcogQAACi1BAhglCn1AAAAEAhEHfUsAAAQCfEEAAAQSBwIoFgAAK92KAQAAAntLAAAEEwcCfEsAAAT+FS8AAAECFSUKfUAAAAQSByiDAAAKAntEAAAEObsAAAACe0QAAAR7BAAABCh3AAAKOqYAAAACe0QAAAR7BgAABCh3AAAKOpEAAAACe0YAAAQsJQJ7RQAABCwdAntFAAAEewQAAAQCe0QAAAR7BAAABCi5AAAKLGQHAntEAAAEKCIAAAZvgAAAChMHEgcogQAACi1BAhklCn1AAAAEAhEHfUsAAAQCfEEAAAQSBwIoFgAAK93EAAAAAntLAAAEEwcCfEsAAAT+FS8AAAECFSUKfUAAAAQSByiDAAAKAntHAAAEEwYRBiwXEQZ1LQAAASUtAxEGeiidAAAKb54AAAoCe0gAAAQTCBEIFzMJAntJAAAEDN5FAhR9RwAABAIUfUkAAAQCFH1EAAAEAhR9RQAABN4nEwkCH/59QAAABAIUfUQAAAQCFH1FAAAEAnxBAAAEEQkougAACt4iAh/+fUAAAAQCFH1EAAAEAhR9RQAABAJ8QQAABAgouwAACipBZAAAAgAAAMMAAAATAAAA1gAAAA4AAAAAAAAAAgAAAHABAAAUAAAAhAEAABAAAAAAAAAAAAAAAEgAAAB/AQAAxwEAAAwAAAAHAAABAAAAAA4AAACAAwAAjgMAACcAAAAtAAABNgJ8QQAABAMovAAACioAABswBQAwBQAAGAAAEQJ7TAAABAoCe08AAAQLBhg2EQICe04AAAQovQAACn1UAAAEAAYYNiICe1QAAAQHewoAAARvvgAACgICe1QAAARvJAAACn1VAAAEAAYYNiECAntQAAAEcp8IAHACe1EAAAQokgAACnO/AAAKfVYAAAQABjlCAQAABhdZF0NlAQAAAntWAAAEb8AAAApy0wgAcHLzCABwb8EAAAoCe1YAAARvwAAACnIfCQBwcj8JAHBvwQAACgJ7VgAABG/AAAAKckMJAHByUQkAcG/BAAAKAntWAAAEb8AAAApycwkAcHKJCQBwb8EAAAoCe1IAAAQsRQJ7VgAABG/AAAAKcsUJAHACe1IAAAR7BgAABHPCAAAKb8MAAAoCe1YAAARvwAAACnLTCQBwAntSAAAEewQAAARvwQAACgJ7UwAABCwmAntWAAAEAntTAAAEFCgXAAArKMUAAApyUQkAcHPGAAAKb8cAAAoHewkAAAQCe1YAAAQXAntVAAAEb8gAAAoWb8kAAAoTBRIFKMoAAAoTBBIEKMsAAAotQQIWJQp9TAAABAIRBH1YAAAEAnxNAAAEEgQCKBgAACvddgMAAAJ7WAAABBMEAnxYAAAE/hUbAAAbAhUlCn1MAAAEEgQozQAACg0CCX1XAAAEAAYXO5oAAAAGGDvBAAAAAntXAAAEb84AAApvzwAACm/QAAAKEwkgAAAEAGoTChIJKNEAAAoRCv4CEgko0gAACl8sC3LlCQBwcxgAAAZ6AntXAAAEb84AAAoCe1UAAARv0wAAChZv1AAAChMNEg0o1QAAChMMEgwo1gAACi1BAhclCn1MAAAEAhEMfVoAAAQCfE0AAAQSDAIoGQAAK92oAgAAAntaAAAEEwwCfFoAAAT+FR8AABsCFSUKfUwAAAQSDCjXAAAKEwsCEQt9WQAABAAGGC4LAnPYAAAKfVsAAAQABhg7pgAAAAIgABAAAI11AAABfVwAAAQrNgJ7WwAABG/ZAAAKEQ5qWCAAAAQAajELcuUJAHBzGAAABnoCe1sAAAQCe1wAAAQWEQ5v2gAACgJ7WQAABAJ7XAAABBYCe1wAAASOaQJ7VQAABG/bAAAKFm/cAAAKExASECjdAAAKEw8SDyjeAAAKLUECGCUKfUwAAAQCEQ99XQAABAJ8TQAABBIPAigaAAAr3bwBAAACe10AAAQTDwJ8XQAABP4VIgAAGwIVJQp9TAAABBIPKN8AAAolEw46QP///wJ7WwAABG/gAAAKEwYCFH1cAAAE3hgGFi8TAntbAAAELAsCe1sAAARvSgAACtwCFH1bAAAE3hgGFi8TAntZAAAELAsCe1kAAARvSgAACtwCFH1ZAAAEEQYo4QAAChIR/hVBAAABEREo4gAAChMHAntXAAAEb+MAAAosJxEHb7YAAAoTEhIScisKAHASCChxAAAKLA4SCCjkAAAKIOgDAAAuRREHb7YAAAoTEhIScisKAHASCChxAAAKLBASCCjkAAAKICkjAAD+ASsBFhEHb+UAAAotB3I1CgBwKwVy2AoAcHMYAAAGehEHDN2NAAAABhYvEwJ7VwAABCwLAntXAAAEb0oAAArcBhYvEwJ7VgAABCwLAntWAAAEb0oAAArcdTMAAAElLQQmFisSJgJ8TgAABCibAAAKFv4BFv4D/hEmcqMLAHBzGAAABnoGFi8TAntUAAAELAsCe1QAAARvSgAACtwTEwIf/n1MAAAEAnxNAAAEERMo5gAACt4UAh/+fUwAAAQCfE0AAAQIKOcAAAoqQawAAAIAAADGAgAA7wAAALUDAAAYAAAAAAAAAAIAAAC2AgAAIAEAANYDAAAYAAAAAAAAAAIAAADmAQAAqAIAAI4EAAAYAAAAAAAAAAIAAABxAAAANQQAAKYEAAAYAAAAAAAAAAEAAABLAAAAcwQAAN4EAAAMAAAAvgQAAAIAAAAkAAAAxgQAAOoEAAAYAAAAAAAAAAAAAAAOAAAA9AQAAAIFAAAZAAAALQAAATYCfE0AAAQDKOgAAAoqAAAbMAYADgEAABkAABECe14AAAQKAntgAAAECwYmAAYsGQIjAAAAAAAAJEAoagAACnPpAAAKfWIAAAQABixUB3IwDABwKOoAAAoCe2EAAAQUAntiAAAEbyQAAAooHgAABm+yAAAKDRIDKLMAAAotPwIWJQp9XgAABAIJfWMAAAQCfF8AAAQSAwIoGwAAK92IAAAAAntjAAAEDQJ8YwAABP4VFgAAGwIVJQp9XgAABBIDKLUAAAoM3g4GFi8JCCwGCG9KAAAK3N4YBhYvEwJ7YgAABCwLAntiAAAEb0oAAArcAhR9YgAABN4DJt4A3hkTBAIf/n1eAAAEAnxfAAAEEQQoiQAACt4TAh/+fV4AAAQCfF8AAAQoigAACioAAAE0AAACAKkAAqsADgAAAAACAC4AjbsAGAAAAAAAABEAy9wAAwcAAAEAAA4A0+EAGS0AAAE2AnxfAAAEAyiLAAAKKgAAGzAGAGwCAAAaAAARAntkAAAECgJ7ZgAABAsGLGkHew0AAAQtFwd7DgAABHL/AQBwKAgAAAalUAAAASwF3SMCAAAHF30NAAAEB3sOAAAEcv8BAHAXjFAAAAEoCQAABgd7DwAABHI8DABwb00AAAoHew8AAAQWb04AAAoHexAAAAQXb1MAAAoABiw3B3sOAAAEcmwMAHAoBgAABnR3AAABFxZylAwAcHPrAAAKbxwAACsCB3sRAAAEb+0AAAp9ZwAABAAGLEMHexIAAAQCe2cAAAQoEwAABm+XAAAKDRIDKJgAAAotPwIWJQp9ZAAABAIJfWgAAAQCfGUAAAQSAwIoHQAAK91vAQAAAntoAAAEDQJ8aAAABP4VEAAAGwIVJQp9ZAAABBIDKJkAAAoMCG+aAAAKLBgHew4AAARylgwAcCgNAAArKAcAAAYmKzgHew4AAARysgwAcBeNBwAAASUWCKIoBwAABiYHexAAAAQIb+8AAApv8AAACgd7EAAABBZvUwAACt4YBhYvEwJ7ZwAABCwLAntnAAAEb0oAAArcAhR9ZwAABN5LJh8PcsoMAHAojAAAChMEB3sOAAAEcrIMAHAXjQcAAAElFhEEoigHAAAGJgd7EAAABBEEb+8AAApv8AAACgd7EAAABBZvUwAACt4A3lUGFi9QBxZ9DQAABAd7DgAABHL/AQBwFoxQAAABKAkAAAYHew8AAARy2wEAcG9NAAAKB3sPAAAEB3sOAAAEcv8BAHAoCAAABqVQAAABFv4Bb04AAArc3hkTBQIf/n1kAAAEAnxlAAAEEQUo8QAACt4TAh/+fWQAAAQCfGUAAAQo8gAACipBZAAAAgAAALYAAADEAAAAegEAABgAAAAAAAAAAAAAAHsAAAAgAQAAmwEAAEsAAAAtAAABAgAAAHsAAABtAQAA6AEAAFUAAAAAAAAAAAAAAA4AAAAxAgAAPwIAABkAAAAtAAABNgJ8ZQAABAMo8wAACioAAEJTSkIBAAEAAAAAAAwAAAB2NC4wLjMwMzE5AAAAAAUAbAAAAGQVAAAjfgAA0BUAAFAWAAAjU3RyaW5ncwAAAAAgLAAAUA0AACNVUwBwOQAAEAAAACNHVUlEAAAAgDkAACwMAAAjQmxvYgAAAAAAAAACAAABVx+iCwkOAAAA+gEzABYAAAEAAAB5AAAAEQAAAGgAAAA9AAAARgAAAAoAAADzAAAAAgAAADMAAAAaAAAAAQAAAAEAAAABAAAAEgAAACMAAAABAAAADAAAAAsAAAABAAAAHQAAAAAAxQsBAAAAAAAGAPAJOxAGACQKOxAGAGQJ6Q8PAFsQAAAGANgJOxAGAEkJOxAGAK8TTwwGAAsJ6Q8GAIoJ6Q8GAMAJ6Q8GAHgJOxAGAOIQJQ0GAA4ITwwGACUOJQ0GABAKTwwGAC8OJQ0KAO8QKxMOAFoT2hEGAJwMmgoSAJkImRIGAOMATwwGAPUTTwwGAKUJOxAGAE0LWBEGAAgBWBEOAD0UdhEGANwATwwWAA8OoxEWAJgLoxEGAEkB3QMWAJAU3wsWAJ0LoxEWAOkGoxEWABcMoxEWACMMoxEWAPEOoxEWAD8LoxEaAHQFeAsaADAPeAsWADkR3wsaACAReAsGAAEITwwGAMQHOxAGADsBOxAGALQNTwwGAJsOOxAGAIgPOxASAFcBExMSAGIIvg0GALIOOxAGAGANTwwGAA8BOxAOAO4IdhESAIIIEAsGAE4HTwweAHIUYg4GAHgMTwwiAKsU3Q0iAP4U3Q0eAFgGYg4eABgHYg4GAO4AOxD7AH4PAAAGAEAMuAMiAC8S3Q0GAJUGmgoeACwHYg4GADoMuAMGACgB3QMGANsKTwwGAIsOTwwGAJcNTwwGAEwIJQ0GAFAOJQ0KAPkQKxMGAPsNTwwKAAkRKxMmAMIG3xMSAKYImRIGAFkMTwwWAJoU3wsWAKUT3wsWADcNoxEGAMIPBhIWACoMoxEWAMsU3wsWAMIK3wsWACgW3wsWAJEQ9gwWAEwP3wsWAFcIphAeAB4PYg4eAAsPYg4GAHsNTwwGAKIVmgoiAEoG3Q0eAPgOYg4OAO4N2hESAGcUExMGAOIVTwwOALgP2hEqAGAUhBMGADoOGhAqAGIBhBMSAHIIEAsGACEC3QMeAIYSQxIeAGcSQxIeAFEKQxIiAJ8P3Q0iABkS3Q0GAKsKsxUeADoVYg4eAEgVYg4eAEsNYg4eAHMSQxIGAEIKTwwGAGsBTwwuANYOwxIyAP8GahAyACIJvhEAAAAAnwMAAAAAAQABAAABEADGAAAAHQABAAEAgQEQAH0UaBUdAAIABgAAARAANwhoFbUABAAYAAABEADhDGgVHQAEABkAAAEQAAAMaBUdAAgAGgADIRAA2QMAAB0ACwAkAAMBEABLAAAAHQANACcAAwEQAC4CAACpABYALAADARAA5wIAAKkAHAAuAAMBEACHAQAAqQAuADAAAwEQAIgAAACpADMAMgADARAAngIAAKkAOAA0AAMBEAAPAAAAqQBAADYAAwEQAFMDAACpAEwAOAADARAAdQAAAKkAXgA6AAMBEADIBAAAqQBkADwAIQASBjUAU4DZFccHMQB0BsoHBgAOBscHBgASBccHBgCyDMcHBgCPDMcHU4AyDMcHIQCJFM4HIQCbFbUCNgCRA9MHFgAuANcHBgAFFt8HBgBWDOIHBgAWDuUHBgA/B+kHBgDxC9cHBgAtC+IHBgC0Ct8HBgCJEO4HBgCLBfMHBgAtCfgHBgDJDvsHBgAtC+IHAQB8AfgHAQC/AAAIAQAaAgUIBgAtCfgHBgDJDhQIBgAtC+IHBgAODB0IAQDpASEIAQBeAiUIAQDAAikIAQD5At8HAQAiA98HAQA7A+IHAQBmA/gHAQCGAy0IAQABAC0IAQC/ADEIAQAaAgAIAQCXAjoIAQAiAOIHAQCfAPgHBgAtCfgHBgDJDvsHBgAtC+IHBgC+DCUIAQC/AAAIBgAtCfgHBgDJDvsHBgAtC+IHBgC+DCUIAQC/AEMIBgAtCfgHBgDJDhQIBgAtC+IHBgByDt8HAQDNASUIAQBqAi0IAQC/AAAIAQAaAjoIBgAtCfgHBgDJDlIIBgBOER0IBgC+DCUIAQDZASkIAQB3AikIAQCxAt8HAQDcAuIHAQAXA/gHAQA7AykIAQC/AFsIAQAaAgAIBgAtCfgHBgDJDmUIBgC+DCUIBgBOER0IBgBtBm8IBgBUFccHBgDuDCkIBgAlBeIHAQCvAXQIAQBLAiUIAQDOAnkIAQAIA34IAQC/AIMIAQAvA40IAQAaApIIAQBGA5wIAQB6A6EIAQCXAqUIBgAtCfgHBgDJDvsHBgBOER0IBgDuDCkIAQD4AXQIAQC/AFsIBgAtCfgHBgDJDq0IBgBOEbIIAQC+AR0IAQC/ADoISCAAAAAAhggZBRgBAQBQIAAAAACGGNwPCAEBAGAgAAAAAMYAbxG2CAIAlSAAAAAAxgC2BssEAwC0IAAAAADGAM8KagADAPwgAAAAAJMAJwa7CAQATCEAAAAAkwDAC8EIBgCdIQAAAACRANsTuwgJALYhAAAAAJEA6hPJCAsA0CEAAAAAkwB+FdAIDgDtIQAAAACRAGgT1ggPAAoiAAAAAJEAuAzdCBEAJCIAAAAAlgBoD+MIEgD/IgAAAACWAL0H4wgUACgjAAAAAJEAewTqCBYAdCMAAAAAkQAkBOoIGADAIwAAAACRAGUE8ggaAAQkAAAAAJEAGAT4CBsAUCQAAAAAkwBaBAMJHQCbJAAAAACWAAwO4wgfAMQkAAAAAJMAKQgPCSEA0CYAAAAAkQCOCxoJIwD8JwAAAACRGOIPJAkmAAUoAAAAAIYY3A+hACYADigAAAAAhhjcDwYAJwAWKAAAAACDGNwPBgAnAC8oAAAAAIMY3A8oCScASCgAAAAAgxjcDy8JKACkKAAAAACRAMMVOQkqANAoAAAAAIEAiwRBCSwAQCkAAAAAkQDmDFQJMQCYKQAAAACRANEMXAkyAOgpAAAAAIMAPARjCTQANCoAAAAAgwAMBG4JNQB/KgAAAADmAcYIBgA2AIwqAAAAAJEY4g8kCTYADigAAAAAhhjcDwYANgCYKgAAAACDADgAdQk2AA4oAAAAAIYY3A8GADYAoCoAAAAAgwBhAHoJNgDYKgAAAACDAKsAggk4ACgrAAAAAIMABgJ6CToAgysAAAAAgwCDAnoJPACoKwAAAADhAaoVBgA+ANwtAAAAAOEB1wchAD4A7C0AAAAA4QGqFQYAPwC0NAAAAADhAdcHIQA/AMQ0AAAAAOEBqhUGAEAAFDYAAAAA4QHXByEAQAAkNgAAAADhAaoVBgBBADw3AAAAAOEB1wchAEEATDcAAAAA4QGqFQYAQgAIOwAAAADhAdcHIQBCABg7AAAAAOEBqhUGAEMAYD8AAAAA4QHXByEAQwBwPwAAAADhAaoVBgBEAFhFAAAAAOEB1wchAEQAaEUAAAAA4QGqFQYARQC4RgAAAADhAdcHIQBFAMhGAAAAAOEBqhUGAEYApEkAAAAA4QHXByEARgAAAAEAHQUAAAEAigoAAAAAAAAAAAEA7hMAAAIAqQcAAAEA7hMAAAIAqQcAAAMASREAAAEA7hMAAAIAqQcAAAEA7hMAAAIAqQcAAAMAigoAAAEAFxEAAAEALQsAAAIAbxMAAAEALQsAAAEALQsAAAIASREAAAEALQsAAAIASREAAAEALQsAAAIAvgwAAAEALQsAAAIAvgwAAAEALQsAAAEALQsAAAIAcg4AAAEALQsAAAIADgwAAAEA7gYAAAIASREAAAEA7gYAAAIA8QsAAAEAXRUAAAIAFg4AAAMACgsAAAEAPwcAAAEAiRQAAAEAiRQAAAIAmxUAAAEAABYAAAIAqQcAAAEAVBUAAAIAbQYAAAMA7gwAAAQAJQUAAAUAvgwAAAEAABYAAAEA7gwAAAIAoQUAAAEAvgwAAAEA7gwAAAEAlQMAAAIAmgMAAAEA6g4AAAIAmAoAAAEAlQMAAAIAmgMAAAEAlQMAAAIAmgMAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcAAAEA5wcGAN0ACQCtAAoArQALAK0ADACtAA0ArQAOAK0ADwCtABAArQARAK0ACQDcDwEAEQDcDwYAGQDcDwoAKQDcDwEAMQDcDwYASQDcDxAAUQDcDwYAWQDcDxYAeQDcDwYAuQDcDxsAWQGqFQYAWQHXByEAWQDcDygADAASBjUAOQDcDwYAFAAfFEoAFABvEVQAFAC2BlwAOQDPCmoAMQJ9E24AOQALCH8AaQAkBoQAcQAWFowAcQB4CpQAaQD0B38AaQAWFpkAQQLcD6EAaQBjBq0AgQAWFrUASQJHB70AaQBEFsQAUQJ4CpQAUQKBCs0AWQIDBWoAMQL/CtMAEQKBDNsAaQKhB6EAaQJ8B6EAaQKyC6EAaQKYBO8AJABrCv8AsQDIFQMBJADcDwgBaQKwBA4BoQDcDwYAoQAOBaEAoQBjB6EAoQBsB6EAoQCoC6EAJABHChgBsQD8Dx0BoQCuByEB6QHcDyYBeQLcDwYAiQGtBgEAeQJfDy0BLAAyCzwBwQBIFEsBkQEECWcBkQFiFW0BkQFJC3oBNAAECaABNABiFW0BNABJC68BPADcD8kBiQILFeEB6QAKFucBAQHEDO8BmQLOD/UBRAAWFRgBiQJaB2oAMQIKFgUCoQKqFf8AuQHGCAYA4QDcDwYAiQJjB6EAGQEuFQsCqQKTBRACiQLHFBUCqQLfFBUCKQHcDwYAKQG+ChwC+QAkFiMCyQLzBCoC0QLcD8kB2QI1CzICOQHcD8kBMQFJBTkCiQIxBTICiQI8BTICmQItBUAC+QAKFmQCAQEWFmwC6QAWFucBCQEWFnYCEQEiFYACEQEWFoUCGQEWFo8CGQEiFZkCIQEWFp0CIQEtBoACaQHcD6EA4QLcDwYA4QLFExACwQHcD6cCyQEOEK4CyQFdDrUCyQFSC7oCyQFhDLoC8QLcD6EA+QJwDLUCwQGPFcQC0QFBFtEC0QE8BtoC0QHYCmoATAAECaABTABiFW0BTABJC68BMQIzFvMCVAAECaABVABiFW0BVABJC68BCQPGCAYAcQEECRkDcQFiFW0BSQGQB2oAMQFdBTkCwQCUDzwDeQHFBf8AkQGuBUIDeQFTFAYAGQO0CFUDXACUD3EDZADFBf8AZABTFBgBIQM7FpsDkQGxDaYDkQFdFAYAkQHXByEA0QCjC88DbACUD3EDdADFBf8ANACuBUIDdABTFBgBmQDVBQYAMQJ2E/MDWQIOBaEAWQKuDKEAWQKLDKEAWQLfBKEAfACUD3EDhADFBf8AhABTFBgBMQO3Ev8AmQDyBf8AaQHzBmoAOQNECBwEOQPTFQYANACxDaYDNABdFAgBNADXByEAaQLqCEMEjABrCv8AjABHChgBqQFHDGoAqQHUCFUEsQBSC1oEGQNvCH4ElACUD3EDnADFBf8AnABTFBgBpABHChgBsQEdDsUESQNPE8sESQO2E8sE0QAyC+UE4QGGFRwFrACUD3EDtADFBf8AVACuBUIDtABTFBgB2QG3FEAFvADcDwYAxADcDwgBMQIWFgUCVACxDaYDVABdFAgBVADXByEAEQJ9BrUFEQJyD8QCGQLcD70FGQJbEsUFYQMtBcsFaQPcD8sFWQMTDdEFcQOQCtgFgQNxA+IFiQPcD+gFGQIuFfEFwQECBPgFzAAEFBIG1ACUDyYG3ADFBf8ATACuBUID3ABTFBgB6QEiFUYGkQNbEkwGoQPtClIG5AArFBgB5ABrCv8AkQNIBGAG7AAEFBIG9ACUDyYG/ADFBf8A/ABTFBgBIQLcDwYAAQLiCh0BAQJDCZMGAQL4A5sGBAEEFBIGDAGUDyYGFAHFBf8AFAFTFBgBIQLgFcgGHAETFNQG2QHOCOEG6QHRBv8A0QGmAcsE2QHGCAYATACxDaYDTABdFAgBTADXByEAEQLcD8QC4QE4CRwFwQPcDyUHuQM3BjAHPABHBxgBcQGuBUIDMQOuD2oAKQG/FaEAcQGxDaYDcQFdFAYAcQHXByEADgAIAG0HDgAgAJQHIQAzAAgMJwAjACIMLgALAI8JLgATAJgJLgAbALcJQAA7AMAJQwArAMAJYAA7AMAJZABDABwMgAA7AMAJoAA7AMAJ4wArAMAJAwErAMAJBAFLAMAJIwErAMAJQwErAMAJYwErAMAJgwErAMAJowErAMAJwwErAMAJ4AFTAMUJ4wErAMAJAAJTAAMKAwIrAMAJIAJTAEkKQAJTAI0KYAJTAMcKwANTAAALIARTADwLQARTAHgLAAVTALQLoAU7AMAJ4AU7AMAJIAY7AMAJYAY7AMAJoAY7AMAJ4AY7AMAJIAc7AMAJYAc7AMAJoAc7AMAJxAdDABwM5AdDABwMBAhDABwMJAhDABwMRAhDABwMZAhDABwMhAhDABwMpAhDABwMxAhDABwMAQtrABEMQQtrABEMOQBiAHgApgDgAGIBfwGJAZMBuAHPAUYCywLgAvgCCgMUAyQDrQMlBGIEzwT+BGIF8AYRBwIAAQAAAB0FigkCAAEAAwAJAFgAFwAJAFoAGQAKAFwAFwAKAF4AGQALAGAAFwALAGIAGQAMAGQAFwAMAGYAGQANAGgAFwANAGoAGQAOAGwAFwAOAG4AGQAPAHAAFwAPAHIAGQAQAHQAFwAQAHYAGQARAHgAFwARAHoAGQAuAEIAZwD4ADMBmAHCAf4B5QL9AmQDewPYA98DAQQIBE0EjwScBLwEIgUqBUYFTgUKBh0GMAZaBmwGdAZ9BqkGrwa2Bs0GBIAAAAAAAAAAAAAAAAAAAAAAaBUAAAgAAAAAAAAAAAAAAEkHwgMAAAAABQABAAkAAAAAAAAAAAArEwAAAAAAAAAAAAAAAAAAAAAAAO0SAAAAAAUAAQAJAAAAAAAAAAAAExMAAAAAAwAAAAAAAAAAAAAAUgeoAwAAAAAIAAAAAAAAAAAAAABbB2ULAAAAAAgAAAAAAAAAAAAAAFsHYg4AAAAACAAAAAAAAAAAAAAAZAfdDQAAAAAIAAAAAAAAAAAAAABbB8wQAAAAAAUAAQAJAAAAAAAAAAAA6BUAAAAABQABAAkAAAAAAAAAAADDEgAAAAAFAAEACQAAAAAAAAAAABMIAAAAAAcAAwAIAAMACQADAAoAAwALAAMADAADAA0AAwAOAAYADwAGABAABgARAAgAAAAAAAQAeg51AFcBeQB1AXkAhAF5AI4BfwCqAX8AvQHrAO4C8wAFA3kADwP7AB8DBQFNAwUBiQMRAaIDHwHnAx8B+QMfARAEBQE7BAUBqgQfAeoEHwHyBGkBMwVpAVoFiQGiA5kBOQaZAYYGmQG9BgUBBAfZATcH3QE9BwAAAAAAPHJlc3VsdD41X18xMAA8Q3JlYXRlQXN5bmM+ZF9fMTAAPD43X193cmFwMTAAPD45X18xNl8wADxBZGRCdXR0b24+Yl9fMTZfMAA8PmNfX0Rpc3BsYXlDbGFzczE3XzAAPEFkZEJ1dHRvbkNvcmU+Yl9fMAA8UmV2b2tlQXN5bmM+ZF9fMTEAPFJlcXVpcmVWcG5Bc3luYz5kX18xMQA8PjdfX3dyYXAxMQA8QWRkQnV0dG9uQ29yZT5iX18xADw+dV9fMQA8PmZfX0Fub255bW91c1R5cGUwYDEARnVuY2AxAE51bGxhYmxlYDEAQ29uZmlndXJlZFRhc2tBd2FpdGFibGVgMQBUYXNrYDEAQXN5bmNUYXNrTWV0aG9kQnVpbGRlcmAxAEVxdWFsaXR5Q29tcGFyZXJgMQBUYXNrQXdhaXRlcmAxAElFbnVtZXJhdG9yYDEAQXBpUmVzcG9uc2VSZXN1bHRgMQBSZWFkT25seU1lbW9yeWAxADw+N19fd3JhcDEAPFJlcXVpcmVDZXJ0aWZpY2F0ZUFzeW5jPmRfXzEyAEdldEludDMyADxkZWFkbGluZT41X18yADxwcm90b2NvbD41X18yADx0b2tlbj41X18yADxib290c3RyYXA+NV9fMgA8c2V0dGluZ3M+NV9fMgA8dGltZW91dD41X18yADxBZGRCdXR0b25Db3JlPmJfXzIAPD51X18yAERpY3Rpb25hcnlgMgA8RW5kRmFpbGVkU2Vzc2lvbkFzeW5jPmRfXzEzADxyZXF1ZXN0VG9rZW4+NV9fMwA8dG9rZW4+NV9fMwA8cmVzdWx0PjVfXzMAPGd1ZXN0PjVfXzMAPEFkZEJ1dHRvbkNvcmU+Yl9fMwA8PnVfXzMAPFJlc3VtZUFzeW5jPmRfXzE0ADxhY2NlcHRlZD41X180ADxzZXNzaW9uPjVfXzQAPHJlcXVlc3Q+NV9fNAA8PjdfX3dyYXA0ADxMb2dpbkFzeW5jPmRfXzE1ADxhY2NlcHRlZD41X181ADxyZXNwb25zZT41X181ADw+N19fd3JhcDUAPHN0b3JlZD41X182ADxpbnB1dD41X182ADw+N19fd3JhcDYAPGJ1ZmZlcj41X183ADxSZXF1ZXN0QXN5bmM+ZF9fNwA8PjdfX3dyYXA3AGdldF9VVEY4ADxibG9jaz41X184ADw+N19fd3JhcDgAPD45ADxwMD4APHAxPgA8TW9kdWxlPgBNaWNyb3NvZnQuV2luVUkAU3lzdGVtLklPAFN5c3RlbS5Qcml2YXRlLkNvcmVMaWIAPD5jAFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljAFJlYWRBc3luYwBTZW5kQXN5bmMAUmV2b2tlQXN5bmMAUmVzdW1lQXN5bmMAUmVxdWlyZUNlcnRpZmljYXRlQXN5bmMAQ3JlYXRlQXN5bmMAUmVhZEFzU3RyZWFtQXN5bmMATG9naW5Bc3luYwBFbmRGYWlsZWRTZXNzaW9uQXN5bmMAUmVxdWlyZVZwbkFzeW5jAFJlcXVlc3RBc3luYwBnZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwBzZXRfVXNlckNyZWF0aW9uRGF0ZVV0YwA8PEFkZEJ1dHRvbkNvcmU+Yl9fMD5kAHNldF9VbmlxdWVTZXNzaW9uSWQAU2V0QXV0b21hdGlvbklkAGdldF9Vc2VySWQAc2V0X1VzZXJJZABnZXRfUGF5bG9hZABwYXlsb2FkAEFkZABhZGRfTG9hZGVkAGFkZF9VbmxvYWRlZABhZGRfUHJvcGVydHlDaGFuZ2VkAHJlbW92ZV9Qcm9wZXJ0eUNoYW5nZWQASU5vdGlmeVByb3BlcnR5Q2hhbmdlZABjaGFuZ2VkAHNldF9Jc0VuYWJsZWQAdXNlclJlcXVpcmVkAEF3YWl0VW5zYWZlT25Db21wbGV0ZWQAZ2V0X0lzQ29tcGxldGVkAFRocm93SWZDYW5jZWxsYXRpb25SZXF1ZXN0ZWQAZ2V0X0lzQ2FuY2VsbGF0aW9uUmVxdWVzdGVkAFVpZAA8UGF5bG9hZD5pX19GaWVsZABHZXRGaWVsZABnZXRfQ2hpbGQAU2VuZABnZXRfVmFsdWVLaW5kAEpzb25WYWx1ZUtpbmQASHR0cE1ldGhvZABHZXRNZXRob2QAbWV0aG9kAEluc3RhbmNlAENyZWF0ZUxpbmtlZFRva2VuU291cmNlAENhbmNlbGxhdGlvblRva2VuU291cmNlAHNldF9Db2RlAEdldEhhc2hDb2RlAEh0dHBTdGF0dXNDb2RlAGdldF9Jc1N1Y2Nlc3NTdGF0dXNDb2RlAFBhZ2UAcGFnZQBnZXRfTWVzc2FnZQBMb2dpblN0YXRlQ2hhbmdlZE1lc3NhZ2UASHR0cFJlc3BvbnNlTWVzc2FnZQBIdHRwUmVxdWVzdE1lc3NhZ2UAbWVzc2FnZQBJbnZva2UASURpc3Bvc2FibGUAZ2V0X05hbWUAc2V0X05hbWUAc2V0X0Rpc3BsYXlOYW1lAHNldF9Vc2VyRGlzcGxheU5hbWUAZ2V0X1Byb3BlcnR5TmFtZQBzZXRfVXNlcm5hbWUAc2V0X0NyZWF0ZVRpbWUAUmVzdW1lAElBc3luY1N0YXRlTWFjaGluZQBTZXRTdGF0ZU1hY2hpbmUAc3RhdGVNYWNoaW5lAGdldF9CYXNlVHlwZQBWYWx1ZVR5cGUAR2V0VHlwZQBQcm90b25WUE4uQ2xpZW50LkNvcmUAQWRkQnV0dG9uQ29yZQBHdWVzdEZhaWx1cmUAQ2FwdHVyZQBNZXRob2RCYXNlAEJ1dHRvbkJhc2UAQmFzZVJlc3BvbnNlAEdldFZwbkluZm9SZXNwb25zZQBWcG5JbmZvV3JhcHBlclJlc3BvbnNlAFVzZXJSZXNwb25zZQBVc2Vyc1Jlc3BvbnNlAEdldExvZ291dFJlc3BvbnNlAERpc3Bvc2UAUGFyc2UAZ2V0X0V4cGlyYXRpb25VdGNEYXRlAGdldF9Db25uZWN0aW9uQ2VydGlmaWNhdGUAQ3JlYXRlAERlYnVnZ2VyQnJvd3NhYmxlU3RhdGUATG9naW5TdGF0ZQA8PjFfX3N0YXRlAGdldF9EZWxldGUAV3JpdGUAQ29tcGlsZXJHZW5lcmF0ZWRBdHRyaWJ1dGUARGVidWdnYWJsZUF0dHJpYnV0ZQBOdWxsYWJsZUF0dHJpYnV0ZQBEZWJ1Z2dlckJyb3dzYWJsZUF0dHJpYnV0ZQBBc3luY1N0YXRlTWFjaGluZUF0dHJpYnV0ZQBEZWJ1Z2dlckhpZGRlbkF0dHJpYnV0ZQBSZWZTYWZldHlSdWxlc0F0dHJpYnV0ZQBDb21waWxhdGlvblJlbGF4YXRpb25zQXR0cmlidXRlAFBhcmFtQXJyYXlBdHRyaWJ1dGUAUnVudGltZUNvbXBhdGliaWxpdHlBdHRyaWJ1dGUAQnl0ZQBnZXRfVmFsdWUAQXV0aGVudGljYXRpb25IZWFkZXJWYWx1ZQBnZXRfSGFzVmFsdWUAR2V0VmFsdWUAU2V0VmFsdWUAdmFsdWUAU2VyaWFsaXplAFN5c3RlbS5UaHJlYWRpbmcARW5jb2RpbmcAbGlzdGVuaW5nAHNldF9UZXh0V3JhcHBpbmcAVG9TdHJpbmcAR2V0U3RyaW5nAGdldF9MZW5ndGgAZ2V0X0NvbnRlbnRMZW5ndGgAU3RhcnRzV2l0aABkZXB0aABQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5BdXRoAGF1dGgAT2sAYWRkX0NsaWNrAFRleHRCbG9jawBnZXRfVGFzawBvcF9MZXNzVGhhbk9yRXF1YWwAU3lzdGVtLk9iamVjdE1vZGVsAFN5c3RlbS5Db21wb25lbnRNb2RlbABGaW5kUGFuZWwAU3RhY2tQYW5lbABGYWlsAHNldF9FbWFpbABzZXRfVXNlckVtYWlsAENhbGwAUGF0Y2h3b3JrLlByb3Rvbkd1ZXN0LmRsbABNaWNyb3NvZnQuVUkuWGFtbABjcmVhdGVQcm90b2NvbABHdWVzdFByb3RvY29sAHByb3RvY29sAFVzZXJDb250cm9sAENvbnRlbnRDb250cm9sAEJhc2VVcmwATWVtb3J5U3RyZWFtAGdldF9QZW0AU3lzdGVtAHZtAEJvb2xlYW4Ab3BfR3JlYXRlclRoYW4ASW5maW5pdGVUaW1lU3BhbgBnZXRfVG9rZW4Ac2V0X1JlZnJlc2hUb2tlbgBDYW5jZWxsYXRpb25Ub2tlbgBzZXRfQWNjZXNzVG9rZW4AdG9rZW4AZ2V0X0NoaWxkcmVuAFZhbGlkYXRlU2Vzc2lvbgBHdWVzdFNlc3Npb24Ac2Vzc2lvbgBNaWNyb3NvZnQuVUkuWGFtbC5BdXRvbWF0aW9uAHNldF9BdXRob3JpemF0aW9uAFN5c3RlbS5SZWZsZWN0aW9uAFVJRWxlbWVudENvbGxlY3Rpb24ASHR0cENvbXBsZXRpb25PcHRpb24AT3BlcmF0aW9uQ2FuY2VsZWRFeGNlcHRpb24AQXJndW1lbnRPdXRPZlJhbmdlRXhjZXB0aW9uAEludmFsaWRPcGVyYXRpb25FeGNlcHRpb24AU2V0RXhjZXB0aW9uAFByb3RvblZQTi5BcGkuQ29udHJhY3RzLkNvbW1vbgBTeXN0ZW0uVGV4dC5Kc29uAExvZ291dFJlYXNvbgBTdHJpbmdDb21wYXJpc29uAEFkZEJ1dHRvbgBidXR0b24AZ2V0X1ZwbgBGaWVsZEluZm8ATWV0aG9kSW5mbwBFeGNlcHRpb25EaXNwYXRjaEluZm8AUHJvcGVydHlJbmZvAFplcm8AU3lzdGVtLk5ldC5IdHRwAHN0YXJ0dXAAPFBheWxvYWQ+al9fVFBhcgBJRm9ybWF0UHJvdmlkZXIAQXN5bmNWb2lkTWV0aG9kQnVpbGRlcgBBc3luY1Rhc2tNZXRob2RCdWlsZGVyADw+dF9fYnVpbGRlcgBJRXZlbnRNZXNzYWdlU2VuZGVyAHNlbmRlcgBCb3JkZXIASHR0cE1lc3NhZ2VJbnZva2VyAEh0dHBNZXNzYWdlSGFuZGxlcgBIdHRwQ2xpZW50SGFuZGxlcgBQcm9wZXJ0eUNoYW5nZWRFdmVudEhhbmRsZXIAUm91dGVkRXZlbnRIYW5kbGVyAHNldF9Vc2VyAEd1ZXN0VXNlcgBDYW5jZWxBZnRlcgBDb25maWd1cmVkVGFza0F3YWl0ZXIAR2V0QXdhaXRlcgBKc29uU2VyaWFsaXplcgBnZXRfRXJyb3IAQXV0aEVycm9yAElFbnVtZXJhdG9yAEdldEVudW1lcmF0b3IALmN0b3IALmNjdG9yAFN5c3RlbS5EaWFnbm9zdGljcwBUb1VuaXhUaW1lU2Vjb25kcwBGcm9tU2Vjb25kcwBTeXN0ZW0uUnVudGltZS5FeGNlcHRpb25TZXJ2aWNlcwBTeXN0ZW0uUnVudGltZS5Db21waWxlclNlcnZpY2VzAERlYnVnZ2luZ01vZGVzAFByb3RvblZQTi5DbGllbnQuQ29yZS5NZXNzYWdlcwBjaGFuZ2VzAEF1dG9tYXRpb25Qcm9wZXJ0aWVzAE1pY3Jvc29mdC5VSS5YYW1sLkNvbnRyb2xzLlByaW1pdGl2ZXMAU3lzdGVtLk5ldC5QcmltaXRpdmVzAEJpbmRpbmdGbGFncwBJU2V0dGluZ3MASUdsb2JhbFNldHRpbmdzAElVc2VyU2V0dGluZ3MAc2V0dGluZ3MAUHJvcGVydHlDaGFuZ2VkRXZlbnRBcmdzAFJvdXRlZEV2ZW50QXJncwBhcmdzADw+NF9fdGhpcwBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzAEVxdWFscwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzLk1vZGVscwBNaWNyb3NvZnQuVUkuWGFtbC5Db250cm9scwBQcm90b25WUE4uQ2xpZW50LkNvcmUuRW51bXMAUHJvdG9uVlBOLkNsaWVudC5Mb2dpYy5BdXRoLkNvbnRyYWN0cy5FbnVtcwBTeXN0ZW0uQ29sbGVjdGlvbnMASnNvblNlcmlhbGl6ZXJPcHRpb25zAEpzb25Eb2N1bWVudE9wdGlvbnMAU3lzdGVtLk5ldC5IdHRwLkhlYWRlcnMAZ2V0X0hlYWRlcnMASHR0cEhlYWRlcnMASHR0cENvbnRlbnRIZWFkZXJzAEh0dHBSZXF1ZXN0SGVhZGVycwBQcm90b25WUE4uQXBpLkNvbnRyYWN0cy5Vc2VycwBnZXRfU3VjY2VzcwBQcm90b25WUE4uQ2xpZW50LkV2ZW50TWVzc2FnaW5nLkNvbnRyYWN0cwBQcm90b25WUE4uQ2xpZW50LkxvZ2ljLkF1dGguQ29udHJhY3RzAFByb3RvblZQTi5BcGkuQ29udHJhY3RzAFByb3RvblZQTi5DbGllbnQuU2V0dGluZ3MuQ29udHJhY3RzAGdldF9TdGF0dXMAQXV0aGVudGljYXRpb25TdGF0dXMAc3RhdHVzAENvbmNhdABGb3JtYXQAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kuQWJzdHJhY3QARGVwZW5kZW5jeU9iamVjdABnZXRfTWF4Q29ubmVjdABzZXRfQWxsb3dBdXRvUmVkaXJlY3QAR2V0AFN5c3RlbS5OZXQAU2V0AHRhcmdldABEYXRlVGltZU9mZnNldABDb25maWd1cmVBd2FpdABvcF9JbXBsaWNpdABnZXRfRGVmYXVsdABHZXRWYWx1ZU9yRGVmYXVsdABBdXRoUmVzdWx0AEZyb21SZXN1bHQAR2V0UmVzdWx0AFNldFJlc3VsdABJQXBpQ2xpZW50AEh0dHBDbGllbnQAR3Vlc3RDbGllbnQAY2xpZW50AFVJRWxlbWVudABGcmFtZXdvcmtFbGVtZW50AEpzb25FbGVtZW50AGdldF9Sb290RWxlbWVudABzZXRfSG9yaXpvbnRhbEFsaWdubWVudABzZXRfSG9yaXpvbnRhbENvbnRlbnRBbGlnbm1lbnQASnNvbkRvY3VtZW50AGdldF9QYXJlbnQAZ2V0X0N1cnJlbnQAZ2V0X0NvbnRlbnQAc2V0X0NvbnRlbnQAU3RyaW5nQ29udGVudABIdHRwQ29udGVudABlbmRwb2ludAByb290AFN0YXJ0AFBhdGNod29yay5Qcm90b25HdWVzdABJc0d1ZXN0AGdldF9Qb3N0AHNldF9UaW1lb3V0AHJlcXVlc3RUaW1lb3V0AE1vdmVOZXh0AFN5c3RlbS5UZXh0AHNldF9UZXh0AGdldF9VdGNOb3cAVGhyb3cAUHJlZml4AFRvQXJyYXkAUHJvdG9uVlBOLkNvbW1vbi5MZWdhY3kAYm9keQBidXN5AG9wX0VxdWFsaXR5AG9wX0luZXF1YWxpdHkAc2V0X1Zpc2liaWxpdHkASXNOdWxsT3JFbXB0eQBUcnlHZXRQcm9wZXJ0eQAAJ3sAewAgAFAAYQB5AGwAbwBhAGQAIAA9ACAAewAwAH0AIAB9AH0AADlHAHUAZQBzAHQAIABjAGwAaQBlAG4AdAAgAGYAaQBlAGwAZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAA7RwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAIABtAGUAdABoAG8AZAAgAG0AaQBzAG0AYQB0AGMAaAAuAAAncABhAHQAYwBoAHcAbwByAGsALQBnAHUAZQBzAHQAOgB2ADEAOgABL1MAZQB0AEEAdQB0AGgAZQBuAHQAaQBjAGEAdABpAG8AbgBTAHQAYQB0AHUAcwAACV8AYwB0AHMAABNfAHMAZQB0AHQAaQBuAGcAcwAAC0cAdQBlAHMAdAAAGVMAaQBnAG4ASQBuAEIAdQB0AHQAbwBuAAA7RwB1AGUAcwB0ACAAYgB1AHQAdABvAG4AIABwAGEAcgBlAG4AdAAgAG0AaQBzAG0AYQB0AGMAaAAuAAApUABhAHQAYwBoAHcAbwByAGsARwB1AGUAcwB0AEIAdQB0AHQAbwBuAAATVgBpAGUAdwBNAG8AZABlAGwAACVfAHUAcwBlAHIAQQB1AHQAaABlAG4AdABpAGMAYQB0AG8AcgAAI0MAbwBuAHQAaQBuAHUAZQAgAGEAcwAgAGcAdQBlAHMAdAAAF0kAcwBTAGkAZwBuAGkAbgBnAEkAbgAAHXIAZQBxAHUAZQBzAHQAVABpAG0AZQBvAHUAdAAAB1UASQBEAAANVQBzAGUAcgBJAEQAABdBAGMAYwBlAHMAcwBUAG8AawBlAG4AABlSAGUAZgByAGUAcwBoAFQAbwBrAGUAbgAAZUcAdQBlAHMAdAAgAHMAZQByAHYAaQBjAGUAIAByAGUAdAB1AHIAbgBlAGQAIABpAG4AYwBvAG0AcABsAGUAdABlACAAcwBlAHMAcwBpAG8AbgAgAGQAZQB0AGEAaQBsAHMALgAAF0wAbwBnAG8AdQB0AEEAcwB5AG4AYwAAFV8AYQBwAGkAQwBsAGkAZQBuAHQAADtfAGMAbwBuAG4AZQBjAHQAaQBvAG4AQwBlAHIAdABpAGYAaQBjAGEAdABlAE0AYQBuAGEAZwBlAHIAADdEAGUAbABlAHQAZQBLAGUAeQBQAGEAaQByAEEAbgBkAEMAZQByAHQAaQBmAGkAYwBhAHQAZQAAL0MAbABlAGEAcgBBAHUAdABoAFMAZQBzAHMAaQBvAG4ARABlAHQAYQBpAGwAcwAAN0gAYQBzAEEAdQB0AGgAZQBuAHQAaQBjAGEAdABlAGQAUwBlAHMAcwBpAG8AbgBEAGEAdABhAAB3UwBpAGcAbgAgAG8AdQB0ACAAbwBmACAAdABoAGUAIABjAHUAcgByAGUAbgB0ACAAcwBlAHMAcwBpAG8AbgAgAGIAZQBmAG8AcgBlACAAYwBvAG4AdABpAG4AdQBpAG4AZwAgAGEAcwAgAGcAdQBlAHMAdAAuAABDUgBlAHMAZQB0AEMAYQBuAGMAZQBsAGwAYQB0AGkAbwBuAFQAbwBrAGUAbgBJAGYAQwBhAG4AYwBlAGwAbABlAGQAACVDAG8AbQBwAGwAZQB0AGUATABvAGcAaQBuAEEAcwB5AG4AYwAAMUcAdQBlAHMAdAAgAHMAaQBnAG4ALQBpAG4AIABjAGEAbgBjAGUAbABsAGUAZAAuAAF7RwB1AGUAcwB0ACAAcwBpAGcAbgAtAGkAbgAgAHQAaQBtAGUAZAAgAG8AdQB0AC4AIABDAGgAZQBjAGsAIAB5AG8AdQByACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGEAbgBkACAAdAByAHkAIABhAGcAYQBpAG4ALgABgJ9HAHUAZQBzAHQAIABzAGkAZwBuAC0AaQBuACAAZgBhAGkAbABlAGQALgAgAEMAaABlAGMAawAgAHkAbwB1AHIAIABjAG8AbgBuAGUAYwB0AGkAbwBuACAAYQBuAGQAIAB0AHIAeQAgAGEAZwBhAGkAbgAsACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAAE1UgBlAHEAdQBlAHMAdABOAGUAdwBDAGUAcgB0AGkAZgBpAGMAYQB0AGUAQQBzAHkAbgBjAACAk1QAaABlACAAZwB1AGUAcwB0ACAAYwBvAG4AbgBlAGMAdABpAG8AbgAgAGMAZQByAHQAaQBmAGkAYwBhAHQAZQAgAGMAbwB1AGwAZAAgAG4AbwB0ACAAYgBlACAAbwBiAHQAYQBpAG4AZQBkAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuAC4AAIC5VABoAGUAIABnAHUAZQBzAHQAIABzAGUAcwBzAGkAbwBuACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIABhAHUAdABoAG8AcgBpAHoAZQBkACAAZgBvAHIAIABWAFAATgAgAHUAcwBlAC4AIABQAGwAZQBhAHMAZQAgAHQAcgB5ACAAYQBnAGEAaQBuACAAbwByACAAcwBpAGcAbgAgAGkAbgAgAG4AbwByAG0AYQBsAGwAeQAuAACApUcAdQBlAHMAdAAgAHMAZQBzAHMAaQBvAG4AIABlAHgAcABpAHIAZQBkACAAbwByACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIAByAGUAcwB1AG0AZQBkAC4AIABDAG8AbgB0AGkAbgB1AGUAIABhAHMAIABnAHUAZQBzAHQAIABhAGcAYQBpAG4AIABvAHIAIABzAGkAZwBuACAAaQBuAC4AACMvAGEAdQB0AGgALwB2ADQALwBzAGUAcwBzAGkAbwBuAHMAAC8vAGEAdQB0AGgALwB2ADQALwBjAHIAZQBkAGUAbgB0AGkAYQBsAGwAZQBzAHMAADNoAHQAdABwAHMAOgAvAC8AdgBwAG4ALQBhAHAAaQAuAHAAcgBvAHQAbwBuAC4AbQBlAAEfeAAtAHAAbQAtAGEAcABwAHYAZQByAHMAaQBvAG4AASthAG4AZAByAG8AaQBkAC0AdgBwAG4AQAA1AC4AMgAwAC4ANQA3AC4AMAABH3gALQBwAG0ALQBhAHAAaQB2AGUAcgBzAGkAbwBuAAEDMwAADUEAYwBjAGUAcAB0AAAhYQBwAHAAbABpAGMAYQB0AGkAbwBuAC8AagBzAG8AbgAAFVUAcwBlAHIALQBBAGcAZQBuAHQAATtQAGEAdABjAGgAdwBvAHIAawAgAFAAcgBvAHQAbwBuACAAZwB1AGUAcwB0ACAAYwBsAGkAZQBuAHQAAA1CAGUAYQByAGUAcgAAEXgALQBwAG0ALQB1AGkAZAABRVUAbgBlAHgAcABlAGMAdABlAGQAIABnAHUAZQBzAHQAIABzAGUAcgB2AGkAYwBlACAAcgBlAHMAcABvAG4AcwBlAC4AAAlDAG8AZABlAACAoVAAcgBvAHQAbwBuACAAZABpAGQAIABuAG8AdAAgAGEAdQB0AGgAbwByAGkAegBlACAAZwB1AGUAcwB0ACAAbQBvAGQAZQAuACAAUABsAGUAYQBzAGUAIAB0AHIAeQAgAGEAZwBh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",
+          "moduleSha256": "f3e619c7f89432d37a7f0b7716756c82e78212ae74ea8d5ac5a251d40e84026e",
+          "entryType": "Patchwork.ProtonGuest.GuestClient",
+          "entryMethod": "Resume",
+          "mode": "fallback"
+        },
+        {
+          "kind": "managedReturn",
+          "file": "ProtonVPN.Api.dll",
+          "sha256": "bf8fa6800ee0849997e26ae83a3c45473589963ae00a71c73c481b8f125c4e13",
+          "method": "System.Void ProtonVPN.Api.TokenClient::LogRefreshToken(ProtonVPN.Api.Contracts.Auth.RefreshTokenRequest)",
+          "returnType": "void"
+        }
+      ],
+      "version": "1.0.1"
+    },
+    {
+      "id": "accent-color",
+      "name": "Custom accent color",
+      "description": "Choose the color used by primary buttons, links, focus borders and accent brushes, plus its foreground text color. Applies to Light and Dark themes. Choose contrasting colors for readable controls.",
+      "category": "Appearance",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedThemeResources",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.App::LoadTypographyResourceDictionary()",
+          "resources": [
+            {
+              "theme": "Light",
+              "key": "PrimaryColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "PrimaryColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "LinkActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "InteractionNormActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "BorderFocusColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "BorderFocusColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Light",
+              "key": "TextOnPrimaryColor",
+              "type": "color",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Light",
+              "key": "TextOnPrimaryColorBrush",
+              "type": "brush",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Dark",
+              "key": "PrimaryColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "PrimaryColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "LinkActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormHoverColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormHoverColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormActiveColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "InteractionNormActiveColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderFocusColor",
+              "type": "color",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "BorderFocusColorBrush",
+              "type": "brush",
+              "value": "$accent"
+            },
+            {
+              "theme": "Dark",
+              "key": "TextOnPrimaryColor",
+              "type": "color",
+              "value": "$foreground"
+            },
+            {
+              "theme": "Dark",
+              "key": "TextOnPrimaryColorBrush",
+              "type": "brush",
+              "value": "$foreground"
+            }
+          ]
+        }
+      ],
+      "version": "1.0.0",
+      "options": [
+        {
+          "id": "accent",
+          "label": "Accent",
+          "type": "color",
+          "default": "#8A66FF"
+        },
+        {
+          "id": "foreground",
+          "label": "Button text",
+          "type": "color",
+          "default": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "switch-style",
+      "name": "Custom switch colors",
+      "description": "Choose enabled toggle-switch track and knob colors while keeping the native switch layout, disabled states and keyboard controls. Applies to Light and Dark themes.",
+      "category": "Appearance",
+      "status": "ready",
+      "operations": [
+        {
+          "kind": "managedThemeResources",
+          "file": "ProtonVPN.Client.dll",
+          "sha256": "f61efed6d51fb3ffd92c7e9091c779db7244c9c48a4505126b40e396e7e3483a",
+          "method": "System.Void ProtonVPN.Client.App::LoadTypographyResourceDictionary()",
+          "resources": [
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchFillOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchStrokeOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOn",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOnPointerOver",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Light",
+              "key": "ToggleSwitchKnobFillOnPressed",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchFillOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOn",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOnPointerOver",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchStrokeOnPressed",
+              "type": "brush",
+              "value": "$track"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOn",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOnPointerOver",
+              "type": "brush",
+              "value": "$knob"
+            },
+            {
+              "theme": "Dark",
+              "key": "ToggleSwitchKnobFillOnPressed",
+              "type": "brush",
+              "value": "$knob"
+            }
+          ]
+        }
+      ],
+      "version": "1.0.0",
+      "options": [
+        {
+          "id": "track",
+          "label": "Switch track",
+          "type": "color",
+          "default": "#36C9A0"
+        },
+        {
+          "id": "knob",
+          "label": "Switch knob",
+          "type": "color",
+          "default": "#FFFFFF"
+        }
+      ]
+    }
+  ]
+}
