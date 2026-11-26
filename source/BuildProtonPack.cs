@@ -91,6 +91,8 @@ class BuildProtonPack
     }
     static int Main(string[] args)
     {
+        if (args.Length != 3)
+            throw new ArgumentException("Usage: BuildProtonPack ORIGINAL_APP_ROOT OUTPUT_JSON GUEST_DLL");
         root = Path.GetFullPath(args[0]);
         string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(Path.Combine(root, "ProtonVPN.Client.exe")).FileVersion;
         string appVersion, packVersion, sourceCommit;
@@ -98,7 +100,8 @@ class BuildProtonPack
         {
             case "5.1.8.0": appVersion = "5.1.8"; packVersion = "1.5.1"; sourceCommit = "d2a4f8bc92a0fd296943a7cdd15f4f870c8a87f9"; break;
             case "5.1.9.0": appVersion = "5.1.9"; packVersion = "1.6.0"; sourceCommit = "bd8380fe92c2b07f07ee6e48858307f12780fcb9"; break;
-            default: throw new Exception("Pack generator supports original Windows 5.1.8.0 and 5.1.9.0 releases only.");
+            case "5.1.10.0": appVersion = "5.1.10"; packVersion = "1.7.1"; sourceCommit = "52b9967ae9b196117adce7a52774dc148672b72c"; break;
+            default: throw new Exception("Pack generator supports original Windows 5.1.8.0, 5.1.9.0, and 5.1.10.0 releases only.");
         }
         const string client = "ProtonVPN.Client.dll", settings = "ProtonVPN.Client.Settings.dll", statistical = "ProtonVPN.StatisticalEvents.dll", logic = "ProtonVPN.Client.Logic.Connection.dll";
         const string advanced = "ProtonVPN.Client.UI.Main.Settings.Pages.AdvancedSettingsPageViewModel";
@@ -197,7 +200,8 @@ class BuildProtonPack
         recentRow["type"] = recentType; recentRow["setterMethod"] = "System.Void ProtonVPN.Client.Models.Connections.ConnectionItemBase::set_IsRestricted(System.Boolean)"; recentRow["value"] = false; recentRow["conditionExpected"] = false;
         recentRow["condition"] = new[] { "ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection " + recentType + "::get_RecentConnection()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent ProtonVPN.Client.Logic.Recents.Contracts.IRecentConnection::get_ConnectionIntent()", "ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.Locations.ILocationIntent ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IConnectionIntent::get_Location()", "System.Boolean ProtonVPN.Client.Logic.Connection.Contracts.Models.Intents.IIntent::get_IsForPaidUsersOnly()" };
         recentRow["exclusions"] = new[] { "IsSecureCore", "IsP2P", "IsTor", "IsB2B", "IsProfileIntent" }.Select(x => new[] { "System.Boolean " + recentType + "::get_" + x + "()" }).ToArray();
-        Add("free-locations", "Free country and individual server selection", "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. Requires a signed-in or guest VPN session.", "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers, recentRow);
+        string signInRequirement = "Requires a signed-in or guest VPN session.";
+        Add("free-locations", "Free country and individual server selection", "Expand a free country to see individual free servers; Search and standard Recents keep the selected server ID and show Connect. Candidate filtering remains free/non-business with no server fallback. Paid-only recent features/profiles keep their checks. Paid accounts retain city/state browsing. Maintenance remains active. " + signInRequirement, "Connections", freeCountries, freeServers, countryRow, countryIntent, strictCountry, serverRow, serverIntent, countryServers, recentRow);
         ((Dictionary<string, object>)patches.Last())["version"] = "1.3.0";
         var modes = Op(client, "ProtonVPN.Client.UI.Main.Sidebar.Connections.Countries.CountriesPageViewModel", "get_CountriesComponents", "managedEnumFilter");
         modes["elementGetter"] = "ProtonVPN.Client.Core.Enums.CountriesConnectionType ProtonVPN.Client.UI.Main.Sidebar.Connections.Bases.Contracts.ICountriesComponent::get_ConnectionType()"; modes["value"] = 0;

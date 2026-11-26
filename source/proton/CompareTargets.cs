@@ -23,7 +23,7 @@ class CompareTargets
         {
             object operand = instruction.Operand;
             string value = operand is Instruction ? index((Instruction)operand) : operand is Instruction[] ? String.Join(",", ((Instruction[])operand).Select(index)) : Convert.ToString(operand, CultureInfo.InvariantCulture);
-            if (normalize && operand is string) value = System.Text.RegularExpressions.Regex.Replace(value, @"^C:\\gitlab\\builds\\[^\\]+\\0\\ProtonVPN\\Windows\\win-app\\", "<upstream-build>/");
+            if (normalize && operand is string) value = System.Text.RegularExpressions.Regex.Replace(value, @"^C:\\(?:gitlab\\builds\\[^\\]+\\0|gitlab-runner\\builds)\\ProtonVPN\\Windows\\win-app\\", "<upstream-build>/");
             var called = operand as MethodReference;
             if (normalize && called != null && called.DeclaringType.FullName == "ProtonVPN.Client.Logic.Servers.Cache.ServersCache" && called.Name.StartsWith("<get_Countries>b__", StringComparison.Ordinal))
                 value = "get_Countries lambda body|" + Body(called.Resolve());

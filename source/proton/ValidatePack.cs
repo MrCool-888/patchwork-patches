@@ -94,8 +94,11 @@ public static class ValidatePack
         Assert(!Directory.Exists(scratch) && !File.Exists(scratch), "Scratch path must not already exist.");
         var bundle = PatchBundle.Parse(File.ReadAllText(packPath));
         var ready = bundle.Patches.Where(p => p.Ready).ToArray();
-        Assert(ready.Length == 15, "Expected 15 ready Proton patches; found " + ready.Length + ".");
-        // This small sibling assembly is not patched, but Cecil resolves it while rewriting ProtonVPN.Client.dll.
+        int expectedPatches = 15;
+        Assert(ready.Length == expectedPatches, "Expected " + expectedPatches + " ready Proton patches; found " + ready.Length + ".");
+        var operations = bundle.Patches.SelectMany(p => p.Operations).ToArray();
+        Assert(operations.Length == 62, "Expected 62 operations in the Proton pack.");
+        Assert(bundle.Patches.Any(p => p.Id == "no-sign-in"), "Expected the guest sign-in patch.");
         string[] tracked = Paths(bundle);
         byte[] versionBytes = File.ReadAllBytes(Path.Combine(original, bundle.VersionFile));
         Assert(Hash(versionBytes) == bundle.VersionSha256, "Original root does not match the bundle version fingerprint.");
@@ -111,7 +114,7 @@ public static class ValidatePack
             Same(clean, Snapshot(target, tracked), "Individual preview wrote a target file");
             Assert(individual.PatchIds.SequenceEqual(new[] { patch.Id }), "Individual preview selected an unexpected patch.");
         }
-        Pass("15 ready individual previews are read-only");
+        Pass(ready.Length + " ready individual previews are read-only");
 
         var first = engine.Preview(bundle, target, ids);
         var second = engine.Preview(bundle, target, ids);
